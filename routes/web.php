@@ -1,0 +1,59 @@
+<?php
+
+use App\Http\Controllers\CashflowCategoryController;
+use App\Http\Controllers\CashflowController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\InternetPackageController;
+use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\SettingsController;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
+
+Route::get('/', function () {
+    return Inertia::render('welcome');
+})->name('home');
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    // Dashboard Route
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Settings Route
+    Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
+
+    // Internet Package Routes
+    Route::resource('internet-packages', InternetPackageController::class);
+
+    // Customer Routes
+    Route::resource('customers', CustomerController::class);
+
+    // Cashflow Category Routes
+    Route::resource('cashflow-categories', CashflowCategoryController::class);
+
+    // Cashflow Routes
+    Route::resource('cashflows', CashflowController::class);
+
+    // Invoice Routes
+    Route::resource('invoices', InvoiceController::class);
+    Route::patch('invoices/{invoice}/mark-as-paid', [InvoiceController::class, 'markAsPaid'])->name('invoices.mark-as-paid');
+    Route::patch('invoices/{invoice}/mark-as-unpaid', [InvoiceController::class, 'markAsUnpaid'])->name('invoices.mark-as-unpaid');
+    Route::patch('invoices/{invoice}/mark-as-cancelled', [InvoiceController::class, 'markAsCancelled'])->name('invoices.mark-as-cancelled');
+
+    // Cashflows Route
+    Route::resource('cashflows', CashflowController::class);
+});
+
+Route::middleware('guest')->group(function () {
+    Route::get('login', [AuthController::class, 'showLogin'])->name('login');
+    Route::post('login', [AuthController::class, 'login']);
+    Route::get('register', [AuthController::class, 'showRegister'])->name('register');
+    Route::post('register', [AuthController::class, 'register']);
+});
+
+Route::middleware('auth')->group(function () {
+    Route::post('logout', [AuthController::class, 'logout'])->name('logout');
+});
+
+require __DIR__ . '/settings.php';
+require __DIR__ . '/auth.php';

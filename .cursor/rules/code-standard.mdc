@@ -1,0 +1,16 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+
+
+- Gunakan PascalCase ketika membuat component baru
+- Buat setiap page sesimple mungkin, agar bisa achieved clean code dan mudah dibaca
+- Jika pada page terdapat component yang bisa dibuat component baru dan dapat membuatnya lebih reusable, maka pisahkan menjadi component baru
+- Pastikan menggunakan Typescript dengan benar, setiap variable harus memiliki types, agar menjaga kerapihan code
+- Untuk setiap pembuatan / terdapat form di dalam sebuah component, gunakan useForm dari inertiajs
+
+[code-standard.mdc](mdc:.cursor/rules/code-standard.mdc)
+
+
