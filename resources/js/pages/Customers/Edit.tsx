@@ -4,7 +4,8 @@ import { currencyFormat } from '@/lib/utils';
 import { Coordinate, InternetPackage, type Customer, type PageProps } from '@/types';
 import { useForm, usePage } from '@inertiajs/react';
 
-interface CreateCustomerPageProps extends PageProps {
+interface EditCustomerPageProps extends PageProps {
+    customer: Customer;
     packages: InternetPackage[];
 }
 
@@ -21,28 +22,38 @@ interface CustomerFormData {
     email?: string;
 }
 
-export default function CreateCustomer({ onClose }: { onClose: () => void }) {
-    const { packages } = usePage<CreateCustomerPageProps>().props;
+interface EditCustomerProps {
+    customer: Customer;
+    onClose: () => void;
+}
 
-    const { data, setData, post, processing, errors } = useForm<CustomerFormData>({
-        name: '',
-        status: 'active',
-        address: '',
-        npwp: '',
-        package_id: '',
-        coordinates: {
-            latitude: '',
-            longitude: '',
-        },
-        phone: '',
-        join_date: new Date().toISOString().split('T')[0],
-        email: '',
+export default function EditCustomer({ customer, onClose }: EditCustomerProps) {
+    const { packages } = usePage<EditCustomerPageProps>().props;
+
+    const { data, setData, put, processing, errors } = useForm<CustomerFormData>({
+        name: customer.name,
+        status: customer.status,
+        address: customer.address,
+        npwp: customer.npwp,
+        package_id: customer.package?.id?.toString() || '',
+        coordinates: customer.coordinate
+            ? {
+                  latitude: customer.coordinate.split(',')[0],
+                  longitude: customer.coordinate.split(',')[1],
+              }
+            : {
+                  latitude: '',
+                  longitude: '',
+              },
+        phone: customer.phone,
+        join_date: customer.join_date,
+        email: customer.email || '',
     });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        post(route('customers.store'), {
+        put(route('customers.update', customer.id), {
             onSuccess: () => {
                 onClose();
                 console.log('success');
@@ -55,7 +66,7 @@ export default function CreateCustomer({ onClose }: { onClose: () => void }) {
 
     return (
         <div className="mx-auto mt-5 h-screen w-full max-w-4xl overflow-y-auto rounded-2xl bg-white text-slate-800">
-            <h2 className="px-5 pt-5 text-lg font-medium text-gray-900">Tambah Customer Baru</h2>
+            <h2 className="px-5 pt-5 text-lg font-medium text-gray-900">Edit Customer</h2>
             <form onSubmit={handleSubmit} className="space-y-6 p-5">
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <div>
@@ -104,6 +115,7 @@ export default function CreateCustomer({ onClose }: { onClose: () => void }) {
                         />
                         {errors.address && <p className="mt-1 text-sm text-red-600">{errors.address}</p>}
                     </div>
+
                     <div>
                         <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                             Email
@@ -120,12 +132,12 @@ export default function CreateCustomer({ onClose }: { onClose: () => void }) {
                     </div>
 
                     <div>
-                        <label htmlFor="tax_number" className="block text-sm font-medium text-gray-700">
-                            No. NPWP / NIK
+                        <label htmlFor="npwp" className="block text-sm font-medium text-gray-700">
+                            NPWP
                         </label>
                         <input
-                            type="number"
-                            id="tax_number"
+                            type="text"
+                            id="npwp"
                             value={data.npwp}
                             onChange={(e) => setData('npwp', e.target.value)}
                             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none"
@@ -174,7 +186,6 @@ export default function CreateCustomer({ onClose }: { onClose: () => void }) {
                         <input
                             type="text"
                             id="latitude"
-                            placeholder="opsional"
                             value={data.coordinates?.latitude}
                             onChange={(e) =>
                                 setData('coordinates', {
@@ -194,7 +205,6 @@ export default function CreateCustomer({ onClose }: { onClose: () => void }) {
                         <input
                             type="text"
                             id="longitude"
-                            placeholder="opsional"
                             value={data.coordinates?.longitude}
                             onChange={(e) =>
                                 setData('coordinates', {

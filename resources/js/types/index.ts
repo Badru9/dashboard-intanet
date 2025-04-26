@@ -21,17 +21,21 @@ export interface Cashflow {
 export interface Customer {
     id: number;
     name: string;
+    email?: string;
     status: 'active' | 'inactive' | 'paused';
     address: string;
     phone: string;
     join_date: string;
     package?: InternetPackage;
-    coordinates?: {
-        latitude: number;
-        longitude: number;
-    };
+    coordinate?: string;
     npwp: string;
-    tax_number: string;
+    tax_invoice_number: string;
+}
+
+export interface Coordinate {
+    [key: string]: string;
+    latitude: string;
+    longitude: string;
 }
 
 export interface PageProps {

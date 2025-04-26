@@ -28,6 +28,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Customer Routes
     Route::resource('customers', CustomerController::class);
+    Route::get('customers/{customer}/edit', [CustomerController::class, 'edit'])->name('customers.edit');
+    Route::patch('customers/{customer}', [CustomerController::class, 'update'])->name('customers.update');
+    Route::delete('customers/{customer}', [CustomerController::class, 'destroy'])->name('customers.destroy');
 
     // Cashflow Category Routes
     Route::resource('cashflow-categories', CashflowCategoryController::class);

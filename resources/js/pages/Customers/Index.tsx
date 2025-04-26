@@ -1,13 +1,16 @@
+import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import Table from '@/components/Table/Table';
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
 import { currencyFormat } from '@/lib/utils';
 import { type Customer, type PageProps } from '@/types';
 import { type TableColumn } from '@/types/table';
 import { Button, Modal, ModalBody, ModalContent, useDisclosure } from '@heroui/react';
-import { Head, usePage } from '@inertiajs/react';
-import { MagnifyingGlass, Plus } from '@phosphor-icons/react';
+import { Head, router, usePage } from '@inertiajs/react';
+import { MagnifyingGlass, PencilSimple, Plus, Trash } from '@phosphor-icons/react';
 import moment from 'moment';
+import { useState } from 'react';
 import CreateCustomer from './Create';
+import EditCustomer from './Edit';
 
 const statusColors = {
     active: 'bg-green-100 text-green-700',
@@ -37,7 +40,31 @@ type CustomerPageProps = PageProps &
 
 export default function CustomersIndex() {
     const { customers } = usePage<CustomerPageProps>().props;
-    const { isOpen, onOpen, onOpenChange } = useDisclosure();
+    const { isOpen: isCreateOpen, onOpen: onCreateOpen, onOpenChange: onCreateOpenChange } = useDisclosure();
+    const { isOpen: isEditOpen, onOpen: onEditOpen, onOpenChange: onEditOpenChange } = useDisclosure();
+    const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onOpenChange: onDeleteOpenChange } = useDisclosure();
+    const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+
+    const handleEdit = (customer: Customer) => {
+        setSelectedCustomer(customer);
+        onEditOpen();
+    };
+
+    const handleDelete = (customer: Customer) => {
+        setSelectedCustomer(customer);
+        onDeleteOpen();
+    };
+
+    const confirmDelete = () => {
+        if (selectedCustomer) {
+            router.delete(route('customers.destroy', selectedCustomer.id), {
+                onSuccess: () => {
+                    onDeleteOpenChange();
+                    setSelectedCustomer(null);
+                },
+            });
+        }
+    };
 
     console.log(customers);
 
@@ -60,9 +87,13 @@ export default function CustomersIndex() {
             ),
         },
         {
+            header: 'Email',
+            value: (customer: Customer) => <span className="text-gray-500">{customer.email || '-'}</span>,
+        },
+        {
             header: 'Status',
             value: (customer: Customer) => (
-                <span className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${statusColors[customer.status]}`}>
+                <span className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${statusColors[customer.status]}`}>
                     {customer.status.charAt(0).toUpperCase() + customer.status.slice(1)}
                 </span>
             ),
@@ -76,8 +107,8 @@ export default function CustomersIndex() {
             value: (customer: Customer) => <span className="text-gray-500">{customer.npwp || '-'}</span>,
         },
         {
-            header: 'No. NPWP',
-            value: (customer: Customer) => <span className="text-gray-500">{customer.tax_number || '-'}</span>,
+            header: 'No Faktur Pajak',
+            value: (customer: Customer) => <span className="text-gray-500">{customer.tax_invoice_number || '-'}</span>,
         },
         {
             header: 'Paket',
@@ -92,7 +123,7 @@ export default function CustomersIndex() {
             header: 'Koordinat',
             value: (customer: Customer) => (
                 <span className="text-gray-500">
-                    {customer.coordinates?.latitude || '-'}, {customer.coordinates?.longitude || '-'}
+                    {customer.coordinate?.split(',')[0] || '-'}, {customer.coordinate?.split(',')[1] || '-'}
                 </span>
             ),
         },
@@ -106,13 +137,19 @@ export default function CustomersIndex() {
         },
         {
             header: 'Aksi',
-            value: () => (
+            value: (customer: Customer) => (
                 <div className="flex items-center gap-2">
-                    <button className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600">
-                        <i className="feather-edit-2 h-4 w-4" />
+                    <button
+                        onClick={() => handleEdit(customer)}
+                        className="cursor-pointer rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-yellow-500"
+                    >
+                        <PencilSimple className="h-4 w-4" />
                     </button>
-                    <button className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600">
-                        <i className="feather-trash h-4 w-4" />
+                    <button
+                        onClick={() => handleDelete(customer)}
+                        className="cursor-pointer rounded-lg p-2 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600"
+                    >
+                        <Trash className="h-4 w-4" />
                     </button>
                 </div>
             ),
@@ -140,7 +177,7 @@ export default function CustomersIndex() {
                             />
                         </div>
                         <Button
-                            onPress={onOpen}
+                            onPress={onCreateOpen}
                             className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none"
                         >
                             <Plus className="h-5 w-5" />
@@ -153,7 +190,7 @@ export default function CustomersIndex() {
                 <Table<Customer> data={customers.data} column={columns} pagination={customers} />
 
                 {/* Modal for Create Customer */}
-                <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="lg">
+                <Modal isOpen={isCreateOpen} onOpenChange={onCreateOpenChange} size="lg">
                     <ModalContent className="bg-black/20">
                         {(onClose) => (
                             <ModalBody>
@@ -162,6 +199,22 @@ export default function CustomersIndex() {
                         )}
                     </ModalContent>
                 </Modal>
+
+                {/* Modal for Edit Customer */}
+                <Modal isOpen={isEditOpen} onOpenChange={onEditOpenChange} size="lg">
+                    <ModalContent className="bg-black/20">
+                        {(onClose) => <ModalBody>{selectedCustomer && <EditCustomer customer={selectedCustomer} onClose={onClose} />}</ModalBody>}
+                    </ModalContent>
+                </Modal>
+
+                {/* Modal for Delete Confirmation */}
+                <DeleteConfirmationDialog
+                    isOpen={isDeleteOpen}
+                    onClose={onDeleteOpenChange}
+                    onConfirm={confirmDelete}
+                    title="Hapus Customer"
+                    description={`Apakah Anda yakin ingin menghapus customer ${selectedCustomer?.name}?`}
+                />
             </div>
         </AuthenticatedLayout>
     );

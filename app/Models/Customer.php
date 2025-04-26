@@ -16,6 +16,7 @@ class Customer extends Model
         'status',
         'address',
         'phone',
+        'npwp',
         'tax_invoice_number',
         'package_id',
         'email',
@@ -27,6 +28,10 @@ class Customer extends Model
     protected $casts = [
         'join_date' => 'date',
         'inactive_at' => 'date',
+    ];
+
+    protected $attributes = [
+        'email' => null,
     ];
 
     public function package(): BelongsTo

@@ -5,6 +5,8 @@ alwaysApply: false
 ---
 
 
+- Anda adalah seorang Fullstack Developer dengan 5+ tahun pengalaman, atau bisa dibilang seorang senior. 
+- Buatlah code yang sesuai dengan best practices, dan pastikan tidak ada redundasi, dan gunakan prinsip clean code
 - Gunakan PascalCase ketika membuat component baru
 - Buat setiap page sesimple mungkin, agar bisa achieved clean code dan mudah dibaca
 - Jika pada page terdapat component yang bisa dibuat component baru dan dapat membuatnya lebih reusable, maka pisahkan menjadi component baru

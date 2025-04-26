@@ -14,6 +14,7 @@ class CustomerController extends Controller
     public function index()
     {
         $customers = Customer::with(['package'])
+            ->whereNull('deleted_at')
             ->paginate(10);
 
         $packages = InternetPackage::select('id', 'name', 'price')->get();
@@ -26,39 +27,55 @@ class CustomerController extends Controller
 
     public function store(Request $request)
     {
+        Log::info('Request data:', $request->all());
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'status' => 'required|in:active,inactive,paused',
             'address' => 'required|string',
             'phone' => 'required|string|max:255',
-            'tax_invoice' => 'nullable|string|max:255',
+            'npwp' => 'required|string|max:255',
             'package_id' => 'required|exists:internet_packages,id',
-            'coordinate' => 'required|array',
-            'coordinate.latitude' => 'required|string',
-            'coordinate.longitude' => 'required|string',
+            'coordinates' => 'required|array',
+            'coordinates.latitude' => 'required|string',
+            'coordinates.longitude' => 'required|string',
             'join_date' => 'required|date',
+            'email' => 'nullable|email|unique:customers,email',
         ]);
 
-        $customer = Customer::create([
-            'name' => $validated['name'],
-            'status' => $validated['status'],
-            'address' => $validated['address'],
-            'phone' => $validated['phone'],
-            'tax_number' => $validated['tax_number'],
-            'package_id' => $validated['package_id'],
-            'coordinate' => json_encode($validated['coordinate']),
-            'join_date' => $validated['join_date'],
-        ]);
+        Log::info('Validated data:', $validated);
 
-        return redirect()->route('customers.index')
-            ->with('message', 'Customer created successfully.');
+        try {
+            $customer = Customer::create([
+                'name' => $validated['name'],
+                'status' => $validated['status'],
+                'address' => $validated['address'],
+                'phone' => $validated['phone'],
+                'npwp' => $validated['npwp'],
+                'package_id' => $validated['package_id'],
+                'email' => $validated['email'] ?: null,
+                'coordinate' => $validated['coordinates']['latitude'] . ',' . $validated['coordinates']['longitude'],
+                'join_date' => $validated['join_date'],
+            ]);
+
+            Log::info('Customer created successfully', ['customer' => $customer]);
+
+            return redirect()->route('customers.index')
+                ->with('message', 'Customer berhasil ditambahkan.');
+        } catch (\Exception $e) {
+            Log::error('Failed to create customer', ['error' => $e->getMessage()]);
+
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Gagal menambahkan customer. Silakan coba lagi.');
+        }
     }
 
     public function edit(Customer $customer)
     {
-        return inertia('Customers/Edit', [
+        return Inertia::render('Customers/Edit', [
             'customer' => $customer->load('package'),
-            'packages' => InternetPackage::all()
+            'packages' => InternetPackage::all(),
         ]);
     }
 
@@ -66,21 +83,32 @@ class CustomerController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'status' => 'required|in:active,inactive,paused',
+            'status' => 'required|string|in:active,inactive,paused',
             'address' => 'required|string',
-            'phone' => 'required|string|max:255',
-            'tax_invoice_number' => 'nullable|string|max:255',
+            'email' => 'nullable|email|unique:customers,email,' . $customer->id,
+            'npwp' => 'nullable|string|max:255',
             'package_id' => 'required|exists:internet_packages,id',
-            'email' => 'required|email|unique:customers,email,' . $customer->id,
-            'coordinate' => 'nullable|string|max:255',
+            'phone' => 'required|string|max:255',
+            'coordinates' => 'required|array',
+            'coordinates.latitude' => 'required|string',
+            'coordinates.longitude' => 'required|string',
             'join_date' => 'required|date',
-            'inactive_at' => 'nullable|date',
         ]);
 
-        $customer->update($validated);
+        $customer->update([
+            'name' => $validated['name'],
+            'status' => $validated['status'],
+            'address' => $validated['address'],
+            'email' => $validated['email'] ?: null,
+            'npwp' => $validated['npwp'],
+            'package_id' => $validated['package_id'],
+            'phone' => $validated['phone'],
+            'coordinate' => $validated['coordinates']['latitude'] . ',' . $validated['coordinates']['longitude'],
+            'join_date' => $validated['join_date'],
+        ]);
 
         return redirect()->route('customers.index')
-            ->with('message', 'Customer updated successfully.');
+            ->with('success', 'Customer berhasil diperbarui');
     }
 
     public function destroy(Customer $customer)

@@ -99,7 +99,7 @@ export type Customer = {
     npwp: string;
     coordinate?: string;
     tax_invoice?: string;
-    status: CustomerStatus;
+    status: 'active' | 'inactive' | 'paused';
     package: InternetPackage;
     join_date: string;
     paused_at?: string;
@@ -172,10 +172,4 @@ export enum RoleType {
 export enum CashflowType {
     INCOME = 'income',
     EXPENSE = 'expense',
-}
-
-export enum CustomerStatus {
-    ACTIVE = 'active',
-    INACTIVE = 'inactive',
-    PAUSED = 'paused',
 }
