@@ -1,15 +1,9 @@
+import Table from '@/components/Table/Table';
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
+import { type Invoice } from '@/types';
+import { type TableColumn } from '@/types/table';
 import { Head } from '@inertiajs/react';
-
-type Invoice = {
-    id: number;
-    invoiceNumber: string;
-    customer: string;
-    amount: number;
-    status: 'paid' | 'unpaid' | 'cancelled';
-    dueDate: string;
-    createdAt: string;
-};
+import { Plus } from '@phosphor-icons/react';
 
 const invoices: Invoice[] = [
     {
@@ -18,8 +12,12 @@ const invoices: Invoice[] = [
         customer: 'John Doe',
         amount: 499000,
         status: 'paid',
-        dueDate: '2024-04-15',
-        createdAt: '2024-04-01',
+        due_date: '2024-04-15',
+        customer_id: 0,
+        number: '',
+        date: '',
+        updated_at: '',
+        created_at: '',
     },
     {
         id: 2,
@@ -27,8 +25,12 @@ const invoices: Invoice[] = [
         customer: 'Jane Smith',
         amount: 999000,
         status: 'unpaid',
-        dueDate: '2024-04-20',
-        createdAt: '2024-04-05',
+        due_date: '2024-04-20',
+        customer_id: 0,
+        number: '',
+        date: '',
+        updated_at: '',
+        created_at: '',
     },
     {
         id: 3,
@@ -36,8 +38,12 @@ const invoices: Invoice[] = [
         customer: 'Robert Johnson',
         amount: 299000,
         status: 'cancelled',
-        dueDate: '2024-04-10',
-        createdAt: '2024-03-25',
+        due_date: '2024-04-10',
+        customer_id: 0,
+        number: '',
+        date: '',
+        updated_at: '',
+        created_at: '',
     },
 ];
 
@@ -48,95 +54,91 @@ const statusColors = {
 };
 
 export default function InvoicesIndex() {
+    const columns: TableColumn<Invoice>[] = [
+        {
+            header: 'Invoice',
+            value: (invoice: Invoice) => <p className="font-medium text-gray-900">{invoice.invoiceNumber}</p>,
+        },
+        {
+            header: 'Customer',
+            value: (invoice: Invoice) => (
+                <div className="flex items-center gap-3">
+                    <div className="h-8 w-8 overflow-hidden rounded-full bg-gray-100">
+                        <img
+                            src={`https://ui-avatars.com/api/?name=${invoice.customer}&background=random`}
+                            alt={invoice.customer}
+                            className="h-full w-full object-cover"
+                        />
+                    </div>
+                    <p className="text-gray-600">{invoice.customer}</p>
+                </div>
+            ),
+        },
+        {
+            header: 'Amount',
+            value: (invoice: Invoice) => <p className="font-medium text-gray-900">Rp {invoice.amount.toLocaleString('id-ID')}</p>,
+        },
+        {
+            header: 'Status',
+            value: (invoice: Invoice) => (
+                <span className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${statusColors[invoice.status]}`}>
+                    {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
+                </span>
+            ),
+        },
+        {
+            header: 'Due Date',
+            value: (invoice: Invoice) => <span className="text-gray-600">{invoice.due_date}</span>,
+        },
+        {
+            header: 'Created At',
+            value: (invoice: Invoice) => <span className="text-gray-600">{invoice.created_at}</span>,
+        },
+        {
+            header: 'Actions',
+            value: () => (
+                <div className="flex items-center gap-2">
+                    <button className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600">
+                        <i className="feather-eye h-4 w-4" />
+                    </button>
+                    <button className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600">
+                        <i className="feather-printer h-4 w-4" />
+                    </button>
+                    <button className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600">
+                        <i className="feather-trash h-4 w-4" />
+                    </button>
+                </div>
+            ),
+        },
+    ];
+
     return (
         <AuthenticatedLayout>
             <Head title="Invoices" />
 
-            <div className="space-y-6">
+            <div className="p-8">
                 {/* Header with Filters and Action */}
-                <div className="flex items-center justify-between">
+                <div className="mb-6 flex items-center justify-between">
                     <div>
                         <h2 className="text-2xl font-bold text-gray-900">Invoices</h2>
                         <p className="mt-1 text-sm text-gray-500">Manage customer invoices and payments</p>
                     </div>
                     <div className="flex items-center gap-4">
-                        <select className="rounded-lg border border-gray-300 px-4 py-2 text-sm text-slate-800 focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none">
+                        <select className="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-900 focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none">
                             <option value="">All Status</option>
                             <option value="paid">Paid</option>
                             <option value="unpaid">Unpaid</option>
                             <option value="cancelled">Cancelled</option>
                         </select>
-                        <button className="inline-flex items-center gap-2 rounded-lg bg-green-500 px-4 py-2 text-white hover:bg-green-600">
-                            <i className="feather-plus h-4 w-4" />
+                        <button className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none">
+                            <Plus className="h-5 w-5" />
                             Create Invoice
                         </button>
                     </div>
                 </div>
 
                 {/* Invoices Table */}
-                <div className="rounded-xl bg-white shadow-sm">
-                    <div className="overflow-x-auto">
-                        <table className="w-full">
-                            <thead>
-                                <tr className="border-b border-gray-200">
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Invoice</th>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Customer</th>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Amount</th>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Status</th>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Due Date</th>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Created At</th>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {invoices.map((invoice) => (
-                                    <tr key={invoice.id} className="border-b border-gray-200 last:border-0">
-                                        <td className="px-6 py-4">
-                                            <p className="font-medium text-gray-900">{invoice.invoiceNumber}</p>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="h-8 w-8 rounded-full bg-gray-100">
-                                                    <img
-                                                        src={`https://ui-avatars.com/api/?name=${invoice.customer}&background=random`}
-                                                        alt={invoice.customer}
-                                                        className="h-full w-full rounded-full"
-                                                    />
-                                                </div>
-                                                <p className="text-gray-600">{invoice.customer}</p>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <p className="font-medium text-gray-900">Rp {invoice.amount.toLocaleString('id-ID')}</p>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <span
-                                                className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${statusColors[invoice.status]}`}
-                                            >
-                                                {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4 text-gray-600">{invoice.dueDate}</td>
-                                        <td className="px-6 py-4 text-gray-600">{invoice.createdAt}</td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center gap-2">
-                                                <button className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600">
-                                                    <i className="feather-eye h-4 w-4" />
-                                                </button>
-                                                <button className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600">
-                                                    <i className="feather-printer h-4 w-4" />
-                                                </button>
-                                                <button className="rounded-lg p-2 text-gray-400 hover:bg-red-50 hover:text-red-600">
-                                                    <i className="feather-trash h-4 w-4" />
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                <Table<Invoice> data={invoices} column={columns} />
             </div>
         </AuthenticatedLayout>
     );

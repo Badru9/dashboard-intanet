@@ -1,4 +1,5 @@
 import { Link, useForm, usePage } from '@inertiajs/react';
+import { Bell } from '@phosphor-icons/react';
 import { PropsWithChildren } from 'react';
 
 type SidebarItem = {
@@ -29,9 +30,6 @@ const supportItems: SidebarItem[] = [{ name: 'Settings', icon: 'settings', href:
 
 export default function AuthenticatedLayout({ children }: PropsWithChildren) {
     const { auth } = usePage<PageProps>().props;
-
-    console.log(auth);
-
     const { post } = useForm({});
 
     const handleLogout = () => {
@@ -39,9 +37,9 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
     };
 
     return (
-        <div className="flex min-h-screen bg-gray-50">
+        <div className="flex h-screen bg-gray-50">
             {/* Sidebar */}
-            <aside className="fixed top-0 left-0 z-40 h-screen w-64 border-r border-gray-200 bg-white">
+            <aside className="fixed inset-y-0 left-0 z-40 w-64 border-r border-gray-200 bg-white">
                 {/* Logo */}
                 <div className="flex h-16 items-center border-b border-gray-200 px-6">
                     <img src="/images/logo/intanet-text.png" alt="Logo" className="h-8 object-contain" />
@@ -87,7 +85,10 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
 
                     {/* User Menu */}
                     <div className="border-t border-gray-200 pt-4">
-                        <button onClick={handleLogout} className="flex w-full items-center rounded-lg px-4 py-2 text-gray-600 hover:bg-gray-100">
+                        <button
+                            onClick={handleLogout}
+                            className="flex w-full cursor-pointer items-center rounded-lg px-4 py-2 text-gray-600 hover:bg-gray-100"
+                        >
                             <i className="feather-log-out mr-3 h-5 w-5" />
                             Log Out
                         </button>
@@ -96,10 +97,10 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
             </aside>
 
             {/* Main Content */}
-            <main className="ml-64 flex-1 p-8">
-                <div className="mx-auto max-w-7xl">
-                    {/* Header */}
-                    <div className="mb-8 flex items-center justify-between">
+            <main className="max-w-full flex-1 overflow-y-hidden pl-64">
+                {/* Header */}
+                <div className="sticky top-0 z-30 border-b border-gray-200 bg-white">
+                    <div className="flex h-16 items-center justify-between px-8">
                         <div>
                             <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
                             <p className="text-gray-500">Welcome back, {auth.user.name}</p>
@@ -108,7 +109,7 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
                         {/* User Menu */}
                         <div className="flex items-center gap-4">
                             <button className="rounded-full bg-gray-100 p-2 text-gray-600 hover:bg-gray-200">
-                                <i className="feather-bell h-5 w-5" />
+                                <Bell size={24} className="cursor-pointer" />
                             </button>
                             <div className="flex items-center gap-3">
                                 <img
@@ -120,10 +121,10 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
                             </div>
                         </div>
                     </div>
-
-                    {/* Content */}
-                    {children}
                 </div>
+
+                {/* Page Content */}
+                <div className="h-[calc(100vh-4rem)] overflow-y-auto">{children}</div>
             </main>
         </div>
     );

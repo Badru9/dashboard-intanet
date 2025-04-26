@@ -5,25 +5,22 @@ namespace App\Http\Controllers;
 use App\Models\Customer;
 use App\Models\InternetPackage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Inertia\Inertia;
 
 class CustomerController extends Controller
 {
     public function index()
     {
-        $customers = Customer::with(['package', 'parent'])
-            ->withCount('children')
+        $customers = Customer::with(['package'])
             ->paginate(10);
 
-        return inertia('Customers/Index', [
-            'customers' => $customers
-        ]);
-    }
+        $packages = InternetPackage::select('id', 'name', 'price')->get();
 
-    public function create()
-    {
-        return inertia('Customers/Create', [
-            'packages' => InternetPackage::all(),
-            'customers' => Customer::select('id', 'name')->get()
+        return inertia('Customers/Index', [
+            'customers' => $customers,
+            'packages' => $packages
         ]);
     }
 
@@ -34,16 +31,24 @@ class CustomerController extends Controller
             'status' => 'required|in:active,inactive,paused',
             'address' => 'required|string',
             'phone' => 'required|string|max:255',
-            'tax_invoice_number' => 'nullable|string|max:255',
-            'customer_id' => 'nullable|exists:customers,id',
+            'tax_invoice' => 'nullable|string|max:255',
             'package_id' => 'required|exists:internet_packages,id',
-            'email' => 'required|email|unique:customers,email',
-            'coordinate' => 'nullable|string|max:255',
+            'coordinate' => 'required|array',
+            'coordinate.latitude' => 'required|string',
+            'coordinate.longitude' => 'required|string',
             'join_date' => 'required|date',
-            'inactive_at' => 'nullable|date',
         ]);
 
-        Customer::create($validated);
+        $customer = Customer::create([
+            'name' => $validated['name'],
+            'status' => $validated['status'],
+            'address' => $validated['address'],
+            'phone' => $validated['phone'],
+            'tax_number' => $validated['tax_number'],
+            'package_id' => $validated['package_id'],
+            'coordinate' => json_encode($validated['coordinate']),
+            'join_date' => $validated['join_date'],
+        ]);
 
         return redirect()->route('customers.index')
             ->with('message', 'Customer created successfully.');
@@ -52,11 +57,8 @@ class CustomerController extends Controller
     public function edit(Customer $customer)
     {
         return inertia('Customers/Edit', [
-            'customer' => $customer->load('package', 'parent'),
-            'packages' => InternetPackage::all(),
-            'customers' => Customer::where('id', '!=', $customer->id)
-                ->select('id', 'name')
-                ->get()
+            'customer' => $customer->load('package'),
+            'packages' => InternetPackage::all()
         ]);
     }
 
@@ -68,7 +70,6 @@ class CustomerController extends Controller
             'address' => 'required|string',
             'phone' => 'required|string|max:255',
             'tax_invoice_number' => 'nullable|string|max:255',
-            'customer_id' => 'nullable|exists:customers,id',
             'package_id' => 'required|exists:internet_packages,id',
             'email' => 'required|email|unique:customers,email,' . $customer->id,
             'coordinate' => 'nullable|string|max:255',

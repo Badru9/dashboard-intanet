@@ -10,6 +10,7 @@ alwaysApply: false
 - Jika pada page terdapat component yang bisa dibuat component baru dan dapat membuatnya lebih reusable, maka pisahkan menjadi component baru
 - Pastikan menggunakan Typescript dengan benar, setiap variable harus memiliki types, agar menjaga kerapihan code
 - Untuk setiap pembuatan / terdapat form di dalam sebuah component, gunakan useForm dari inertiajs
+- Ketika membuat seeder, selalu coba untuk gunakan faker agar lebih mudah
 
 [code-standard.mdc](mdc:.cursor/rules/code-standard.mdc)
 

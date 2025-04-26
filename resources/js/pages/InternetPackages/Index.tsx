@@ -1,78 +1,73 @@
+import Table from '@/components/Table/Table';
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
+import { InternetPackage } from '@/types';
+import { TableColumn } from '@/types/table';
 import { Head } from '@inertiajs/react';
+import { PencilSimple, Trash } from '@phosphor-icons/react';
+import { useEffect, useState } from 'react';
 
 export default function InternetPackagesIndex() {
+    const [packages, setPackages] = useState<InternetPackage[]>([]);
+
+    useEffect(() => {
+        // Fetch data from backend
+        fetch('/api/internet-packages')
+            .then((res) => res.json())
+            .then((data) => setPackages(data));
+    }, []);
+
+    const columns: TableColumn<InternetPackage>[] = [
+        {
+            header: 'Name',
+            value: 'name',
+        },
+        {
+            header: 'Speed',
+            value: 'speed',
+        },
+        {
+            header: 'Price',
+            value: (data) => `Rp ${data.price.toLocaleString()}`,
+        },
+        {
+            header: 'Description',
+            value: 'description',
+        },
+        {
+            header: 'Actions',
+            value: (data) => (
+                <div className="flex gap-2">
+                    <button className="rounded-lg p-2 text-blue-600 hover:bg-blue-50" onClick={() => handleEdit(data.id)}>
+                        <PencilSimple size={20} />
+                    </button>
+                    <button className="rounded-lg p-2 text-red-600 hover:bg-red-50" onClick={() => handleDelete(data.id)}>
+                        <Trash size={20} />
+                    </button>
+                </div>
+            ),
+        },
+    ];
+
+    const handleEdit = (id: number) => {
+        // Handle edit action
+        console.log('Edit package:', id);
+    };
+
+    const handleDelete = (id: number) => {
+        // Handle delete action
+        console.log('Delete package:', id);
+    };
+
     return (
         <AuthenticatedLayout>
             <Head title="Internet Packages" />
-
-            <div className="space-y-6">
-                {/* Header with Action */}
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h2 className="text-2xl font-bold text-gray-900">Internet Packages</h2>
-                        <p className="mt-1 text-sm text-gray-500">Manage your internet packages and pricing</p>
-                    </div>
-                    <button className="inline-flex items-center gap-2 rounded-lg bg-green-500 px-4 py-2 text-white hover:bg-green-600">
-                        <i className="feather-plus h-5 w-5" />
-                        Add Package
-                    </button>
+            <div className="p-8">
+                <div className="mb-6 flex items-center justify-between">
+                    <h1 className="text-2xl font-semibold text-gray-900">Internet Packages</h1>
+                    <button className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">Add Package</button>
                 </div>
-
-                {/* Packages Grid */}
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    {[
-                        {
-                            name: 'Basic Plan',
-                            speed: '10 Mbps',
-                            price: 299000,
-                            features: ['Up to 10 Mbps', 'Unlimited Bandwidth', '24/7 Support'],
-                        },
-                        {
-                            name: 'Pro Plan',
-                            speed: '20 Mbps',
-                            price: 499000,
-                            features: ['Up to 20 Mbps', 'Unlimited Bandwidth', '24/7 Support', 'Static IP'],
-                        },
-                        {
-                            name: 'Business Plan',
-                            speed: '50 Mbps',
-                            price: 999000,
-                            features: ['Up to 50 Mbps', 'Unlimited Bandwidth', '24/7 Priority Support', 'Static IP', 'Custom DNS'],
-                        },
-                    ].map((pkg, index) => (
-                        <div key={index} className="rounded-xl bg-white p-6 shadow-sm">
-                            <div className="mb-4">
-                                <h3 className="text-lg font-semibold text-gray-900">{pkg.name}</h3>
-                                <p className="text-sm text-gray-500">{pkg.speed} Download & Upload</p>
-                            </div>
-
-                            <div className="mb-6">
-                                <p className="text-3xl font-bold text-gray-900">
-                                    Rp {pkg.price.toLocaleString('id-ID')}
-                                    <span className="text-base font-normal text-gray-500">/month</span>
-                                </p>
-                            </div>
-
-                            <ul className="mb-6 space-y-3">
-                                {pkg.features.map((feature, idx) => (
-                                    <li key={idx} className="flex items-center gap-2 text-sm text-gray-600">
-                                        <i className="feather-check h-5 w-5 text-green-500" />
-                                        {feature}
-                                    </li>
-                                ))}
-                            </ul>
-
-                            <div className="flex gap-2">
-                                <button className="flex-1 rounded-lg border border-gray-300 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
-                                    Edit
-                                </button>
-                                <button className="flex-1 rounded-lg border border-red-200 py-2 text-sm font-medium text-red-600 hover:bg-red-50">
-                                    Delete
-                                </button>
-                            </div>
-                        </div>
-                    ))}
+                <div className="rounded-lg bg-white shadow">
+                    <Table<InternetPackage> data={packages} column={columns} className="w-full" />
                 </div>
             </div>
         </AuthenticatedLayout>

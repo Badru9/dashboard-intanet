@@ -12,8 +12,9 @@ class InternetPackage extends Model
 
     protected $fillable = [
         'name',
-        'price',
         'speed',
+        'price',
+        'description',
     ];
 
     public function customers(): HasMany

@@ -24,6 +24,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Internet Package Routes
     Route::resource('internet-packages', InternetPackageController::class);
+    Route::get('internet-packages/get-packages', [InternetPackageController::class, 'getPackages'])->name('internet-packages.get-packages');
 
     // Customer Routes
     Route::resource('customers', CustomerController::class);

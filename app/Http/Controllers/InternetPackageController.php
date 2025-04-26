@@ -4,12 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\InternetPackage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class InternetPackageController extends Controller
 {
     public function index()
     {
-        $packages = InternetPackage::withCount('customers')->get();
+        $packages = DB::table('internet_packages')->get();
         return inertia('InternetPackages/Index', [
             'packages' => $packages
         ]);
@@ -61,5 +62,11 @@ class InternetPackageController extends Controller
 
         return redirect()->route('internet-packages.index')
             ->with('message', 'Package deleted successfully.');
+    }
+
+    public function getPackages()
+    {
+        $packages = InternetPackage::select('id', 'name', 'price')->get();
+        return response()->json($packages);
     }
 }

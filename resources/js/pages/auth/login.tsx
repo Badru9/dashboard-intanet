@@ -1,12 +1,7 @@
 import { FormInput } from '@/components/ui/form-input';
+import { type LoginForm } from '@/types/index.d';
 import { useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
-
-type LoginForm = {
-    email: string;
-    password: string;
-    remember: boolean;
-};
 
 export default function Login() {
     const { data, setData, post, processing, errors } = useForm<LoginForm>({
@@ -76,7 +71,7 @@ export default function Login() {
 
                         <button
                             type="submit"
-                            className="bg-primary focus:ring-tertiary hover:bg-primary-dark w-full rounded-xl py-3.5 text-white transition duration-200 focus:ring-2 focus:ring-offset-2"
+                            className="bg-primary hover:bg-primary/70 focus:ring-tertiary hover:bg-primary-dark w-full cursor-pointer rounded-xl py-3.5 text-white transition duration-200 focus:ring-2 focus:ring-offset-2"
                             disabled={processing}
                         >
                             {processing ? 'Signing in...' : 'Sign In'}

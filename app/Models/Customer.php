@@ -17,7 +17,6 @@ class Customer extends Model
         'address',
         'phone',
         'tax_invoice_number',
-        'customer_id',
         'package_id',
         'email',
         'coordinate',
@@ -33,16 +32,6 @@ class Customer extends Model
     public function package(): BelongsTo
     {
         return $this->belongsTo(InternetPackage::class, 'package_id');
-    }
-
-    public function parent(): BelongsTo
-    {
-        return $this->belongsTo(Customer::class, 'customer_id');
-    }
-
-    public function children(): HasMany
-    {
-        return $this->hasMany(Customer::class, 'customer_id');
     }
 
     public function invoices(): HasMany

@@ -1,15 +1,6 @@
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
+import { type Cashflow } from '@/types';
 import { Head } from '@inertiajs/react';
-
-type Cashflow = {
-    id: number;
-    description: string;
-    type: 'income' | 'expense';
-    amount: number;
-    category: string;
-    date: string;
-    notes?: string;
-};
 
 const cashflows: Cashflow[] = [
     {

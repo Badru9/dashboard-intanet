@@ -1,16 +1,7 @@
 import { FormInput } from '@/components/ui/form-input';
+import { type RegisterForm } from '@/types/index.d';
 import { useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
-
-type RegisterForm = {
-    name: string;
-    email: string;
-    username: string;
-    password: string;
-    password_confirmation: string;
-    phone: string;
-    address: string;
-};
 
 export default function Register() {
     const { data, setData, post, processing, errors } = useForm<RegisterForm>({
@@ -21,6 +12,7 @@ export default function Register() {
         password_confirmation: '',
         phone: '',
         address: '',
+        terms: false,
     });
 
     const submit: FormEventHandler = (e) => {
@@ -29,7 +21,7 @@ export default function Register() {
     };
 
     return (
-        <div className="bg-background flex min-h-screen items-center justify-center text-gray-900">
+        <div className="bg-background flex min-h-screen items-center justify-center p-5 text-gray-900">
             <div className="container mx-auto flex max-w-6xl items-center justify-between px-6">
                 {/* Form Section */}
                 <div className="w-full max-w-md space-y-8 rounded-2xl bg-white p-8 shadow-lg">
@@ -112,7 +104,7 @@ export default function Register() {
 
                         <button
                             type="submit"
-                            className="bg-primary focus:ring-tertiary hover:bg-primary-dark w-full rounded-xl py-3.5 text-white transition duration-200 focus:ring-2 focus:ring-offset-2"
+                            className="bg-primary focus:ring-tertiary hover:bg-primary-dark w-full cursor-pointer rounded-xl py-3.5 text-white transition duration-200 focus:ring-2 focus:ring-offset-2"
                             disabled={processing}
                         >
                             {processing ? 'Creating account...' : 'Create account'}
