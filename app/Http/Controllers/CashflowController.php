@@ -11,10 +11,7 @@ class CashflowController extends Controller
 {
     public function index()
     {
-        $cashflows = Cashflow::with(['category', 'creator'])
-            ->latest()
-            ->paginate(15);
-
+        $cashflows = Cashflow::with(['category'])->get();
         return inertia('Cashflows/Index', [
             'cashflows' => $cashflows
         ]);
