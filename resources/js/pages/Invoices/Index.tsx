@@ -118,11 +118,7 @@ export default function InvoicesIndex() {
 
             <div className="p-8">
                 {/* Header with Filters and Action */}
-                <div className="mb-6 flex items-center justify-between">
-                    <div>
-                        <h2 className="text-2xl font-bold text-gray-900">Invoices</h2>
-                        <p className="mt-1 text-sm text-gray-500">Manage customer invoices and payments</p>
-                    </div>
+                <div className="mb-6 flex items-center justify-end">
                     <div className="flex items-center gap-4">
                         <select className="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-900 focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none">
                             <option value="">All Status</option>

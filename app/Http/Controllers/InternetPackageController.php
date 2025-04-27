@@ -10,7 +10,7 @@ class InternetPackageController extends Controller
 {
     public function index()
     {
-        $packages = DB::table('internet_packages')->get();
+        $packages = DB::table('internet_packages')->paginate(10);
         return inertia('InternetPackages/Index', [
             'packages' => $packages
         ]);

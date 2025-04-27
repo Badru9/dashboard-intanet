@@ -8,7 +8,7 @@ interface PaginationProps {
 
 export default function Pagination({ pagination }: PaginationProps) {
     return (
-        <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
+        <div className="flex items-center justify-between rounded-lg border-gray-200 bg-white px-4 py-3 sm:px-6">
             <div className="flex flex-1 justify-between sm:hidden">
                 <Link
                     href={pagination.prev_page_url || '#'}
@@ -17,7 +17,6 @@ export default function Pagination({ pagination }: PaginationProps) {
                     }`}
                 >
                     <CaretLeft className="mr-2 h-4 w-4" />
-                    Previous
                 </Link>
                 <Link
                     href={pagination.next_page_url || '#'}
@@ -25,7 +24,6 @@ export default function Pagination({ pagination }: PaginationProps) {
                         pagination.next_page_url ? 'text-gray-700 hover:bg-gray-50' : 'cursor-not-allowed text-gray-400'
                     }`}
                 >
-                    Next
                     <CaretRight className="ml-2 h-4 w-4" />
                 </Link>
             </div>
@@ -45,7 +43,7 @@ export default function Pagination({ pagination }: PaginationProps) {
                                     <Link
                                         key={index}
                                         href={link.url || '#'}
-                                        className={`relative inline-flex items-center rounded-l-md px-2 py-2 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 ${
+                                        className={`relative inline-flex items-center rounded-l-md px-2 py-2 ring-1 ring-gray-100 ring-inset hover:bg-gray-50 ${
                                             link.url ? 'text-gray-500' : 'cursor-not-allowed text-gray-300'
                                         }`}
                                     >
@@ -60,7 +58,7 @@ export default function Pagination({ pagination }: PaginationProps) {
                                     <Link
                                         key={index}
                                         href={link.url || '#'}
-                                        className={`relative inline-flex items-center rounded-r-md px-2 py-2 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 ${
+                                        className={`relative inline-flex items-center rounded-r-md px-2 py-2 ring-1 ring-gray-100 ring-inset hover:bg-gray-50 ${
                                             link.url ? 'text-gray-500' : 'cursor-not-allowed text-gray-300'
                                         }`}
                                     >
@@ -77,7 +75,7 @@ export default function Pagination({ pagination }: PaginationProps) {
                                     className={`relative inline-flex items-center px-4 py-2 text-sm font-medium ${
                                         link.active
                                             ? 'bg-primary z-10 text-white focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-green-600'
-                                            : 'text-gray-900 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus:outline-offset-0'
+                                            : 'text-gray-900 ring-1 ring-gray-100 ring-inset hover:bg-gray-50 focus:outline-offset-0'
                                     } `}
                                 >
                                     {link.label}

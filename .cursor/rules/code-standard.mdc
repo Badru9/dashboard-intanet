@@ -13,6 +13,9 @@ alwaysApply: false
 - Pastikan menggunakan Typescript dengan benar, setiap variable harus memiliki types, agar menjaga kerapihan code
 - Untuk setiap pembuatan / terdapat form di dalam sebuah component, gunakan useForm dari inertiajs
 - Ketika membuat seeder, selalu coba untuk gunakan faker agar lebih mudah
+- Design yang akan dibuat harus modern dan sleek, juga clean
+- Ketika membuat component, pastikan bisa dibuka di berbagai platform ( responsive )
+- Ketika membuat component, gunakan library component @heroui/react, dan pastikan component tersedia di heroui
 
 [code-standard.mdc](mdc:.cursor/rules/code-standard.mdc)
 

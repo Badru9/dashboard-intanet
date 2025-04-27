@@ -41,7 +41,7 @@ export default function CashflowsCategoriesIndex() {
     const columns: TableColumn<CashflowCategory>[] = [
         {
             header: 'Nama',
-            value: 'name',
+            value: (value: CashflowCategory) => value.name,
         },
         {
             header: 'Tipe',
@@ -100,31 +100,35 @@ export default function CashflowsCategoriesIndex() {
 
     return (
         <AuthenticatedLayout>
-            <div className="p-8">
-                <Head title="Cashflows Categories" />
-                <div className="mb-6 flex items-center justify-end">
-                    <Button
-                        onClick={() => setIsCreateModalOpen(true)}
-                        className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none"
-                    >
-                        <Plus className="h-5 w-5" />
-                        Tambah Kategori
-                    </Button>
+            <Head title="Cashflows Categories" />
+            <div className="p-4 lg:p-8">
+                <div className="mb-6 flex flex-col items-center gap-4 lg:flex-row lg:items-center lg:justify-between">
+                    <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-center lg:justify-end">
+                        <Button
+                            onClick={() => setIsCreateModalOpen(true)}
+                            className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none lg:w-auto"
+                        >
+                            <Plus className="h-5 w-5" />
+                            Tambah Kategori
+                        </Button>
+                    </div>
                 </div>
 
-                <Table<CashflowCategory> data={categories.data} column={columns} pagination={categories} />
+                <div className="-mx-4 lg:mx-0">
+                    <Table column={columns} data={categories.data} pagination={categories} />
+                </div>
 
-                <Modal isOpen={isCreateModalOpen} onOpenChange={setIsCreateModalOpen} size="lg">
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-                        <ModalContent className="relative w-full max-w-4xl rounded-2xl bg-white p-0">
+                <Modal isOpen={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
+                    <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30">
+                        <ModalContent className="relative w-full max-w-sm rounded-2xl bg-white p-0 lg:max-w-4xl">
                             <CreateCashflowCategory onClose={() => setIsCreateModalOpen(false)} />
                         </ModalContent>
                     </div>
                 </Modal>
 
-                <Modal isOpen={isEditModalOpen} onOpenChange={setIsEditModalOpen} size="lg">
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-                        <ModalContent className="relative w-full max-w-4xl rounded-2xl bg-white p-0">
+                <Modal isOpen={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+                    <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30">
+                        <ModalContent className="relative w-full max-w-sm rounded-2xl bg-white p-0 lg:max-w-4xl">
                             {selectedCategory && <EditCashflowCategory category={selectedCategory} onClose={() => setIsEditModalOpen(false)} />}
                         </ModalContent>
                     </div>

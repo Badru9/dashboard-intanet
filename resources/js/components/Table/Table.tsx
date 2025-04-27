@@ -29,15 +29,15 @@ export default function Table<T = Record<string, unknown>>({
 }: TableProps<T>) {
     return (
         <div className="flex flex-col gap-4">
-            <div className="w-full rounded-lg border border-gray-200 bg-white shadow-sm">
-                <div className="scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 overflow-x-auto">
+            <div className="w-full rounded-lg border border-gray-200 bg-white">
+                <div className="scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 overflow-x-auto rounded-lg bg-white py-1">
                     <table className={clsx('w-full whitespace-nowrap', className)}>
                         <thead>
                             {header != undefined && (
                                 <tr className="border-b border-gray-200 bg-gray-50">
                                     {numbering ? (
                                         <th
-                                            className="sticky left-0 bg-gray-50 px-6 py-3 text-center text-xs font-medium tracking-wider text-gray-500 uppercase"
+                                            className="bg-gray-50 px-6 py-3 text-center text-xs font-medium tracking-wider text-gray-500 uppercase"
                                             rowSpan={2}
                                         >
                                             No.
@@ -55,11 +55,9 @@ export default function Table<T = Record<string, unknown>>({
                                     ))}
                                 </tr>
                             )}
-                            <tr className="border-b border-gray-200 bg-gray-50">
+                            <tr className="border-b border-gray-200">
                                 {numbering && header == undefined ? (
-                                    <th className="sticky left-0 bg-gray-50 px-6 py-3 text-center text-xs font-medium tracking-wider text-gray-500 uppercase">
-                                        No.
-                                    </th>
+                                    <th className="px-6 py-3 text-center text-xs font-medium tracking-wider text-gray-500 uppercase">No.</th>
                                 ) : null}
                                 {column
                                     .filter((col) => col.header)
@@ -88,7 +86,7 @@ export default function Table<T = Record<string, unknown>>({
                                     onClick={() => (onClickRow ? onClickRow(dt) : null)}
                                 >
                                     {numbering ? (
-                                        <td className="sticky left-0 bg-white px-6 py-4 text-center text-sm whitespace-nowrap text-gray-500">
+                                        <td className="bg-white px-6 py-4 text-center text-sm whitespace-nowrap text-gray-500">
                                             {pagination ? pagination.from + index : index + 1}
                                         </td>
                                     ) : null}
@@ -120,7 +118,7 @@ export default function Table<T = Record<string, unknown>>({
                         {footer != undefined && (
                             <tfoot className="bg-gray-50">
                                 <tr className="border-t border-gray-200">
-                                    {numbering ? <th className="sticky left-0 bg-gray-50 px-6 py-3"></th> : null}
+                                    {numbering ? <th className="bg-gray-50 px-6 py-3"></th> : null}
                                     {footer.map((f, idx) => (
                                         <th
                                             colSpan={f.colSpan ?? 1}

@@ -11,17 +11,26 @@ use Inertia\Inertia;
 
 class CustomerController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $customers = Customer::with(['package'])
-            ->whereNull('deleted_at')
-            ->paginate(10);
+        $query = Customer::query();
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        $customers = $query->with('package')->paginate(10)->withQueryString();
 
         $packages = InternetPackage::select('id', 'name', 'price')->get();
 
         return inertia('Customers/Index', [
             'customers' => $customers,
-            'packages' => $packages
+            'packages' => $packages,
+            'filters' => $request->only('search'),
         ]);
     }
 

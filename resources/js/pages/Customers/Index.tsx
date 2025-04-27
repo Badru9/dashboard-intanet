@@ -8,7 +8,7 @@ import { Button, Modal, ModalBody, ModalContent, useDisclosure } from '@heroui/r
 import { Head, router, usePage } from '@inertiajs/react';
 import { MagnifyingGlass, PencilSimple, Plus, Trash } from '@phosphor-icons/react';
 import moment from 'moment';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import CreateCustomer from './Create';
 import EditCustomer from './Edit';
 
@@ -36,14 +36,24 @@ type CustomerPageProps = PageProps &
                 active: boolean;
             }>;
         };
+        filters: Record<string, string>;
     };
 
 export default function CustomersIndex() {
-    const { customers } = usePage<CustomerPageProps>().props;
+    const { customers, filters } = usePage<CustomerPageProps>().props;
     const { isOpen: isCreateOpen, onOpen: onCreateOpen, onOpenChange: onCreateOpenChange } = useDisclosure();
     const { isOpen: isEditOpen, onOpen: onEditOpen, onOpenChange: onEditOpenChange } = useDisclosure();
     const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onOpenChange: onDeleteOpenChange } = useDisclosure();
     const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+    const [search, setSearch] = useState(filters?.search || '');
+
+    const filteredCustomers = useMemo(() => {
+        if (!search) return customers.data;
+        return customers.data.filter(
+            (customer) =>
+                customer.name.toLowerCase().includes(search.toLowerCase()) || (customer.email || '').toLowerCase().includes(search.toLowerCase()),
+        );
+    }, [customers.data, search]);
 
     const handleEdit = (customer: Customer) => {
         setSelectedCustomer(customer);
@@ -156,29 +166,32 @@ export default function CustomersIndex() {
         },
     ];
 
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearch(e.target.value);
+        router.get(route('customers.index'), { search: e.target.value }, { preserveState: true, replace: true });
+    };
+
     return (
         <AuthenticatedLayout>
             <Head title="Customers" />
 
-            <div className="p-8">
+            <div className="p-4 lg:p-8">
                 {/* Header with Search and Action */}
-                <div className="mb-6 flex items-center justify-between">
-                    <div>
-                        <h2 className="text-2xl font-bold text-gray-900">Customers</h2>
-                        <p className="mt-1 text-sm text-gray-500">Manage your customer accounts</p>
-                    </div>
-                    <div className="flex items-center gap-4">
-                        <div className="relative">
+                <div className="mb-6 flex flex-col items-center gap-4 lg:flex-row lg:items-center lg:justify-between">
+                    <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-center lg:justify-end">
+                        <div className="relative w-full rounded-lg bg-white lg:w-auto">
                             <MagnifyingGlass className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
                             <input
                                 type="text"
                                 placeholder="Search customers..."
-                                className="rounded-lg border border-gray-300 py-2 pr-4 pl-10 text-sm text-gray-900 placeholder-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none"
+                                value={search}
+                                onChange={handleSearch}
+                                className="w-full rounded-lg border border-gray-100 py-2 pr-4 pl-10 text-sm text-gray-900 placeholder-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none lg:w-auto"
                             />
                         </div>
                         <Button
                             onPress={onCreateOpen}
-                            className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none"
+                            className="flex w-full items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none lg:w-auto"
                         >
                             <Plus className="h-5 w-5" />
                             Tambah Customer
@@ -187,7 +200,9 @@ export default function CustomersIndex() {
                 </div>
 
                 {/* Customers Table */}
-                <Table<Customer> data={customers.data} column={columns} pagination={customers} />
+                <div className="-mx-4 lg:mx-0">
+                    <Table<Customer> data={filteredCustomers} column={columns} pagination={customers} />
+                </div>
 
                 {/* Modal for Create Customer */}
                 <Modal isOpen={isCreateOpen} onOpenChange={onCreateOpenChange} size="lg">
