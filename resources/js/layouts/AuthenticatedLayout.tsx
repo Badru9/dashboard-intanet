@@ -71,7 +71,7 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
     };
 
     return (
-        <div className="flex h-screen bg-sky-50">
+        <div className="flex h-screen bg-white">
             {/* Sidebar */}
             <aside
                 className={clsx(
@@ -145,7 +145,7 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
             {/* Main Content */}
             <main className={clsx('flex-1 overflow-y-hidden transition-all duration-300', isSidebarOpen ? 'pl-64' : 'pl-20')}>
                 {/* Header */}
-                <div className="sticky top-0 z-30 flex items-center justify-end bg-white px-10 py-6 shadow-sm">
+                <div className="sticky top-0 z-30 flex items-center justify-end bg-white px-10 py-6">
                     <div className="flex items-center gap-4">
                         <Dropdown>
                             <DropdownTrigger>
@@ -181,7 +181,9 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
                 </div>
 
                 {/* Page Content */}
-                <div className="h-[calc(100vh-7rem)] max-w-md overflow-y-auto lg:max-w-7xl xl:max-w-full">{children}</div>
+                <div className="h-[calc(100vh-7rem)] max-w-md overflow-y-auto lg:max-w-7xl xl:max-w-full">
+                    <div className="bg-primary/10 min-h-screen w-full rounded-tl-3xl">{children}</div>
+                </div>
             </main>
         </div>
     );
