@@ -24,6 +24,7 @@ const sidebarItems: SidebarItem[] = [
     { name: 'Customers', icon: 'users', href: route('customers.index') },
     { name: 'Invoices', icon: 'file-text', href: route('invoices.index') },
     { name: 'Cashflows', icon: 'dollar-sign', href: route('cashflows.index') },
+    { name: 'Cashflows Categories', icon: 'dollar-sign', href: route('cashflow-categories.index') },
 ];
 
 const supportItems: SidebarItem[] = [{ name: 'Settings', icon: 'settings', href: route('settings.index') }];

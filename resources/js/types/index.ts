@@ -18,6 +18,15 @@ export interface Cashflow {
     notes?: string;
 }
 
+export interface CashflowCategory {
+    id: number;
+    name: string;
+    is_out: 0 | 1;
+    note?: string;
+    created_at: string;
+    updated_at: string;
+}
+
 export interface Customer {
     id: number;
     name: string;
