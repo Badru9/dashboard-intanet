@@ -1,6 +1,6 @@
 import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from '@heroui/react';
 import { Link, useForm, usePage } from '@inertiajs/react';
-import { CurrencyDollar, FileText, Gear, House, List, SignOut, Users, WifiHigh, X } from '@phosphor-icons/react';
+import { CurrencyDollar, FileText, Gear, House, List, SignOut, User, Users, WifiHigh } from '@phosphor-icons/react';
 import clsx from 'clsx';
 import { PropsWithChildren, useState } from 'react';
 
@@ -27,7 +27,7 @@ const MenuItem = ({ item, isOpen }: { item: SidebarItem; isOpen: boolean }) => {
         <Link
             href={item.href}
             className={clsx(
-                'hover:bg-primary flex items-center rounded-full px-4 py-2 text-gray-600 transition-all duration-300 hover:text-white',
+                'to-primary flex items-center rounded-full from-purple-700 px-4 py-2 text-slate-500 transition-all duration-300 hover:bg-gradient-to-r hover:text-white',
                 isOpen ? 'w-full' : 'w-12 justify-center',
             )}
             title={!isOpen ? item.name : undefined}
@@ -35,7 +35,7 @@ const MenuItem = ({ item, isOpen }: { item: SidebarItem; isOpen: boolean }) => {
             <item.Icon size={isOpen ? 20 : 24} />
             <span
                 className={clsx(
-                    'ml-3 whitespace-nowrap transition-all duration-300',
+                    'ml-5 text-sm whitespace-nowrap transition-all duration-300',
                     isOpen ? 'relative w-auto max-w-xs opacity-100 delay-300' : 'absolute w-0 max-w-0 overflow-hidden opacity-0 delay-0',
                 )}
                 style={{ transitionProperty: 'opacity, width, max-width' }}
@@ -46,12 +46,15 @@ const MenuItem = ({ item, isOpen }: { item: SidebarItem; isOpen: boolean }) => {
     );
 };
 
-const sidebarItems: SidebarItem[] = [
+const mainMenuItems: SidebarItem[] = [
     { name: 'Dashboard', Icon: House, href: route('dashboard') },
-    { name: 'Internet Packages', Icon: WifiHigh, href: route('internet-packages.index') },
     { name: 'Customers', Icon: Users, href: route('customers.index') },
     { name: 'Invoices', Icon: FileText, href: route('invoices.index') },
     { name: 'Cashflows', Icon: CurrencyDollar, href: route('cashflows.index') },
+];
+
+const settingMenu: SidebarItem[] = [
+    { name: 'Internet Packages', Icon: WifiHigh, href: route('internet-packages.index') },
     { name: 'Cashflows Categories', Icon: CurrencyDollar, href: route('cashflow-categories.index') },
 ];
 
@@ -81,14 +84,14 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
             >
                 {/* Logo */}
                 <div className="flex h-16 items-center justify-between gap-3 px-6">
-                    <img
-                        src="/images/logo/intanet-text.png"
-                        alt="Logo"
-                        className={clsx('h-6 object-contain transition-all duration-300', !isSidebarOpen && 'hidden')}
-                    />
-                    <button onClick={toggleSidebar} className="cursor-pointer rounded-lg p-2 text-slate-900 hover:bg-gray-100">
-                        {isSidebarOpen ? <X size={20} /> : <List size={20} />}
+                    <button onClick={toggleSidebar} className="cursor-pointer rounded-lg bg-gray-100 p-2 text-slate-900 hover:bg-gray-200">
+                        <List size={20} />
                     </button>
+                    <img
+                        src={isSidebarOpen ? '/images/logo/intanet-text.png' : '/images/logo/intanet.png'}
+                        alt="Logo"
+                        className={clsx('h-6 object-contain transition-all duration-300')}
+                    />
                 </div>
 
                 {/* Navigation */}
@@ -97,8 +100,14 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
                         {/* Main Menu */}
                         <div>
                             <h2 className={clsx('px-4 text-xs font-semibold text-gray-400 uppercase', !isSidebarOpen && 'hidden')}>General Menu</h2>
-                            <nav className="mt-4 space-y-1">
-                                {sidebarItems.map((item) => (
+                            <nav className="mt-2 space-y-1">
+                                {mainMenuItems.map((item) => (
+                                    <MenuItem key={item.name} item={item} isOpen={isSidebarOpen} />
+                                ))}
+                            </nav>
+                            <h2 className={clsx('mt-5 px-4 text-xs font-semibold text-gray-400 uppercase', !isSidebarOpen && 'hidden')}>Settings</h2>
+                            <nav className="mt-2 space-y-1">
+                                {settingMenu.map((item) => (
                                     <MenuItem key={item.name} item={item} isOpen={isSidebarOpen} />
                                 ))}
                             </nav>
@@ -145,13 +154,17 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
             {/* Main Content */}
             <main className={clsx('flex-1 overflow-y-hidden transition-all duration-300', isSidebarOpen ? 'pl-64' : 'pl-20')}>
                 {/* Header */}
-                <div className="sticky top-0 z-30 flex items-center justify-end bg-white px-10 py-6">
+                <div className="sticky top-0 z-30 flex items-center justify-end bg-white px-10 py-3">
                     <div className="flex items-center gap-4">
                         <Dropdown>
                             <DropdownTrigger>
-                                <span className="bg-primary/10 hover:bg-primary/20 cursor-pointer rounded-full p-2 transition-colors">
-                                    <Gear size={24} className="text-primary" />
-                                </span>
+                                <button
+                                    className="hover:text-primary hover:bg-primary/10 flex cursor-pointer items-center gap-3 rounded-full bg-slate-50 px-3 py-2 text-slate-500 transition-colors"
+                                    onClick={() => {}}
+                                >
+                                    <User size={20} />
+                                    <h3 className="text-sm font-medium">{auth.user.name}</h3>
+                                </button>
                             </DropdownTrigger>
                             <DropdownMenu className="rounded-lg bg-white shadow-md">
                                 <DropdownItem key="settings">
@@ -181,8 +194,8 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
                 </div>
 
                 {/* Page Content */}
-                <div className="h-[calc(100vh-7rem)] max-w-md overflow-y-auto lg:max-w-7xl xl:max-w-full">
-                    <div className="bg-primary/10 min-h-screen w-full rounded-tl-3xl">{children}</div>
+                <div className="h-[calc(100vh-3rem)] max-w-md overflow-y-auto lg:max-w-7xl xl:max-w-full">
+                    <div className="bg-slate-100 min-h-screen w-full rounded-tl-3xl">{children}</div>
                 </div>
             </main>
         </div>
