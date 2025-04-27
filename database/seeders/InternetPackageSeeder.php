@@ -12,27 +12,27 @@ class InternetPackageSeeder extends Seeder
         $packages = [
             [
                 'name' => 'Basic Plan',
-                'speed' => '10 Mbps',
+                'speed' => 10,
                 'price' => 299000,
             ],
             [
                 'name' => 'Standard Plan',
-                'speed' => '20 Mbps',
+                'speed' => 20,
                 'price' => 499000,
             ],
             [
                 'name' => 'Premium Plan',
-                'speed' => '50 Mbps',
+                'speed' => 50,
                 'price' => 999000,
             ],
             [
                 'name' => 'Business Plan',
-                'speed' => '100 Mbps',
+                'speed' => 100,
                 'price' => 1999000,
             ],
             [
                 'name' => 'Enterprise Plan',
-                'speed' => '200 Mbps',
+                'speed' => 200,
                 'price' => 3999000,
             ],
         ];

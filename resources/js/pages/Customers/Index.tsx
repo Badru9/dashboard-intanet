@@ -4,7 +4,7 @@ import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
 import { currencyFormat } from '@/lib/utils';
 import { type Customer, type PageProps } from '@/types';
 import { type TableColumn } from '@/types/table';
-import { Button, Modal, ModalBody, ModalContent, useDisclosure } from '@heroui/react';
+import { Button, Modal, ModalContent, useDisclosure } from '@heroui/react';
 import { Head, router, usePage } from '@inertiajs/react';
 import { MagnifyingGlass, PencilSimple, Plus, Trash } from '@phosphor-icons/react';
 import moment from 'moment';
@@ -204,22 +204,20 @@ export default function CustomersIndex() {
                     <Table<Customer> data={filteredCustomers} column={columns} pagination={customers} />
                 </div>
 
-                {/* Modal for Create Customer */}
-                <Modal isOpen={isCreateOpen} onOpenChange={onCreateOpenChange} size="lg">
-                    <ModalContent className="bg-black/20">
-                        {(onClose) => (
-                            <ModalBody>
-                                <CreateCustomer onClose={onClose} />
-                            </ModalBody>
-                        )}
-                    </ModalContent>
+                <Modal isOpen={isCreateOpen} onOpenChange={onCreateOpenChange} scrollBehavior="outside" placement="center">
+                    <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30">
+                        <ModalContent className="relative mt-5 w-full max-w-sm rounded-2xl bg-white p-0 lg:max-w-4xl">
+                            <CreateCustomer onClose={() => onCreateOpenChange()} />
+                        </ModalContent>
+                    </div>
                 </Modal>
 
-                {/* Modal for Edit Customer */}
-                <Modal isOpen={isEditOpen} onOpenChange={onEditOpenChange} size="lg">
-                    <ModalContent className="bg-black/20">
-                        {(onClose) => <ModalBody>{selectedCustomer && <EditCustomer customer={selectedCustomer} onClose={onClose} />}</ModalBody>}
-                    </ModalContent>
+                <Modal isOpen={isEditOpen} onOpenChange={onEditOpenChange}>
+                    <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30">
+                        <ModalContent className="relative w-full max-w-sm rounded-2xl bg-white p-0 lg:max-w-4xl">
+                            {selectedCustomer && <EditCustomer customer={selectedCustomer} onClose={() => onEditOpenChange()} />}
+                        </ModalContent>
+                    </div>
                 </Modal>
 
                 {/* Modal for Delete Confirmation */}

@@ -4,7 +4,7 @@ import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
 import { currencyFormat } from '@/lib/utils';
 import { type InternetPackage, type PageProps } from '@/types';
 import { type TableColumn } from '@/types/table';
-import { Button, Modal, ModalBody, ModalContent, useDisclosure } from '@heroui/react';
+import { Button, Modal, ModalContent, useDisclosure } from '@heroui/react';
 import { Head, router, usePage } from '@inertiajs/react';
 import { MagnifyingGlass, PencilSimple, Plus, Trash } from '@phosphor-icons/react';
 import { useMemo, useState } from 'react';
@@ -73,15 +73,11 @@ export default function InternetPackagesIndex() {
         },
         {
             header: 'Kecepatan',
-            value: (pkg: InternetPackage) => <span className="text-gray-500">{pkg.speed}</span>,
+            value: (pkg: InternetPackage) => <span className="text-gray-500">{pkg.speed} Mbps</span>,
         },
         {
             header: 'Harga',
             value: (pkg: InternetPackage) => <span className="font-medium text-gray-900">{currencyFormat(pkg.price)}</span>,
-        },
-        {
-            header: 'Deskripsi',
-            value: (pkg: InternetPackage) => <span className="text-gray-500">{pkg.description}</span>,
         },
         {
             header: 'Aksi',
@@ -142,22 +138,20 @@ export default function InternetPackagesIndex() {
                     <Table<InternetPackage> data={filteredPackages} column={columns} pagination={packages} />
                 </div>
 
-                {/* Modal for Create Package */}
-                <Modal isOpen={isCreateOpen} onOpenChange={onCreateOpenChange} size="lg">
-                    <ModalContent className="bg-black/20">
-                        {(onClose) => (
-                            <ModalBody>
-                                <CreatePackage onClose={onClose} />
-                            </ModalBody>
-                        )}
-                    </ModalContent>
+                <Modal isOpen={isCreateOpen} onOpenChange={onCreateOpenChange}>
+                    <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30">
+                        <ModalContent className="relative w-full max-w-sm self-center rounded-2xl p-0 lg:max-w-4xl">
+                            <CreatePackage onClose={() => onCreateOpenChange()} />
+                        </ModalContent>
+                    </div>
                 </Modal>
 
-                {/* Modal for Edit Package */}
-                <Modal isOpen={isEditOpen} onOpenChange={onEditOpenChange} size="lg">
-                    <ModalContent className="bg-black/20">
-                        {(onClose) => <ModalBody>{selectedPackage && <EditPackage package={selectedPackage} onClose={onClose} />}</ModalBody>}
-                    </ModalContent>
+                <Modal isOpen={isEditOpen} onOpenChange={onEditOpen}>
+                    <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30">
+                        <ModalContent className="relative w-full max-w-sm self-center rounded-2xl p-0 lg:max-w-4xl">
+                            {selectedPackage && <EditPackage package={selectedPackage} onClose={() => onEditOpenChange()} />}
+                        </ModalContent>
+                    </div>
                 </Modal>
 
                 {/* Modal for Delete Confirmation */}

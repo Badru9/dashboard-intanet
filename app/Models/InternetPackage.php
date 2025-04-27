@@ -17,6 +17,11 @@ class InternetPackage extends Model
         'description',
     ];
 
+    protected $casts = [
+        'speed' => 'integer',
+        'price' => 'integer',
+    ];
+
     public function customers(): HasMany
     {
         return $this->hasMany(Customer::class, 'package_id');

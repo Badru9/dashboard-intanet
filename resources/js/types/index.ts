@@ -2,7 +2,7 @@ export interface InternetPackage {
     id: number;
     name: string;
     price: number;
-    speed: string;
+    speed: number;
     description: string;
     created_at: string;
     updated_at: string;

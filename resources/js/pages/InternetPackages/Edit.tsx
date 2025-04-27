@@ -5,9 +5,8 @@ import { useForm } from '@inertiajs/react';
 interface PackageFormData {
     [key: string]: string | number;
     name: string;
-    speed: string;
+    speed: number;
     price: number;
-    description: string;
 }
 
 interface EditPackageProps {
@@ -20,7 +19,6 @@ export default function EditPackage({ package: pkg, onClose }: EditPackageProps)
         name: pkg.name,
         speed: pkg.speed,
         price: pkg.price,
-        description: pkg.description,
     });
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -34,7 +32,7 @@ export default function EditPackage({ package: pkg, onClose }: EditPackageProps)
     };
 
     return (
-        <div className="mx-auto mt-5 h-screen w-full max-w-4xl overflow-y-auto rounded-2xl bg-white text-slate-800">
+        <div className="mx-auto mt-5 h-fit w-[calc(100%-4rem)] max-w-4xl overflow-y-auto rounded-2xl bg-white text-slate-800">
             <h2 className="px-5 pt-5 text-lg font-medium text-gray-900">Edit Paket Internet</h2>
             <form onSubmit={handleSubmit} className="space-y-6 p-5">
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -54,13 +52,13 @@ export default function EditPackage({ package: pkg, onClose }: EditPackageProps)
 
                     <div>
                         <label htmlFor="speed" className="block text-sm font-medium text-gray-700">
-                            Kecepatan
+                            Kecepatan (Mbps)
                         </label>
                         <input
-                            type="text"
+                            type="number"
                             id="speed"
                             value={data.speed}
-                            onChange={(e) => setData('speed', e.target.value)}
+                            onChange={(e) => setData('speed', Number(e.target.value))}
                             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none"
                             placeholder="Contoh: 10 Mbps"
                         />
@@ -79,20 +77,6 @@ export default function EditPackage({ package: pkg, onClose }: EditPackageProps)
                             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none"
                         />
                         {errors.price && <p className="mt-1 text-sm text-red-600">{errors.price}</p>}
-                    </div>
-
-                    <div className="sm:col-span-2">
-                        <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-                            Deskripsi
-                        </label>
-                        <textarea
-                            id="description"
-                            value={data.description}
-                            onChange={(e) => setData('description', e.target.value)}
-                            rows={3}
-                            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none"
-                        />
-                        {errors.description && <p className="mt-1 text-sm text-red-600">{errors.description}</p>}
                     </div>
                 </div>
 
