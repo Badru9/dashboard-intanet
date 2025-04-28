@@ -1,5 +1,5 @@
-import { FormInput } from '@/components/ui/form-input';
 import { type LoginForm } from '@/types/index.d';
+import { Checkbox, Input } from '@heroui/react';
 import { useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
 
@@ -16,7 +16,7 @@ export default function Login() {
     };
 
     return (
-        <div className="bg-background flex min-h-screen items-center justify-center text-gray-900">
+        <div className="flex min-h-screen items-center justify-center bg-background text-gray-900">
             <div className="container mx-auto flex max-w-6xl items-center justify-between px-6">
                 {/* Form Section */}
                 <div className="w-full max-w-md space-y-8 rounded-2xl bg-white p-8 shadow-lg">
@@ -32,46 +32,48 @@ export default function Login() {
                     </div>
 
                     <form onSubmit={submit} className="space-y-6">
-                        <div className="space-y-5">
-                            <FormInput
+                        <div className="space-y-5 text-slate-900">
+                            <Input
                                 type="email"
                                 label="Email"
+                                variant="bordered"
                                 value={data.email}
                                 onChange={(e) => setData('email', e.target.value)}
-                                placeholder="stanley@gmail.com"
-                                error={errors.email}
+                                errorMessage={errors.email}
                                 disabled={processing}
+                                radius="md"
+                                isRequired
                             />
-                            <FormInput
+                            <Input
                                 type="password"
                                 label="Password"
+                                variant="bordered"
                                 value={data.password}
                                 onChange={(e) => setData('password', e.target.value)}
-                                placeholder="••••••••••••"
-                                error={errors.password}
+                                errorMessage={errors.password}
                                 disabled={processing}
+                                radius="md"
+                                isRequired
                             />
                         </div>
 
-                        <div className="flex items-center justify-between">
-                            <label className="flex items-center">
-                                <input
-                                    type="checkbox"
-                                    checked={data.remember}
-                                    onChange={(e) => setData('remember', e.target.checked)}
-                                    className="text-primary focus:ring-primary h-4 w-4 rounded border-gray-300"
-                                    disabled={processing}
-                                />
-                                <span className="ml-2 text-sm text-gray-600">Remember me</span>
-                            </label>
-                            <a href={route('password.request')} className="text-primary hover:text-primary-dark text-sm">
+                        <div className="flex items-center justify-between text-slate-900">
+                            <Checkbox
+                                checked={data.remember}
+                                color="primary"
+                                onChange={(e) => setData('remember', e.target.checked)}
+                                disabled={processing}
+                            >
+                                <span className="text-slate-900">Remember Me</span>
+                            </Checkbox>
+                            <a href={route('password.request')} className="hover:text-primary-dark text-sm text-primary">
                                 Forgot Password?
                             </a>
                         </div>
 
                         <button
                             type="submit"
-                            className="bg-primary hover:bg-primary/70 focus:ring-tertiary hover:bg-primary-dark w-full cursor-pointer rounded-xl py-3.5 text-white transition duration-200 focus:ring-2 focus:ring-offset-2"
+                            className="focus:ring-tertiary hover:bg-primary-dark w-full cursor-pointer rounded-xl bg-primary py-3.5 text-white transition duration-200 hover:bg-primary/70 focus:ring-2 focus:ring-offset-2"
                             disabled={processing}
                         >
                             {processing ? 'Signing in...' : 'Sign In'}
@@ -79,7 +81,7 @@ export default function Login() {
 
                         <div className="text-center text-sm text-gray-600">
                             Don't have an account?{' '}
-                            <a href={route('register')} className="text-primary hover:text-primary-dark font-medium">
+                            <a href={route('register')} className="hover:text-primary-dark font-medium text-primary">
                                 Sign Up
                             </a>
                         </div>

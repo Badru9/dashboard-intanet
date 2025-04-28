@@ -1,5 +1,5 @@
-import { Button } from '@/components/ui/button';
 import { type InternetPackage } from '@/types';
+import { Button } from '@heroui/react';
 import { useForm } from '@inertiajs/react';
 
 interface PackageFormData {
@@ -32,7 +32,7 @@ export default function EditPackage({ package: pkg, onClose }: EditPackageProps)
     };
 
     return (
-        <div className="mx-auto mt-5 h-fit w-[calc(100%-4rem)] max-w-4xl overflow-y-auto rounded-2xl bg-white text-slate-800">
+        <div className="mx-auto mt-5 h-fit w-full rounded-2xl bg-white text-slate-800">
             <h2 className="px-5 pt-5 text-lg font-medium text-gray-900">Edit Paket Internet</h2>
             <form onSubmit={handleSubmit} className="space-y-6 p-5">
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -45,7 +45,7 @@ export default function EditPackage({ package: pkg, onClose }: EditPackageProps)
                             id="name"
                             value={data.name}
                             onChange={(e) => setData('name', e.target.value)}
-                            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none"
+                            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
                         />
                         {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
                     </div>
@@ -59,7 +59,7 @@ export default function EditPackage({ package: pkg, onClose }: EditPackageProps)
                             id="speed"
                             value={data.speed}
                             onChange={(e) => setData('speed', Number(e.target.value))}
-                            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none"
+                            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
                             placeholder="Contoh: 10 Mbps"
                         />
                         {errors.speed && <p className="mt-1 text-sm text-red-600">{errors.speed}</p>}
@@ -74,25 +74,17 @@ export default function EditPackage({ package: pkg, onClose }: EditPackageProps)
                             id="price"
                             value={data.price}
                             onChange={(e) => setData('price', Number(e.target.value))}
-                            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none"
+                            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
                         />
                         {errors.price && <p className="mt-1 text-sm text-red-600">{errors.price}</p>}
                     </div>
                 </div>
 
                 <div className="flex justify-end gap-3 border-t border-gray-200 pt-4">
-                    <Button
-                        variant="outline"
-                        onClick={onClose}
-                        className="cursor-pointer border-none px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-700"
-                    >
+                    <Button onPress={onClose} color="default">
                         Batal
                     </Button>
-                    <Button
-                        type="submit"
-                        disabled={processing}
-                        className="cursor-pointer bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50"
-                    >
+                    <Button type="submit" disabled={processing} color="primary">
                         {processing ? 'Menyimpan...' : 'Simpan'}
                     </Button>
                 </div>

@@ -171,6 +171,10 @@ export default function CustomersIndex() {
         router.get(route('customers.index'), { search: e.target.value }, { preserveState: true, replace: true });
     };
 
+    const handlePageChange = (page: number) => {
+        router.get(route('customers.index'), { page, search }, { preserveState: true, replace: true });
+    };
+
     return (
         <AuthenticatedLayout>
             <Head title="Customers" />
@@ -181,12 +185,14 @@ export default function CustomersIndex() {
                     <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-center lg:justify-end">
                         <div className="relative w-full lg:w-auto">
                             <Input
-                                startContent={<MagnifyingGlass className="h-4 w-4" />}
+                                startContent={<MagnifyingGlass className="h-4 w-4 text-gray-500" />}
                                 type="text"
                                 placeholder="Search customers..."
                                 value={search}
                                 onChange={handleSearch}
                                 color="default"
+                                variant="bordered"
+                                radius="md"
                             />
                         </div>
                         <Button onPress={onCreateOpen} color="primary">
@@ -198,7 +204,16 @@ export default function CustomersIndex() {
 
                 {/* Customers Table */}
                 <div className="-mx-4 lg:mx-0">
-                    <Table<Customer> data={filteredCustomers} column={columns} pagination={customers} />
+                    <Table<Customer>
+                        data={filteredCustomers}
+                        column={columns}
+                        pagination={{
+                            ...customers,
+                            last_page: customers.last_page,
+                            current_page: customers.current_page,
+                            onChange: handlePageChange,
+                        }}
+                    />
                 </div>
 
                 <Modal isOpen={isCreateOpen} onOpenChange={onCreateOpenChange} scrollBehavior="outside" placement="center">

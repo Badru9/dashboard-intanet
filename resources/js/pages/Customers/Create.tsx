@@ -1,16 +1,16 @@
-import { Button } from '@/components/ui/button';
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { CUSTOMER_STATUS_OPTIONS } from '@/constants';
 import { currencyFormat } from '@/lib/utils';
 import { Coordinate, InternetPackage, type Customer, type PageProps } from '@/types';
-import { DatePicker, Input, Select, SelectItem, Textarea } from '@heroui/react';
-import { useForm, usePage } from '@inertiajs/react';
-import { parseDate } from '@internationalized/date';
+import { Button, DatePicker, Input, Select, SelectItem, Textarea } from '@heroui/react';
+import { router, useForm, usePage } from '@inertiajs/react';
+import { DateValue } from '@internationalized/date';
 
 interface CreateCustomerPageProps extends PageProps {
     packages: InternetPackage[];
 }
 
-interface CustomerFormData {
+interface CustomerFormData extends Record<string, any> {
     // [key: string]: string | number | Coordinate | undefined;
     name: string;
     status: Customer['status'];
@@ -19,14 +19,14 @@ interface CustomerFormData {
     package_id: string;
     coordinates?: Coordinate;
     phone: string;
-    join_date?: string | null;
+    join_date?: DateValue | null;
     email?: string;
 }
 
 export default function CreateCustomer({ onClose }: { onClose: () => void }) {
     const { packages } = usePage<CreateCustomerPageProps>().props;
 
-    const { data, setData, post, processing, errors } = useForm<CustomerFormData>({
+    const { data, setData, processing, errors } = useForm<CustomerFormData>({
         name: '',
         status: 'active',
         address: '',
@@ -44,7 +44,15 @@ export default function CreateCustomer({ onClose }: { onClose: () => void }) {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        post(route('customers.store'), {
+        // Konversi ke string hanya saat submit
+        const payload = {
+            ...data,
+            join_date: data.join_date
+                ? `${data.join_date.year}-${String(data.join_date.month).padStart(2, '0')}-${String(data.join_date.day).padStart(2, '0')}`
+                : null,
+        };
+
+        router.post(route('customers.store'), payload, {
             onSuccess: () => {
                 onClose();
                 console.log('success');
@@ -132,9 +140,10 @@ export default function CreateCustomer({ onClose }: { onClose: () => void }) {
                             isInvalid={!!errors.package_id}
                             errorMessage={errors.package_id}
                             placeholder="Pilih Paket"
+                            selectedKeys={data.package_id}
                         >
                             {packages?.map((pkg) => (
-                                <SelectItem key={pkg.id} value={pkg.id.toString()}>
+                                <SelectItem key={pkg.id} textValue={pkg.name + ' - ' + currencyFormat(pkg.price)}>
                                     {pkg.name} - {currencyFormat(pkg.price)}
                                 </SelectItem>
                             ))}
@@ -192,18 +201,18 @@ export default function CreateCustomer({ onClose }: { onClose: () => void }) {
                     <div>
                         <DatePicker
                             label="Tanggal Bergabung"
-                            type="date"
                             id="join_date"
-                            value={data.join_date ? parseDate(data.join_date) : undefined}
-                            // onChange={(value) => setData('join_date', value)}
+                            value={data.join_date ?? null}
+                            onChange={(value) => setData('join_date', value)}
                             isInvalid={!!errors.join_date}
                             errorMessage={errors.join_date}
+                            selectorButtonPlacement="start"
                         />
                     </div>
                 </div>
 
                 <div className="flex justify-end gap-3 border-t border-gray-200 pt-4">
-                    <Button onClick={onClose} variant={'default'}>
+                    <Button onPress={onClose} color="default">
                         Batal
                     </Button>
                     <Button type="submit" disabled={processing} color="primary">

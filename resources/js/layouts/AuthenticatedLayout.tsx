@@ -27,7 +27,7 @@ const MenuItem = ({ item, isOpen }: { item: SidebarItem; isOpen: boolean }) => {
         <Link
             href={item.href}
             className={clsx(
-                'to-primary flex items-center rounded-full from-purple-700 px-4 py-2 text-slate-500 transition-all duration-300 hover:bg-gradient-to-r hover:text-white',
+                'flex items-center rounded-full from-purple-700 to-primary px-4 py-2 text-slate-500 transition-all duration-300 hover:bg-gradient-to-r hover:text-white',
                 isOpen ? 'w-full' : 'w-12 justify-center',
             )}
             title={!isOpen ? item.name : undefined}
@@ -35,7 +35,7 @@ const MenuItem = ({ item, isOpen }: { item: SidebarItem; isOpen: boolean }) => {
             <item.Icon size={isOpen ? 20 : 24} />
             <span
                 className={clsx(
-                    'ml-5 text-sm whitespace-nowrap transition-all duration-300',
+                    'ml-5 whitespace-nowrap text-sm transition-all duration-300',
                     isOpen ? 'relative w-auto max-w-xs opacity-100 delay-300' : 'absolute w-0 max-w-0 overflow-hidden opacity-0 delay-0',
                 )}
                 style={{ transitionProperty: 'opacity, width, max-width' }}
@@ -78,7 +78,7 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
             {/* Sidebar */}
             <aside
                 className={clsx(
-                    'fixed inset-y-0 left-0 z-40 bg-white font-medium whitespace-nowrap transition-all duration-300',
+                    'fixed inset-y-0 left-0 z-40 whitespace-nowrap bg-white font-medium transition-all duration-300',
                     isSidebarOpen ? 'w-64' : 'w-20',
                 )}
             >
@@ -99,13 +99,13 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
                     <div className="space-y-8">
                         {/* Main Menu */}
                         <div>
-                            <h2 className={clsx('px-4 text-xs font-semibold text-gray-400 uppercase', !isSidebarOpen && 'hidden')}>General Menu</h2>
+                            <h2 className={clsx('px-4 text-xs font-semibold uppercase text-gray-400', !isSidebarOpen && 'hidden')}>General Menu</h2>
                             <nav className="mt-2 space-y-1">
                                 {mainMenuItems.map((item) => (
                                     <MenuItem key={item.name} item={item} isOpen={isSidebarOpen} />
                                 ))}
                             </nav>
-                            <h2 className={clsx('mt-5 px-4 text-xs font-semibold text-gray-400 uppercase', !isSidebarOpen && 'hidden')}>Settings</h2>
+                            <h2 className={clsx('mt-5 px-4 text-xs font-semibold uppercase text-gray-400', !isSidebarOpen && 'hidden')}>Settings</h2>
                             <nav className="mt-2 space-y-1">
                                 {settingMenu.map((item) => (
                                     <MenuItem key={item.name} item={item} isOpen={isSidebarOpen} />
@@ -159,7 +159,7 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
                         <Dropdown>
                             <DropdownTrigger>
                                 <button
-                                    className="hover:text-primary hover:bg-primary/10 flex cursor-pointer items-center gap-3 rounded-full bg-slate-50 px-3 py-2 text-slate-500 transition-colors"
+                                    className="flex cursor-pointer items-center gap-3 rounded-full bg-slate-50 px-3 py-2 text-slate-500 transition-colors hover:bg-primary/10 hover:text-primary"
                                     onClick={() => {}}
                                 >
                                     <User size={20} />
@@ -195,7 +195,7 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
 
                 {/* Page Content */}
                 <div className="h-[calc(100vh-3rem)] max-w-md overflow-y-auto lg:max-w-7xl xl:max-w-full">
-                    <div className="bg-slate-100 min-h-screen w-full rounded-tl-3xl">{children}</div>
+                    <div className="min-h-screen w-full rounded-tl-3xl bg-slate-100">{children}</div>
                 </div>
             </main>
         </div>

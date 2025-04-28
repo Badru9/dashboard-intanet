@@ -37,7 +37,7 @@ export default function Table<T = Record<string, unknown>>({
                                 <tr className="border-b border-gray-200 bg-gray-50">
                                     {numbering ? (
                                         <th
-                                            className="bg-gray-50 px-6 py-3 text-center text-xs font-medium tracking-wider text-gray-500 uppercase"
+                                            className="bg-gray-50 px-6 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500"
                                             rowSpan={2}
                                         >
                                             No.
@@ -48,7 +48,7 @@ export default function Table<T = Record<string, unknown>>({
                                             key={idx}
                                             rowSpan={h.rowSpan ?? 1}
                                             colSpan={h.colSpan ?? 1}
-                                            className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
+                                            className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
                                         >
                                             {h.name}
                                         </th>
@@ -57,7 +57,7 @@ export default function Table<T = Record<string, unknown>>({
                             )}
                             <tr className="border-b border-gray-200">
                                 {numbering && header == undefined ? (
-                                    <th className="px-6 py-3 text-center text-xs font-medium tracking-wider text-gray-500 uppercase">No.</th>
+                                    <th className="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">No.</th>
                                 ) : null}
                                 {column
                                     .filter((col) => col.header)
@@ -65,7 +65,7 @@ export default function Table<T = Record<string, unknown>>({
                                         <th
                                             key={'header-' + headIndex}
                                             className={clsx(
-                                                'px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase',
+                                                'px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500',
                                                 typeof col.headerClassName === 'function' ? col.headerClassName(col, headIndex) : col.headerClassName,
                                             )}
                                         >
@@ -86,7 +86,7 @@ export default function Table<T = Record<string, unknown>>({
                                     onClick={() => (onClickRow ? onClickRow(dt) : null)}
                                 >
                                     {numbering ? (
-                                        <td className="bg-white px-6 py-4 text-center text-sm whitespace-nowrap text-gray-500">
+                                        <td className="whitespace-nowrap bg-white px-6 py-4 text-center text-sm text-gray-500">
                                             {pagination ? pagination.from + index : index + 1}
                                         </td>
                                     ) : null}
@@ -96,7 +96,7 @@ export default function Table<T = Record<string, unknown>>({
                                         return (
                                             <td
                                                 key={'cell-' + index + '-' + cellIndex}
-                                                className={clsx('px-6 py-4 text-sm whitespace-nowrap text-gray-900', tdClassName)}
+                                                className={clsx('whitespace-nowrap px-6 py-4 text-sm text-gray-900', tdClassName)}
                                             >
                                                 {value as ReactNode}
                                             </td>
@@ -134,7 +134,15 @@ export default function Table<T = Record<string, unknown>>({
                     </table>
                 </div>
             </div>
-            {pagination && <Pagination pagination={pagination} />}
+            {pagination && (
+                <Pagination
+                    total={pagination.last_page}
+                    page={pagination.current_page}
+                    onChange={(page) => {
+                        if (pagination.onChange) pagination.onChange(page);
+                    }}
+                />
+            )}
         </div>
     );
 }

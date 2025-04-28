@@ -1,5 +1,6 @@
-import { Button } from '@/components/ui/button';
+import { CASHFLOW_CATEGORY_OPTIONS } from '@/constants';
 import { CashflowCategory } from '@/types';
+import { Button, Input, Select, SelectItem, Textarea } from '@heroui/react';
 import { useForm } from '@inertiajs/react';
 
 // interface EditCashflowCategoryPageProps extends PageProps {
@@ -41,64 +42,47 @@ export default function EditCashflowCategory({ category, onClose }: EditCashflow
             <h2 className="px-5 pt-5 text-lg font-medium text-gray-900">Edit Kategori Cashflow</h2>
             <form onSubmit={handleSubmit} className="h-fit space-y-6 p-5">
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                    <div>
-                        <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                            Nama Kategori
-                        </label>
-                        <input
-                            type="text"
-                            id="name"
-                            value={data.name}
-                            onChange={(e) => setData('name', e.target.value)}
-                            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none"
-                        />
-                        {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
-                    </div>
-
-                    <div>
-                        <label htmlFor="is_out" className="block text-sm font-medium text-gray-700">
-                            Tipe
-                        </label>
-                        <select
-                            id="is_out"
-                            value={data.is_out}
-                            onChange={(e) => setData('is_out', e.target.value as '0' | '1')}
-                            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none"
-                        >
-                            <option value="0">Pemasukan</option>
-                            <option value="1">Pengeluaran</option>
-                        </select>
-                        {errors.is_out && <p className="mt-1 text-sm text-red-600">{errors.is_out}</p>}
-                    </div>
-
-                    <div className="sm:col-span-2">
-                        <label htmlFor="note" className="block text-sm font-medium text-gray-700">
-                            Catatan
-                        </label>
-                        <textarea
-                            id="note"
-                            value={data.note}
-                            onChange={(e) => setData('note', e.target.value)}
-                            rows={3}
-                            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none"
-                        />
-                        {errors.note && <p className="mt-1 text-sm text-red-600">{errors.note}</p>}
-                    </div>
-                </div>
-
-                <div className="flex justify-end gap-3 border-t border-gray-200 pt-4">
-                    <Button
-                        variant="outline"
-                        onClick={onClose}
-                        className="cursor-pointer border-none px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-700"
+                    <Input
+                        label="Nama Kategori"
+                        id="name"
+                        value={data.name}
+                        onChange={(e) => setData('name', e.target.value)}
+                        isInvalid={!!errors.name}
+                        errorMessage={errors.name}
+                        color="default"
+                    />
+                    <Select
+                        label="Tipe"
+                        id="is_out"
+                        value={data.is_out}
+                        onChange={(e) => setData('is_out', e.target.value as '0' | '1')}
+                        isInvalid={!!errors.is_out}
+                        errorMessage={errors.is_out}
+                        color="default"
+                        selectedKeys={[data.is_out]}
                     >
+                        {CASHFLOW_CATEGORY_OPTIONS.map((option) => (
+                            <SelectItem key={option.value} textValue={option.label}>
+                                {option.label}
+                            </SelectItem>
+                        ))}
+                    </Select>
+                    <Textarea
+                        label="Catatan"
+                        id="note"
+                        value={data.note}
+                        onChange={(e) => setData('note', e.target.value)}
+                        rows={3}
+                        isInvalid={!!errors.note}
+                        errorMessage={errors.note}
+                        color="default"
+                    />
+                </div>
+                <div className="flex justify-end gap-3 border-t border-gray-200 pt-4">
+                    <Button onPress={onClose} color="default">
                         Batal
                     </Button>
-                    <Button
-                        type="submit"
-                        disabled={processing}
-                        className="cursor-pointer bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50"
-                    >
+                    <Button type="submit" disabled={processing} color="primary">
                         {processing ? 'Menyimpan...' : 'Simpan'}
                     </Button>
                 </div>

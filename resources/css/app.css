@@ -1,3 +1,21 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* @layer base {
+    :root {
+        --primary: '#007bff';
+        --secondary: '#6c757d';
+        --success: '#28a745';
+        --danger: '#dc3545';
+        --warning: '#ffc107';
+        --info: '#17a2b8';
+
+        --background: 0 0% 100%;
+        --foreground: 222.2 84% 4.9%;
+        --card: 0 0% 100%;
+        --card-foreground: 222.2 84% 4.9%;
+        --popover: 0 0% 100%;
+        --popover-foreground: 222.2 84% 4.9%;
+    }
+} */

@@ -31,4 +31,5 @@ export interface PaginationProp {
         label: string;
         active: boolean;
     }>;
+    onChange: (page: number) => void;
 }

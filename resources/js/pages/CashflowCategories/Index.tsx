@@ -98,6 +98,10 @@ export default function CashflowsCategoriesIndex() {
         }
     };
 
+    const handlePageChange = (page: number) => {
+        router.get(route('cashflow-categories.index'), { page }, { preserveState: true, replace: true });
+    };
+
     return (
         <AuthenticatedLayout>
             <Head title="Cashflows Categories" />
@@ -106,18 +110,23 @@ export default function CashflowsCategoriesIndex() {
                     <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-center lg:justify-end">
                         <Button
                             onClick={() => setIsCreateModalOpen(true)}
-                            className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none lg:w-auto"
+                            className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 lg:w-auto"
                         >
                             <Plus className="h-5 w-5" />
                             Tambah Kategori
                         </Button>
                     </div>
                 </div>
-
-                <div className="-mx-4 lg:mx-0">
-                    <Table column={columns} data={categories.data} pagination={categories} />
-                </div>
-
+                <Table
+                    column={columns}
+                    data={categories.data}
+                    pagination={{
+                        ...categories,
+                        last_page: categories.last_page,
+                        current_page: categories.current_page,
+                        onChange: handlePageChange,
+                    }}
+                />
                 <Modal isOpen={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
                     <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30">
                         <ModalContent className="relative w-full max-w-sm rounded-2xl bg-white p-0 lg:max-w-4xl">
@@ -125,7 +134,6 @@ export default function CashflowsCategoriesIndex() {
                         </ModalContent>
                     </div>
                 </Modal>
-
                 <Modal isOpen={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
                     <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30">
                         <ModalContent className="relative w-full max-w-sm rounded-2xl bg-white p-0 lg:max-w-4xl">
@@ -133,7 +141,6 @@ export default function CashflowsCategoriesIndex() {
                         </ModalContent>
                     </div>
                 </Modal>
-
                 <DeleteConfirmationDialog
                     isOpen={isDeleteOpen}
                     onClose={onDeleteOpenChange}

@@ -1,5 +1,4 @@
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button, Modal, ModalContent, ModalFooter, ModalHeader } from '@heroui/react';
 import { WarningCircle } from '@phosphor-icons/react';
 
 interface DeleteConfirmationDialogProps {
@@ -20,22 +19,22 @@ export default function DeleteConfirmationDialog({
     isLoading = false,
 }: DeleteConfirmationDialogProps) {
     return (
-        <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-md rounded-xl border border-red-200 bg-white p-6 shadow-2xl">
-                <DialogHeader className="flex flex-col items-center">
+        <Modal isOpen={isOpen} onOpenChange={onClose} placement="center">
+            <ModalContent className="max-w-md rounded-xl border border-red-200 bg-white p-3 shadow-2xl">
+                <ModalHeader className="flex flex-col items-center">
                     <WarningCircle className="mb-2 h-10 w-10 text-red-500" weight="fill" />
-                    <DialogTitle className="text-lg font-bold text-red-600">{title}</DialogTitle>
-                    <DialogDescription className="mt-2 text-center text-gray-700">{description}</DialogDescription>
-                </DialogHeader>
-                <DialogFooter className="mt-6 flex justify-end gap-2 text-slate-900">
-                    <Button variant="outline" onClick={onClose} disabled={isLoading} className="cursor-pointer border-none">
+                    <h3 className="text-lg font-bold text-red-600">{title}</h3>
+                    <p className="mt-2 text-center text-gray-600">{description}</p>
+                </ModalHeader>
+                <ModalFooter className="mt-6 flex justify-end gap-2 text-slate-900">
+                    <Button variant="bordered" onPress={onClose} disabled={isLoading} className="cursor-pointer">
                         Batal
                     </Button>
-                    <Button variant="destructive" onClick={onConfirm} disabled={isLoading} className="cursor-pointer">
+                    <Button color="danger" onPress={onConfirm} disabled={isLoading} className="cursor-pointer">
                         {isLoading ? 'Menghapus...' : 'Hapus'}
                     </Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
+                </ModalFooter>
+            </ModalContent>
+        </Modal>
     );
 }
