@@ -2,12 +2,23 @@
 import { INVOICE_STATUS_OPTIONS } from '@/constants';
 import { currencyFormat } from '@/lib/utils';
 import { Customer, InternetPackage, PageProps } from '@/types';
-import { Button, Input, Select, SelectItem, Textarea } from '@heroui/react';
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { Button, DatePicker, DateValue, Input, Select, SelectItem, Textarea } from '@heroui/react';
+import { Head, router, useForm, usePage } from '@inertiajs/react';
+import moment from 'moment';
 
 interface Props extends PageProps, Record<string, any> {
     customers: Customer[];
     packages: InternetPackage[];
+}
+
+interface InvoicesFormData extends Record<string, any> {
+    customer_id: string;
+    package_id: string;
+    amount: string;
+    status: string;
+    due_date: DateValue | null;
+    note: string;
+    creator: number;
 }
 
 export default function CreateInvoice({ onClose }: { onClose: () => void }) {
@@ -16,21 +27,30 @@ export default function CreateInvoice({ onClose }: { onClose: () => void }) {
     console.log('customers', customers);
     console.log('packages', packages);
 
-    const { data, setData, post, processing, errors } = useForm({
+    const { data, setData, processing, errors } = useForm<InvoicesFormData>({
         customer_id: '',
         package_id: '',
         amount: '',
         status: '',
-        due_date: '',
+        due_date: null,
         note: '',
         creator: auth.user.id,
     });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('invoices.store'), {
+
+        const payload = {
+            ...data,
+            due_date: data.due_date ? moment(data.due_date).format('YYYY-MM-DD') : null,
+        };
+
+        router.post(route('invoices.store'), payload, {
             onSuccess: () => {
                 onClose();
+            },
+            onError: (error) => {
+                console.log('error', error);
             },
         });
     };
@@ -105,14 +125,13 @@ export default function CreateInvoice({ onClose }: { onClose: () => void }) {
                     </div>
 
                     <div>
-                        <Input
-                            type="date"
+                        <DatePicker
                             label="Due Date"
                             value={data.due_date}
-                            onChange={(e) => setData('due_date', e.target.value)}
+                            onChange={(e) => setData('due_date', e)}
                             isInvalid={!!errors.due_date}
                             errorMessage={errors.due_date}
-                            required
+                            selectorButtonPlacement="start"
                         />
                     </div>
 

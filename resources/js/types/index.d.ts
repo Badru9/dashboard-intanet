@@ -124,7 +124,7 @@ export interface Invoices {
     customer: Customer;
     package: InternetPackage;
     note?: string;
-    due_date: string;
+    due_date: string | null;
     amount: number;
     status: PaidStatus;
     created_at: string;
