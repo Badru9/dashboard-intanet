@@ -1,8 +1,9 @@
 import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from '@heroui/react';
 import { Link, useForm, usePage } from '@inertiajs/react';
-import { CurrencyDollar, FileText, Gear, House, List, SignOut, User, Users, WifiHigh } from '@phosphor-icons/react';
+import { CurrencyDollar, FileText, Gear, House, List, SignOut, User, Users, WifiHigh, Sun, Moon } from '@phosphor-icons/react';
 import clsx from 'clsx';
 import { PropsWithChildren, useState } from 'react';
+import { useAppearance } from '@/hooks/use-appearance';
 
 type IconComponent = typeof House | typeof WifiHigh | typeof Users | typeof FileText | typeof CurrencyDollar | typeof Gear | typeof SignOut;
 
@@ -64,7 +65,7 @@ const adminMenuItems: SidebarItem[] = [...settingMenu, { name: 'Users', Icon: Us
 
 export default function AuthenticatedLayout({ children }: PropsWithChildren) {
     const { auth } = usePage<PageProps>().props;
-
+    const { appearance, updateAppearance } = useAppearance();
     const { post } = useForm({});
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
@@ -81,17 +82,17 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
     console.log('auth', auth);
 
     return (
-        <div className="flex h-screen bg-white">
+        <div className="flex h-screen bg-white dark:bg-slate-900">
             {/* Sidebar */}
             <aside
                 className={clsx(
-                    'fixed inset-y-0 left-0 z-40 whitespace-nowrap bg-white font-medium transition-all duration-300',
+                    'fixed inset-y-0 left-0 z-40 whitespace-nowrap bg-white dark:bg-slate-900 font-medium transition-all duration-300',
                     isSidebarOpen ? 'w-64' : 'w-20',
                 )}
             >
                 {/* Logo */}
                 <div className="flex h-16 items-center justify-between gap-3 px-6">
-                    <button onClick={toggleSidebar} className="cursor-pointer rounded-lg bg-gray-100 p-2 text-slate-900 hover:bg-gray-200">
+                    <button onClick={toggleSidebar} className="cursor-pointer rounded-lg bg-gray-100 dark:bg-slate-800 p-2 text-slate-900 dark:text-white hover:bg-gray-200 dark:hover:bg-slate-700">
                         <List size={20} />
                     </button>
                     <img
@@ -106,13 +107,13 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
                     <div className="space-y-8">
                         {/* Main Menu */}
                         <div>
-                            <h2 className={clsx('px-4 text-xs font-semibold uppercase text-gray-400', !isSidebarOpen && 'hidden')}>General Menu</h2>
+                            <h2 className={clsx('px-4 text-xs font-semibold uppercase text-gray-400 dark:text-gray-500', !isSidebarOpen && 'hidden')}>General Menu</h2>
                             <nav className="mt-2 space-y-1">
                                 {mainMenuItems.map((item) => (
                                     <MenuItem key={item.name} item={item} isOpen={isSidebarOpen} />
                                 ))}
                             </nav>
-                            <h2 className={clsx('mt-5 px-4 text-xs font-semibold uppercase text-gray-400', !isSidebarOpen && 'hidden')}>Settings</h2>
+                            <h2 className={clsx('mt-5 px-4 text-xs font-semibold uppercase text-gray-400 dark:text-gray-500', !isSidebarOpen && 'hidden')}>Settings</h2>
                             <nav className="mt-2 space-y-1">
                                 {isAdminMenus.map((item) => (
                                     <MenuItem key={item.name} item={item} isOpen={isSidebarOpen} />
@@ -132,11 +133,11 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
                     </div>
 
                     {/* User Menu */}
-                    <div className="border-t border-gray-200 pt-4">
+                    <div className="border-t border-gray-200 dark:border-slate-700 pt-4">
                         <button
                             onClick={handleLogout}
                             className={clsx(
-                                'flex cursor-pointer items-center rounded-lg px-4 py-2 text-gray-600 hover:bg-gray-100',
+                                'flex cursor-pointer items-center rounded-lg px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800',
                                 isSidebarOpen ? 'w-full' : 'w-12 justify-center',
                             )}
                             title={!isSidebarOpen ? 'Log Out' : undefined}
@@ -161,19 +162,25 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
             {/* Main Content */}
             <main className={clsx('flex-1 overflow-y-hidden transition-all duration-300', isSidebarOpen ? 'pl-64' : 'pl-20')}>
                 {/* Header */}
-                <div className="sticky top-0 z-30 flex items-center justify-end bg-white px-10 py-3">
+                <div className="sticky top-0 z-30 flex items-center justify-end bg-white dark:bg-slate-900 px-10 py-3">
                     <div className="flex items-center gap-4">
+                        <button
+                            onClick={() => updateAppearance(appearance === 'dark' ? 'light' : 'dark')}
+                            className="flex cursor-pointer items-center gap-3 rounded-full bg-slate-50 dark:bg-slate-800 px-3 py-2 text-slate-500 dark:text-slate-300 transition-colors hover:bg-primary/10 hover:text-primary"
+                        >
+                            {appearance === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+                        </button>
                         <Dropdown>
                             <DropdownTrigger>
                                 <button
-                                    className="flex cursor-pointer items-center gap-3 rounded-full bg-slate-50 px-3 py-2 text-slate-500 transition-colors hover:bg-primary/10 hover:text-primary"
+                                    className="flex cursor-pointer items-center gap-3 rounded-full bg-slate-50 dark:bg-slate-800 px-3 py-2 text-slate-500 dark:text-slate-300 transition-colors hover:bg-primary/10 hover:text-primary"
                                     onClick={() => {}}
                                 >
                                     <User size={20} />
                                     <h3 className="text-sm font-medium">{auth.user.name}</h3>
                                 </button>
                             </DropdownTrigger>
-                            <DropdownMenu className="rounded-lg bg-white shadow-md">
+                            <DropdownMenu className="rounded-lg bg-white dark:bg-slate-800 shadow-md">
                                 <DropdownItem key="settings">
                                     <div className="flex items-center gap-3">
                                         <img
@@ -181,7 +188,7 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
                                             alt={auth.user.name}
                                             className="h-5 w-5 rounded-full"
                                         />
-                                        <h3 className="text-sm font-medium text-gray-900">{auth.user.name}</h3>
+                                        <h3 className="text-sm font-medium text-gray-900 dark:text-white">{auth.user.name}</h3>
                                     </div>
                                 </DropdownItem>
                             </DropdownMenu>
@@ -202,7 +209,7 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
 
                 {/* Page Content */}
                 <div className="h-[calc(100vh-3rem)] max-w-md overflow-y-auto lg:max-w-7xl xl:max-w-full">
-                    <div className="min-h-screen w-full rounded-tl-3xl bg-slate-100">{children}</div>
+                    <div className="min-h-screen w-full rounded-tl-3xl bg-slate-100 dark:bg-slate-800">{children}</div>
                 </div>
             </main>
         </div>
