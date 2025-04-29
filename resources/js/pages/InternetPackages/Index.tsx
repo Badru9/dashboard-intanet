@@ -30,10 +30,15 @@ type PackagePageProps = PageProps &
             }>;
         };
         filters: Record<string, string>;
+        auth: {
+            user: {
+                is_admin: number;
+            };
+        };
     };
 
 export default function InternetPackagesIndex() {
-    const { packages, filters } = usePage<PackagePageProps>().props;
+    const { packages, filters, auth } = usePage<PackagePageProps>().props;
     const { isOpen: isCreateOpen, onOpen: onCreateOpen, onOpenChange: onCreateOpenChange } = useDisclosure();
     const { isOpen: isEditOpen, onOpen: onEditOpen, onOpenChange: onEditOpenChange } = useDisclosure();
     const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onOpenChange: onDeleteOpenChange } = useDisclosure();
@@ -66,7 +71,7 @@ export default function InternetPackagesIndex() {
         }
     };
 
-    const columns: TableColumn<InternetPackage>[] = [
+    const baseColumns: TableColumn<InternetPackage>[] = [
         {
             header: 'Nama Paket',
             value: (pkg: InternetPackage) => <span className="font-medium text-gray-900">{pkg.name}</span>,
@@ -79,6 +84,10 @@ export default function InternetPackagesIndex() {
             header: 'Harga',
             value: (pkg: InternetPackage) => <span className="font-medium text-gray-900">{currencyFormat(pkg.price)}</span>,
         },
+    ];
+
+    const adminColumns: TableColumn<InternetPackage>[] = [
+        ...baseColumns,
         {
             header: 'Aksi',
             value: (pkg: InternetPackage) => (
@@ -114,7 +123,6 @@ export default function InternetPackagesIndex() {
             <Head title="Internet Packages" />
 
             <div className="p-4 lg:p-8">
-                {/* Header with Search and Action */}
                 <div className="mb-6 flex flex-col items-center gap-4 lg:flex-row lg:items-center lg:justify-between">
                     <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-center lg:justify-end">
                         <div className="relative w-full lg:w-auto">
@@ -129,51 +137,53 @@ export default function InternetPackagesIndex() {
                                 radius="md"
                             />
                         </div>
-                        <Button onPress={onCreateOpen} color="primary">
-                            <Plus className="h-5 w-5" />
-                            Tambah Paket
-                        </Button>
+                        {auth.user.is_admin === 1 && (
+                            <Button onPress={onCreateOpen} color="primary">
+                                <Plus className="h-5 w-5" />
+                                Tambah Paket
+                            </Button>
+                        )}
                     </div>
                 </div>
 
-                {/* Packages Table */}
-                <div className="-mx-4 lg:mx-0">
-                    <Table<InternetPackage>
-                        data={filteredPackages}
-                        column={columns}
-                        pagination={{
-                            ...packages,
-                            last_page: packages.last_page,
-                            current_page: packages.current_page,
-                            onChange: handlePageChange,
-                        }}
-                    />
-                </div>
-
-                <Modal isOpen={isCreateOpen} onOpenChange={onCreateOpenChange}>
-                    <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30">
-                        <ModalContent className="relative w-full max-w-sm self-center rounded-2xl p-0 lg:max-w-4xl">
-                            <CreatePackage onClose={() => onCreateOpenChange()} />
-                        </ModalContent>
-                    </div>
-                </Modal>
-
-                <Modal isOpen={isEditOpen} onOpenChange={onEditOpen}>
-                    <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30">
-                        <ModalContent className="relative w-full max-w-sm self-center rounded-2xl p-0 lg:max-w-4xl">
-                            {selectedPackage && <EditPackage package={selectedPackage} onClose={() => onEditOpenChange()} />}
-                        </ModalContent>
-                    </div>
-                </Modal>
-
-                {/* Modal for Delete Confirmation */}
-                <DeleteConfirmationDialog
-                    isOpen={isDeleteOpen}
-                    onClose={onDeleteOpenChange}
-                    onConfirm={confirmDelete}
-                    title="Hapus Paket"
-                    description={`Apakah Anda yakin ingin menghapus paket ${selectedPackage?.name}?`}
+                <Table<InternetPackage>
+                    data={filteredPackages}
+                    column={auth.user.is_admin === 1 ? adminColumns : baseColumns}
+                    pagination={{
+                        ...packages,
+                        last_page: packages.last_page,
+                        current_page: packages.current_page,
+                        onChange: handlePageChange,
+                    }}
                 />
+
+                {auth.user.is_admin === 1 && (
+                    <>
+                        <Modal isOpen={isCreateOpen} onOpenChange={onCreateOpenChange}>
+                            <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30">
+                                <ModalContent className="relative w-full max-w-sm self-center rounded-2xl p-0 lg:max-w-4xl">
+                                    <CreatePackage onClose={() => onCreateOpenChange()} />
+                                </ModalContent>
+                            </div>
+                        </Modal>
+
+                        <Modal isOpen={isEditOpen} onOpenChange={onEditOpen}>
+                            <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30">
+                                <ModalContent className="relative w-full max-w-sm self-center rounded-2xl p-0 lg:max-w-4xl">
+                                    {selectedPackage && <EditPackage package={selectedPackage} onClose={() => onEditOpenChange()} />}
+                                </ModalContent>
+                            </div>
+                        </Modal>
+
+                        <DeleteConfirmationDialog
+                            isOpen={isDeleteOpen}
+                            onClose={onDeleteOpenChange}
+                            onConfirm={confirmDelete}
+                            title="Hapus Paket"
+                            description={`Apakah Anda yakin ingin menghapus paket ${selectedPackage?.name}?`}
+                        />
+                    </>
+                )}
             </div>
         </AuthenticatedLayout>
     );

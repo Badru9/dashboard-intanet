@@ -16,7 +16,7 @@ export interface User {
     name: string;
     email: string;
     password: string;
-    is_admin: boolean;
+    is_admin: 0 | 1;
 }
 
 export type LoginForm = {

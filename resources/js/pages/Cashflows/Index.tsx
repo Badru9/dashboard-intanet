@@ -36,7 +36,7 @@ type CashflowPageProps = PageProps & {
 
 export default function CashflowsIndex() {
     // Ambil data cashflows dari props
-    const { cashflows, categories } = usePage<CashflowPageProps>().props;
+    const { cashflows, categories, auth } = usePage<CashflowPageProps>().props;
 
     const { isOpen: isCreateOpen, onOpen: onCreateOpen, onOpenChange: onCreateOpenChange } = useDisclosure();
     const { isOpen: isEditOpen, onOpen: onEditOpen, onOpenChange: onEditOpenChange } = useDisclosure();
@@ -172,6 +172,10 @@ export default function CashflowsIndex() {
             header: 'Tanggal',
             value: (row: Cashflow) => moment(row.created_at).format('DD MMMM YYYY'),
         },
+    ];
+
+    const adminColumns: TableColumn<Cashflow>[] = [
+        ...columns,
         {
             header: 'Aksi',
             value: (cashflow: Cashflow) => (
@@ -233,15 +237,17 @@ export default function CashflowsIndex() {
                             Reset Filter
                         </Button>
                     </div>
-                    <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-center lg:justify-end">
-                        <Button onPress={onCreateOpen} color="primary">
-                            <Plus className="h-5 w-5" />
-                            Tambah Data
-                        </Button>
-                    </div>
+                    {auth.user.is_admin === 1 && (
+                        <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-center lg:justify-end">
+                            <Button onPress={onCreateOpen} color="primary">
+                                <Plus className="h-5 w-5" />
+                                Tambah Data
+                            </Button>
+                        </div>
+                    )}
                 </div>
                 <Table<Cashflow>
-                    column={columns}
+                    column={auth.user.is_admin === 1 ? adminColumns : columns}
                     data={cashflows.data}
                     pagination={{
                         ...cashflows,

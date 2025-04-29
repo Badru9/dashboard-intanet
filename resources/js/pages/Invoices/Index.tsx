@@ -39,10 +39,15 @@ type InvoicePageProps = PageProps &
         filters: Record<string, string>;
         packages: InternetPackage[];
         customers: Customer[];
+        auth: {
+            user: {
+                is_admin: number;
+            };
+        };
     };
 
 export default function InvoicesIndex() {
-    const { invoices, filters, customers, packages } = usePage<InvoicePageProps>().props;
+    const { invoices, filters, customers, packages, auth } = usePage<InvoicePageProps>().props;
     const { isOpen: isCreateOpen, onOpen: onCreateOpen, onOpenChange: onCreateOpenChange } = useDisclosure();
     const { isOpen: isEditOpen, onOpen: onEditOpen, onOpenChange: onEditOpenChange } = useDisclosure();
     const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onOpenChange: onDeleteOpenChange } = useDisclosure();
@@ -79,7 +84,7 @@ export default function InvoicesIndex() {
         }
     };
 
-    const columns: TableColumn<Invoices>[] = [
+    const baseColumns: TableColumn<Invoices>[] = [
         {
             header: 'Customer',
             value: (invoice: Invoices) => (
@@ -119,6 +124,10 @@ export default function InvoicesIndex() {
             header: 'Catatan',
             value: (invoice: Invoices) => <span className="text-gray-600">{invoice.note}</span>,
         },
+    ];
+
+    const adminColumns: TableColumn<Invoices>[] = [
+        ...baseColumns,
         {
             header: 'Actions',
             value: (invoice: Invoices) => (
@@ -167,16 +176,18 @@ export default function InvoicesIndex() {
                                 radius="md"
                             />
                         </div>
-                        <Button onPress={onCreateOpen} color="primary">
-                            <Plus className="h-5 w-5" />
-                            Tambah Invoice
-                        </Button>
+                        {auth.user.is_admin === 1 && (
+                            <Button onPress={onCreateOpen} color="primary">
+                                <Plus className="h-5 w-5" />
+                                Tambah Invoice
+                            </Button>
+                        )}
                     </div>
                 </div>
 
                 <Table<Invoices>
                     data={filteredInvoices}
-                    column={columns}
+                    column={auth.user.is_admin === 1 ? adminColumns : baseColumns}
                     pagination={{
                         ...invoices,
                         last_page: invoices.last_page,
@@ -185,31 +196,40 @@ export default function InvoicesIndex() {
                     }}
                 />
 
-                <Modal isOpen={isCreateOpen} onOpenChange={onCreateOpenChange} scrollBehavior="outside" placement="center">
-                    <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30">
-                        <ModalContent className="relative mt-5 w-full max-w-sm rounded-2xl bg-white p-0 lg:max-w-4xl">
-                            <CreateInvoice onClose={() => onCreateOpenChange()} />
-                        </ModalContent>
-                    </div>
-                </Modal>
+                {auth.user.is_admin === 1 && (
+                    <>
+                        <Modal isOpen={isCreateOpen} onOpenChange={onCreateOpenChange} scrollBehavior="outside" placement="center">
+                            <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30">
+                                <ModalContent className="relative mt-5 w-full max-w-sm rounded-2xl bg-white p-0 lg:max-w-4xl">
+                                    <CreateInvoice onClose={() => onCreateOpenChange()} />
+                                </ModalContent>
+                            </div>
+                        </Modal>
 
-                <Modal isOpen={isEditOpen} onOpenChange={onEditOpenChange}>
-                    <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30">
-                        <ModalContent className="relative w-full max-w-sm rounded-2xl bg-white p-0 lg:max-w-4xl">
-                            {selectedInvoice && (
-                                <EditInvoice customers={customers} packages={packages} invoice={selectedInvoice} onClose={() => onEditOpenChange()} />
-                            )}
-                        </ModalContent>
-                    </div>
-                </Modal>
+                        <Modal isOpen={isEditOpen} onOpenChange={onEditOpenChange}>
+                            <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30">
+                                <ModalContent className="relative w-full max-w-sm rounded-2xl bg-white p-0 lg:max-w-4xl">
+                                    {selectedInvoice && (
+                                        <EditInvoice
+                                            customers={customers}
+                                            packages={packages}
+                                            invoice={selectedInvoice}
+                                            onClose={() => onEditOpenChange()}
+                                        />
+                                    )}
+                                </ModalContent>
+                            </div>
+                        </Modal>
 
-                <DeleteConfirmationDialog
-                    isOpen={isDeleteOpen}
-                    onClose={onDeleteOpenChange}
-                    onConfirm={confirmDelete}
-                    title="Hapus Invoice"
-                    description={`Apakah Anda yakin ingin menghapus invoice ini?`}
-                />
+                        <DeleteConfirmationDialog
+                            isOpen={isDeleteOpen}
+                            onClose={onDeleteOpenChange}
+                            onConfirm={confirmDelete}
+                            title="Hapus Invoice"
+                            description={`Apakah Anda yakin ingin menghapus invoice ini?`}
+                        />
+                    </>
+                )}
             </div>
         </AuthenticatedLayout>
     );

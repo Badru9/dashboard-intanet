@@ -28,16 +28,21 @@ type CashflowCategoryPageProps = PageProps & {
             active: boolean;
         }>;
     };
+    auth: {
+        user: {
+            is_admin: number;
+        };
+    };
 };
 
 export default function CashflowsCategoriesIndex() {
-    const { categories } = usePage<CashflowCategoryPageProps>().props;
+    const { categories, auth } = usePage<CashflowCategoryPageProps>().props;
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState<CashflowCategory | null>(null);
     const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onOpenChange: onDeleteOpenChange } = useDisclosure();
 
-    const columns: TableColumn<CashflowCategory>[] = [
+    const baseColumns: TableColumn<CashflowCategory>[] = [
         {
             header: 'Nama',
             value: (value: CashflowCategory) => value.name,
@@ -54,6 +59,10 @@ export default function CashflowsCategoriesIndex() {
             header: 'Catatan',
             value: (value: CashflowCategory) => value.note,
         },
+    ];
+
+    const adminColumns: TableColumn<CashflowCategory>[] = [
+        ...baseColumns,
         {
             header: 'Aksi',
             value: (value: CashflowCategory) => (
@@ -105,16 +114,18 @@ export default function CashflowsCategoriesIndex() {
         <AuthenticatedLayout>
             <Head title="Cashflows Categories" />
             <div className="p-4 lg:p-8">
-                <div className="mb-6 flex flex-col items-center gap-4 lg:flex-row lg:items-center lg:justify-between">
-                    <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-center lg:justify-end">
-                        <Button onClick={() => setIsCreateModalOpen(true)} color="primary">
-                            <Plus className="h-5 w-5" />
-                            Tambah Kategori
-                        </Button>
+                {auth.user.is_admin === 1 && (
+                    <div className="mb-6 flex flex-col items-center gap-4 lg:flex-row lg:items-center lg:justify-between">
+                        <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-center lg:justify-end">
+                            <Button onPress={() => setIsCreateModalOpen(true)} color="primary">
+                                <Plus className="h-5 w-5" />
+                                Tambah Kategori
+                            </Button>
+                        </div>
                     </div>
-                </div>
+                )}
                 <Table
-                    column={columns}
+                    column={auth.user.is_admin === 1 ? adminColumns : baseColumns}
                     data={categories.data}
                     pagination={{
                         ...categories,

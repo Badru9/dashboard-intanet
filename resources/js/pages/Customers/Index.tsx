@@ -37,10 +37,15 @@ type CustomerPageProps = PageProps &
             }>;
         };
         filters: Record<string, string>;
+        auth: {
+            user: {
+                is_admin: number;
+            };
+        };
     };
 
 export default function CustomersIndex() {
-    const { customers, filters } = usePage<CustomerPageProps>().props;
+    const { customers, filters, auth } = usePage<CustomerPageProps>().props;
     const { isOpen: isCreateOpen, onOpen: onCreateOpen, onOpenChange: onCreateOpenChange } = useDisclosure();
     const { isOpen: isEditOpen, onOpen: onEditOpen, onOpenChange: onEditOpenChange } = useDisclosure();
     const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onOpenChange: onDeleteOpenChange } = useDisclosure();
@@ -78,7 +83,7 @@ export default function CustomersIndex() {
 
     console.log(customers);
 
-    const columns: TableColumn<Customer>[] = [
+    const baseColumns: TableColumn<Customer>[] = [
         {
             header: 'Nama',
             value: (customer: Customer) => (
@@ -145,6 +150,10 @@ export default function CustomersIndex() {
             header: 'Tanggal Bergabung',
             value: (customer: Customer) => <span className="text-gray-500">{moment(customer.join_date).format('DD MMMM YYYY')}</span>,
         },
+    ];
+
+    const adminColumns: TableColumn<Customer>[] = [
+        ...baseColumns,
         {
             header: 'Aksi',
             value: (customer: Customer) => (
@@ -195,10 +204,12 @@ export default function CustomersIndex() {
                                 radius="md"
                             />
                         </div>
-                        <Button onPress={onCreateOpen} color="primary">
-                            <Plus className="h-5 w-5" />
-                            Tambah Customer
-                        </Button>
+                        {auth.user.is_admin === 1 && (
+                            <Button onPress={onCreateOpen} color="primary">
+                                <Plus className="h-5 w-5" />
+                                Tambah Customer
+                            </Button>
+                        )}
                     </div>
                 </div>
 
@@ -206,7 +217,7 @@ export default function CustomersIndex() {
                 <div className="-mx-4 lg:mx-0">
                     <Table<Customer>
                         data={filteredCustomers}
-                        column={columns}
+                        column={auth.user.is_admin === 1 ? adminColumns : baseColumns}
                         pagination={{
                             ...customers,
                             last_page: customers.last_page,
