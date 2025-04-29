@@ -57,8 +57,8 @@ export default function CreateCustomer({ onClose }: { onClose: () => void }) {
                 onClose();
                 console.log('success');
             },
-            onError: () => {
-                console.log(errors);
+            onError: (error) => {
+                console.log('error', error);
             },
         });
     };

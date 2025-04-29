@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Customer;
 use App\Models\InternetPackage;
+use App\Models\Invoice;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
@@ -45,9 +46,9 @@ class CustomerController extends Controller
             'phone' => 'required|string|max:255',
             'npwp' => 'required|string|max:255',
             'package_id' => 'required|exists:internet_packages,id',
-            'coordinates' => 'required|array',
-            'coordinates.latitude' => 'required|string',
-            'coordinates.longitude' => 'required|string',
+            'coordinates' => 'nullable|array',
+            'coordinates.latitude' => 'nullable|string',
+            'coordinates.longitude' => 'nullable|string',
             'join_date' => 'required|date',
             'email' => 'nullable|email|unique:customers,email',
         ]);
@@ -63,8 +64,22 @@ class CustomerController extends Controller
                 'npwp' => $validated['npwp'],
                 'package_id' => $validated['package_id'],
                 'email' => $validated['email'] ?: null,
-                'coordinate' => $validated['coordinates']['latitude'] . ',' . $validated['coordinates']['longitude'],
+                'coordinate' => isset($validated['coordinates']) ?
+                    $validated['coordinates']['latitude'] . ',' . $validated['coordinates']['longitude'] : null,
                 'join_date' => $validated['join_date'],
+            ]);
+
+            // Membuat invoice otomatis
+            $package = InternetPackage::find($validated['package_id']);
+            $dueDate = now()->addMonth();
+
+            Invoice::create([
+                'customer_id' => $customer->id,
+                'package_id' => $validated['package_id'],
+                'amount' => $package->price,
+                'status' => 'unpaid',
+                'due_date' => $dueDate,
+                'created_by' => Auth::id(),
             ]);
 
             Log::info('Customer created successfully', ['customer' => $customer]);
@@ -98,9 +113,9 @@ class CustomerController extends Controller
             'npwp' => 'nullable|string|max:255',
             'package_id' => 'required|exists:internet_packages,id',
             'phone' => 'required|string|max:255',
-            'coordinates' => 'required|array',
-            'coordinates.latitude' => 'required|string',
-            'coordinates.longitude' => 'required|string',
+            'coordinates' => 'nullable|array',
+            'coordinates.latitude' => 'nullable|string',
+            'coordinates.longitude' => 'nullable|string',
             'join_date' => 'required|date',
         ]);
 
@@ -112,7 +127,8 @@ class CustomerController extends Controller
             'npwp' => $validated['npwp'],
             'package_id' => $validated['package_id'],
             'phone' => $validated['phone'],
-            'coordinate' => $validated['coordinates']['latitude'] . ',' . $validated['coordinates']['longitude'],
+            'coordinate' => isset($validated['coordinates']) ?
+                $validated['coordinates']['latitude'] . ',' . $validated['coordinates']['longitude'] : null,
             'join_date' => $validated['join_date'],
         ]);
 

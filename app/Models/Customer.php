@@ -32,6 +32,7 @@ class Customer extends Model
 
     protected $attributes = [
         'email' => null,
+        'coordinate' => null,
     ];
 
     public function package(): BelongsTo

@@ -44,9 +44,10 @@ class InvoiceController extends Controller
             'status' => 'required|in:unpaid,paid,cancelled',
             'due_date' => 'required|date',
             'note' => 'nullable|string',
+            'creator' => 'required|exists:users,id',
         ]);
 
-        $validated['created_id'] = Auth::id();
+        $validated['created_by'] = Auth::id();
 
         Invoice::create($validated);
 

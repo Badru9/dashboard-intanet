@@ -11,7 +11,7 @@ interface Props extends PageProps, Record<string, any> {
 }
 
 export default function CreateInvoice({ onClose }: { onClose: () => void }) {
-    const { customers, packages } = usePage<Props>().props;
+    const { customers, packages, auth } = usePage<Props>().props;
 
     console.log('customers', customers);
     console.log('packages', packages);
@@ -23,6 +23,7 @@ export default function CreateInvoice({ onClose }: { onClose: () => void }) {
         status: '',
         due_date: '',
         note: '',
+        creator: auth.user.id,
     });
 
     const handleSubmit = (e: React.FormEvent) => {
