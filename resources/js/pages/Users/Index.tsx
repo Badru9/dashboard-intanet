@@ -79,14 +79,14 @@ export default function UsersIndex() {
             header: 'Nama',
             value: (user: User) => (
                 <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 overflow-hidden rounded-full bg-gray-100">
+                    <div className="h-8 w-8 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-700">
                         <img
                             src={`https://ui-avatars.com/api/?name=${user.name || 'User'}&background=random`}
                             alt={user.name || 'User'}
                             className="h-full w-full object-cover"
                         />
                     </div>
-                    <p className="text-gray-600">{user.name || 'N/A'}</p>
+                    <p className="text-gray-600 dark:text-gray-300">{user.name || 'N/A'}</p>
                 </div>
             ),
         },
@@ -96,7 +96,7 @@ export default function UsersIndex() {
         },
         {
             header: 'Email',
-            value: (user: User) => <p className="font-medium text-gray-900">{user.email || 'N/A'}</p>,
+            value: (user: User) => <p className="font-medium text-gray-900 dark:text-gray-100">{user.email || 'N/A'}</p>,
         },
         {
             header: 'Aksi',
@@ -131,7 +131,7 @@ export default function UsersIndex() {
     return (
         <AuthenticatedLayout>
             <Head title="Users" />
-            <div className="p-4 lg:p-8">
+            <div className="p-4 dark:bg-gray-900 lg:p-8">
                 <div className="mb-6 flex flex-col items-center gap-4 lg:flex-row lg:items-center lg:justify-between">
                     <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-center lg:justify-end">
                         <div className="relative w-full lg:w-auto">
@@ -168,17 +168,17 @@ export default function UsersIndex() {
 
                 {auth.user.is_admin === 1 && (
                     <>
-                        <Modal isOpen={isCreateOpen} onOpenChange={onCreateOpenChange} scrollBehavior="outside" placement="center">
+                        <Modal isOpen={isCreateOpen} onOpenChange={onCreateOpenChange} size="sm">
                             <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30">
-                                <ModalContent className="relative mt-5 w-full max-w-sm rounded-2xl bg-white p-0 lg:max-w-4xl">
+                                <ModalContent className="relative rounded-2xl bg-white p-0 dark:bg-gray-900">
                                     <CreateInvoice onClose={() => onCreateOpenChange()} />
                                 </ModalContent>
                             </div>
                         </Modal>
 
-                        <Modal isOpen={isEditOpen} onOpenChange={onEditOpenChange}>
+                        <Modal isOpen={isEditOpen} onOpenChange={onEditOpenChange} size="sm">
                             <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30">
-                                <ModalContent className="relative w-full max-w-sm rounded-2xl bg-white p-0 lg:max-w-4xl">
+                                <ModalContent className="relative rounded-2xl bg-white p-0 dark:bg-gray-900">
                                     {selectedUser && <EditInvoice user={selectedUser} onClose={() => onEditOpenChange()} />}
                                 </ModalContent>
                             </div>

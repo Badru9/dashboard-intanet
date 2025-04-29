@@ -23,11 +23,13 @@ class Customer extends Model
         'coordinate',
         'join_date',
         'inactive_at',
+        'bill_date',
     ];
 
     protected $casts = [
         'join_date' => 'date',
         'inactive_at' => 'date',
+        'bill_date' => 'date',
     ];
 
     protected $attributes = [

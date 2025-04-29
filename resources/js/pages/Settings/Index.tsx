@@ -61,14 +61,14 @@ export default function Settings() {
                     {settingSections.map((section) => (
                         <div
                             key={section.title}
-                            className="group cursor-pointer rounded-xl bg-white p-6 shadow-sm transition-all hover:shadow-md"
+                            className="group cursor-pointer rounded-xl bg-white p-6 shadow-sm transition-all hover:shadow-md dark:bg-gray-900"
                             onClick={() => setActiveTab(section.title.toLowerCase())}
                         >
-                            <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-gray-100 text-gray-600 group-hover:bg-green-500 group-hover:text-white">
+                            <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-gray-100 text-gray-600 group-hover:bg-green-500 group-hover:text-white dark:bg-gray-700 dark:text-gray-300">
                                 <i className={`feather-${section.icon} h-6 w-6`} />
                             </div>
-                            <h3 className="mb-2 text-lg font-semibold text-gray-900">{section.title}</h3>
-                            <p className="text-sm text-gray-500">{section.description}</p>
+                            <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">{section.title}</h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-300">{section.description}</p>
                         </div>
                     ))}
                 </div>

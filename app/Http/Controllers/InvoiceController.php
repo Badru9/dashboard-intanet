@@ -8,6 +8,7 @@ use App\Models\InternetPackage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Carbon\Carbon;
 
 class InvoiceController extends Controller
 {
@@ -30,26 +31,41 @@ class InvoiceController extends Controller
     public function create()
     {
         return inertia('Invoices/Create', [
-            'customers' => Customer::with('package')->get(),
-            'packages' => InternetPackage::all()
+            'customers' => Customer::with('package')
+                ->where('status', 'active')
+                ->get()
         ]);
     }
 
-    public function store(Request $request, Customer $customer)
+    public function store(Request $request)
     {
         $validated = $request->validate([
             'customer_id' => 'required|exists:customers,id',
-            'package_id' => 'required|exists:internet_packages,id',
-            'amount' => 'required|numeric|min:0',
-            'status' => 'required|in:unpaid,paid,cancelled',
-            'due_date' => 'required|date',
+            'period' => 'required|date_format:Y-m',
             'note' => 'nullable|string',
-            'creator' => 'required|exists:users,id',
         ]);
 
-        $validated['created_by'] = Auth::id();
+        $customer = Customer::with('package')->findOrFail($validated['customer_id']);
 
-        Invoice::create($validated);
+        // Hitung due date berdasarkan active_date customer
+        $activeDate = Carbon::parse($customer->active_date);
+        $periodDate = Carbon::createFromFormat('Y-m', $validated['period']);
+        $dueDate = Carbon::create(
+            $periodDate->year,
+            $periodDate->month,
+            $activeDate->day
+        );
+
+        Invoice::create([
+            'customer_id' => $customer->id,
+            'package_id' => $customer->package_id,
+            'amount' => $customer->package->price,
+            'status' => 'unpaid',
+            'due_date' => $dueDate,
+            'period' => $periodDate,
+            'note' => $validated['note'],
+            'created_by' => Auth::id(),
+        ]);
 
         return redirect()->route('invoices.index')
             ->with('message', 'Invoice created successfully.');

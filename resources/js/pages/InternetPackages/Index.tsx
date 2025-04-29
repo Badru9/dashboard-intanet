@@ -74,15 +74,15 @@ export default function InternetPackagesIndex() {
     const baseColumns: TableColumn<InternetPackage>[] = [
         {
             header: 'Nama Paket',
-            value: (pkg: InternetPackage) => <span className="font-medium text-gray-900">{pkg.name}</span>,
+            value: (pkg: InternetPackage) => <span className="font-medium text-gray-900 dark:text-gray-100">{pkg.name}</span>,
         },
         {
             header: 'Kecepatan',
-            value: (pkg: InternetPackage) => <span className="text-gray-500">{pkg.speed} Mbps</span>,
+            value: (pkg: InternetPackage) => <span className="text-gray-500 dark:text-gray-300">{pkg.speed} Mbps</span>,
         },
         {
             header: 'Harga',
-            value: (pkg: InternetPackage) => <span className="font-medium text-gray-900">{currencyFormat(pkg.price)}</span>,
+            value: (pkg: InternetPackage) => <span className="font-medium text-gray-900 dark:text-gray-100">{currencyFormat(pkg.price)}</span>,
         },
     ];
 
@@ -159,17 +159,17 @@ export default function InternetPackagesIndex() {
 
                 {auth.user.is_admin === 1 && (
                     <>
-                        <Modal isOpen={isCreateOpen} onOpenChange={onCreateOpenChange}>
+                        <Modal isOpen={isCreateOpen} onOpenChange={onCreateOpenChange} size="sm">
                             <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30">
-                                <ModalContent className="relative w-full max-w-sm self-center rounded-2xl p-0 lg:max-w-4xl">
+                                <ModalContent className="relative rounded-2xl bg-white p-0 dark:bg-gray-900">
                                     <CreatePackage onClose={() => onCreateOpenChange()} />
                                 </ModalContent>
                             </div>
                         </Modal>
 
-                        <Modal isOpen={isEditOpen} onOpenChange={onEditOpen}>
+                        <Modal isOpen={isEditOpen} onOpenChange={onEditOpen} size="sm">
                             <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30">
-                                <ModalContent className="relative w-full max-w-sm self-center rounded-2xl p-0 lg:max-w-4xl">
+                                <ModalContent className="relative rounded-2xl bg-white p-0 dark:bg-gray-900">
                                     {selectedPackage && <EditPackage package={selectedPackage} onClose={() => onEditOpenChange()} />}
                                 </ModalContent>
                             </div>

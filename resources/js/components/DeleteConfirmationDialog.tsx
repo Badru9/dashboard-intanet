@@ -20,13 +20,13 @@ export default function DeleteConfirmationDialog({
 }: DeleteConfirmationDialogProps) {
     return (
         <Modal isOpen={isOpen} onOpenChange={onClose} placement="center">
-            <ModalContent className="max-w-md rounded-xl border border-red-200 bg-white p-3 shadow-2xl">
+            <ModalContent className="max-w-md rounded-xl border border-red-200 bg-white p-3 shadow-2xl dark:bg-gray-900 dark:text-gray-100">
                 <ModalHeader className="flex flex-col items-center">
-                    <WarningCircle className="mb-2 h-10 w-10 text-red-500" weight="fill" />
-                    <h3 className="text-lg font-bold text-red-600">{title}</h3>
-                    <p className="mt-2 text-center text-gray-600">{description}</p>
+                    <WarningCircle className="mb-2 h-10 w-10 text-red-500 dark:text-red-400" weight="fill" />
+                    <h3 className="text-lg font-bold text-red-600 dark:text-red-400">{title}</h3>
+                    <p className="mt-2 text-center text-gray-600 dark:text-gray-300">{description}</p>
                 </ModalHeader>
-                <ModalFooter className="mt-6 flex justify-end gap-2 text-slate-900">
+                <ModalFooter className="mt-6 flex justify-end gap-2 text-slate-900 dark:text-gray-100">
                     <Button variant="bordered" onPress={onClose} disabled={isLoading} className="cursor-pointer">
                         Batal
                     </Button>

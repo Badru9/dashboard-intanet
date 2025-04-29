@@ -18,10 +18,12 @@ class Invoice extends Model
         'status',
         'due_date',
         'note',
+        'period',
     ];
 
     protected $casts = [
         'due_date' => 'date',
+        'period' => 'date',
     ];
 
     public function customer(): BelongsTo

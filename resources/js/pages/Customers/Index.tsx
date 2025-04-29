@@ -1,3 +1,5 @@
+import ActivateCustomerDialog from '@/components/ActivateCustomerDialog';
+import DeactivateCustomerDialog from '@/components/DeactivateCustomerDialog';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import Table from '@/components/Table/Table';
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
@@ -6,7 +8,7 @@ import { type Customer, type PageProps } from '@/types';
 import { type TableColumn } from '@/types/table';
 import { Button, Input, Modal, ModalContent, useDisclosure } from '@heroui/react';
 import { Head, router, usePage } from '@inertiajs/react';
-import { MagnifyingGlass, PencilSimple, Plus, Trash } from '@phosphor-icons/react';
+import { MagnifyingGlass, Pause, PencilSimple, Play, Plus, Power, Trash } from '@phosphor-icons/react';
 import moment from 'moment';
 import { useMemo, useState } from 'react';
 import CreateCustomer from './Create';
@@ -44,13 +46,19 @@ type CustomerPageProps = PageProps &
         };
     };
 
+// Pertama, buat type untuk status yang valid
+type CustomerStatus = 'active' | 'inactive' | 'paused';
+
 export default function CustomersIndex() {
     const { customers, filters, auth } = usePage<CustomerPageProps>().props;
     const { isOpen: isCreateOpen, onOpen: onCreateOpen, onOpenChange: onCreateOpenChange } = useDisclosure();
     const { isOpen: isEditOpen, onOpen: onEditOpen, onOpenChange: onEditOpenChange } = useDisclosure();
     const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onOpenChange: onDeleteOpenChange } = useDisclosure();
+    const { isOpen: isActivateOpen, onOpen: onActivateOpen, onOpenChange: onActivateOpenChange } = useDisclosure();
+    const { isOpen: isStatusChangeOpen, onOpen: onStatusChangeOpen, onOpenChange: onStatusChangeOpenChange } = useDisclosure();
     const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
     const [search, setSearch] = useState(filters?.search || '');
+    const [statusChangeType, setStatusChangeType] = useState<'inactive' | 'paused'>('inactive');
 
     const filteredCustomers = useMemo(() => {
         if (!search) return customers.data;
@@ -68,6 +76,90 @@ export default function CustomersIndex() {
     const handleDelete = (customer: Customer) => {
         setSelectedCustomer(customer);
         onDeleteOpen();
+    };
+
+    const handleStatusChange = (customer: Customer, newStatus: CustomerStatus) => {
+        if (newStatus === 'active') {
+            setSelectedCustomer(customer);
+            onActivateOpen();
+            return;
+        }
+
+        setSelectedCustomer(customer);
+        setStatusChangeType(newStatus);
+        onStatusChangeOpen();
+    };
+
+    const handleStatusChangeConfirm = () => {
+        if (!selectedCustomer) return;
+
+        router.put(
+            route('customers.update-status', selectedCustomer.id),
+            {
+                status: statusChangeType,
+            },
+            {
+                onSuccess: () => {
+                    onStatusChangeOpenChange();
+                    setSelectedCustomer(null);
+                },
+            },
+        );
+    };
+
+    const handleActivateConfirm = (billDate: string) => {
+        if (!selectedCustomer) return;
+
+        router.put(
+            route('customers.update-status', selectedCustomer.id),
+            {
+                status: 'active',
+                bill_date: billDate,
+            },
+            {
+                onSuccess: () => {
+                    onActivateOpenChange();
+                    setSelectedCustomer(null);
+                },
+            },
+        );
+    };
+
+    const renderStatusActions = (customer: Customer) => {
+        if (customer.status === 'active') {
+            return (
+                <>
+                    <button
+                        onClick={() => handleStatusChange(customer, 'paused')}
+                        className="cursor-pointer rounded-lg p-2 text-gray-400 transition-colors hover:bg-yellow-50 hover:text-yellow-600"
+                        title="Pause Customer"
+                    >
+                        <Pause className="h-4 w-4" />
+                    </button>
+                    <button
+                        onClick={() => handleStatusChange(customer, 'inactive')}
+                        className="cursor-pointer rounded-lg p-2 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600"
+                        title="Non-aktifkan Customer"
+                    >
+                        <Power className="h-4 w-4" />
+                    </button>
+                </>
+            );
+        }
+
+        if (customer.status === 'paused' || customer.status === 'inactive') {
+            return (
+                <button
+                    onClick={() => handleStatusChange(customer, 'active')}
+                    className="cursor-pointer rounded-lg p-2 text-gray-400 transition-colors hover:bg-green-50 hover:text-green-600"
+                    title="Aktifkan Customer"
+                >
+                    <Play className="h-4 w-4" />
+                </button>
+            );
+        }
+
+        return null;
     };
 
     const confirmDelete = () => {
@@ -88,7 +180,7 @@ export default function CustomersIndex() {
             header: 'Nama',
             value: (customer: Customer) => (
                 <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 overflow-hidden rounded-full bg-gray-100">
+                    <div className="h-10 w-10 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-700">
                         <img
                             src={`https://ui-avatars.com/api/?name=${customer.name}&background=random`}
                             alt={customer.name}
@@ -96,14 +188,14 @@ export default function CustomersIndex() {
                         />
                     </div>
                     <div>
-                        <p className="font-medium text-gray-900">{customer.name}</p>
+                        <p className="font-medium text-gray-900 dark:text-gray-100">{customer.name}</p>
                     </div>
                 </div>
             ),
         },
         {
             header: 'Email',
-            value: (customer: Customer) => <span className="text-gray-500">{customer.email || '-'}</span>,
+            value: (customer: Customer) => <span className="text-gray-500 dark:text-gray-300">{customer.email || '-'}</span>,
         },
         {
             header: 'Status',
@@ -115,40 +207,44 @@ export default function CustomersIndex() {
         },
         {
             header: 'Alamat',
-            value: (customer: Customer) => <span className="text-gray-500">{customer.address}</span>,
+            value: (customer: Customer) => <span className="text-gray-500 dark:text-gray-300">{customer.address}</span>,
         },
         {
             header: 'NPWP',
-            value: (customer: Customer) => <span className="text-gray-500">{customer.npwp || '-'}</span>,
+            value: (customer: Customer) => <span className="text-gray-500 dark:text-gray-300">{customer.npwp || '-'}</span>,
         },
         {
             header: 'No Faktur Pajak',
-            value: (customer: Customer) => <span className="text-gray-500">{customer.tax_invoice_number || '-'}</span>,
+            value: (customer: Customer) => <span className="text-gray-500 dark:text-gray-300">{customer.tax_invoice_number || '-'}</span>,
         },
         {
             header: 'Paket',
-            value: (customer: Customer) => <span className="font-medium text-gray-900">{customer.package?.name || '-'}</span>,
+            value: (customer: Customer) => <span className="font-medium text-gray-900 dark:text-gray-100">{customer.package?.name || '-'}</span>,
         },
         {
             header: 'Harga Paket',
-            value: (customer: Customer) => <span className="font-medium text-gray-900">{currencyFormat(customer.package?.price || 0)}</span>,
+            value: (customer: Customer) => (
+                <span className="font-medium text-gray-900 dark:text-gray-100">{currencyFormat(customer.package?.price || 0)}</span>
+            ),
         },
 
         {
             header: 'Koordinat',
             value: (customer: Customer) => (
-                <span className="text-gray-500">
+                <span className="text-gray-500 dark:text-gray-300">
                     {customer.coordinate?.split(',')[0] || '-'}, {customer.coordinate?.split(',')[1] || '-'}
                 </span>
             ),
         },
         {
             header: 'Phone',
-            value: (customer: Customer) => <span className="font-medium text-gray-900">{customer.phone}</span>,
+            value: (customer: Customer) => <span className="font-medium text-gray-900 dark:text-gray-100">{customer.phone}</span>,
         },
         {
             header: 'Tanggal Bergabung',
-            value: (customer: Customer) => <span className="text-gray-500">{moment(customer.join_date).format('DD MMMM YYYY')}</span>,
+            value: (customer: Customer) => (
+                <span className="text-gray-500 dark:text-gray-300">{moment(customer.join_date).format('DD MMMM YYYY')}</span>
+            ),
         },
     ];
 
@@ -158,6 +254,7 @@ export default function CustomersIndex() {
             header: 'Aksi',
             value: (customer: Customer) => (
                 <div className="flex items-center gap-2">
+                    {renderStatusActions(customer)}
                     <button
                         onClick={() => handleEdit(customer)}
                         className="cursor-pointer rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-yellow-500"
@@ -227,17 +324,17 @@ export default function CustomersIndex() {
                     />
                 </div>
 
-                <Modal isOpen={isCreateOpen} onOpenChange={onCreateOpenChange} scrollBehavior="outside" placement="center">
-                    <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30">
-                        <ModalContent className="relative mt-5 w-full max-w-sm rounded-2xl bg-white p-0 lg:max-w-4xl">
+                <Modal isOpen={isCreateOpen} onOpenChange={onCreateOpenChange} size="2xl">
+                    <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30 dark:bg-black/30">
+                        <ModalContent className="relative rounded-2xl bg-white p-0 dark:bg-gray-900">
                             <CreateCustomer onClose={() => onCreateOpenChange()} />
                         </ModalContent>
                     </div>
                 </Modal>
 
-                <Modal isOpen={isEditOpen} onOpenChange={onEditOpenChange}>
-                    <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30">
-                        <ModalContent className="relative w-full max-w-sm rounded-2xl bg-white p-0 lg:max-w-4xl">
+                <Modal isOpen={isEditOpen} onOpenChange={onEditOpenChange} size="2xl">
+                    <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30 dark:bg-black/30">
+                        <ModalContent className="relative rounded-2xl bg-white p-0 dark:bg-gray-900">
                             {selectedCustomer && <EditCustomer customer={selectedCustomer} onClose={() => onEditOpenChange()} />}
                         </ModalContent>
                     </div>
@@ -250,6 +347,22 @@ export default function CustomersIndex() {
                     onConfirm={confirmDelete}
                     title="Hapus Customer"
                     description={`Apakah Anda yakin ingin menghapus customer ${selectedCustomer?.name}?`}
+                />
+
+                <ActivateCustomerDialog
+                    isOpen={isActivateOpen}
+                    onClose={onActivateOpenChange}
+                    onConfirm={handleActivateConfirm}
+                    customerName={selectedCustomer?.name || ''}
+                />
+
+                {/* Ganti StatusChangeDialog dengan DeactivateCustomerDialog */}
+                <DeactivateCustomerDialog
+                    isOpen={isStatusChangeOpen}
+                    onClose={onStatusChangeOpenChange}
+                    onConfirm={handleStatusChangeConfirm}
+                    customerName={selectedCustomer?.name || ''}
+                    type={statusChangeType}
                 />
             </div>
         </AuthenticatedLayout>

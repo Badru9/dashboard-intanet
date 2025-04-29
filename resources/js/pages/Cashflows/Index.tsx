@@ -141,15 +141,15 @@ export default function CashflowsIndex() {
         router.get(route('cashflows.index'), params, { preserveState: true });
     };
 
-    const handleResetFilters = () => {
-        setSelectedCategory('all');
-        setSelectedDateRange({
-            start: new CalendarDate(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()),
-            end: new CalendarDate(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()),
-        });
+    // const handleResetFilters = () => {
+    //     setSelectedCategory('all');
+    //     setSelectedDateRange({
+    //         start: new CalendarDate(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()),
+    //         end: new CalendarDate(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()),
+    //     });
 
-        router.get(route('cashflows.index'), {}, { preserveState: true });
-    };
+    //     router.get(route('cashflows.index'), {}, { preserveState: true });
+    // };
 
     const columns: TableColumn<Cashflow>[] = [
         {
@@ -212,7 +212,7 @@ export default function CashflowsIndex() {
                                 label="Filter Kategori"
                                 placeholder="Pilih Kategori"
                                 className="w-full"
-                                color="primary"
+                                color="default"
                                 items={[{ id: 'all', name: 'Semua' }, ...categories]}
                                 selectedKeys={[selectedCategory]}
                                 onSelectionChange={(keys) => handleCategoryChange(Array.from(keys)[0] as string)}
@@ -226,16 +226,24 @@ export default function CashflowsIndex() {
                         </div>
                         <div className="relative w-full lg:w-64">
                             <DateRangePicker
+                                showMonthAndYearPickers
                                 label="Filter Tanggal"
-                                color="primary"
+                                color="default"
                                 selectorButtonPlacement="start"
                                 value={selectedDateRange}
                                 onChange={(value) => handleDateRangeChange(value as { start: DateValue; end: DateValue } | null)}
+                                CalendarBottomContent={
+                                    <div className="flex items-center justify-end px-3 py-2">
+                                        <Button onPress={() => handleDateRangeChange(null)} color="danger" radius="full" variant="flat" size="sm">
+                                            Clear
+                                        </Button>
+                                    </div>
+                                }
                             />
                         </div>
-                        <Button onPress={handleResetFilters} color="danger" variant="flat">
+                        {/* <Button onPress={handleResetFilters} color="danger" variant="flat">
                             Reset Filter
-                        </Button>
+                        </Button> */}
                     </div>
                     {auth.user.is_admin === 1 && (
                         <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-center lg:justify-end">
@@ -258,16 +266,16 @@ export default function CashflowsIndex() {
                 />
             </div>
 
-            <Modal isOpen={isCreateOpen} onOpenChange={onCreateOpenChange}>
-                <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30">
-                    <ModalContent className="relative w-full max-w-sm rounded-2xl bg-white p-0 lg:max-w-4xl">
+            <Modal isOpen={isCreateOpen} onOpenChange={onCreateOpenChange} size="sm">
+                <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30 dark:bg-black/30">
+                    <ModalContent className="relative rounded-2xl bg-white p-0 dark:bg-gray-900">
                         <CreateCashflow onClose={() => onCreateOpenChange()} />
                     </ModalContent>
                 </div>
             </Modal>
-            <Modal isOpen={isEditOpen} onOpenChange={onEditOpenChange}>
-                <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30">
-                    <ModalContent className="relative w-full max-w-sm rounded-2xl bg-white p-0 lg:max-w-4xl">
+            <Modal isOpen={isEditOpen} onOpenChange={onEditOpenChange} size="sm">
+                <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30 dark:bg-black/30">
+                    <ModalContent className="relative w-full max-w-sm rounded-2xl bg-white p-0 dark:bg-gray-900 lg:max-w-4xl">
                         <EditCashflow cashflow={selectedCashflow} onClose={() => onEditOpenChange()} />
                     </ModalContent>
                 </div>

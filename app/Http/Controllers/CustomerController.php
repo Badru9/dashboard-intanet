@@ -52,6 +52,7 @@ class CustomerController extends Controller
             'coordinates.longitude' => 'nullable|string',
             'join_date' => 'required|date',
             'email' => 'nullable|email|unique:customers,email',
+            'bill_date' => 'required|date',
         ]);
 
         Log::info('Validated data:', $validated);
@@ -68,11 +69,12 @@ class CustomerController extends Controller
                 'coordinate' => isset($validated['coordinates']) ?
                     $validated['coordinates']['latitude'] . ',' . $validated['coordinates']['longitude'] : null,
                 'join_date' => $validated['join_date'],
+                'bill_date' => $validated['bill_date'],
             ]);
 
             // Membuat invoice otomatis
             $package = InternetPackage::find($validated['package_id']);
-            $dueDate = Carbon::parse($validated['join_date'])->addMonth();
+            $dueDate = Carbon::parse($validated['bill_date'])->addMonth();
 
             Invoice::create([
                 'customer_id' => $customer->id,
@@ -80,6 +82,7 @@ class CustomerController extends Controller
                 'amount' => $package->price,
                 'status' => 'unpaid',
                 'due_date' => $dueDate,
+                'period' => Carbon::parse($validated['bill_date']),
                 'created_by' => Auth::id(),
             ]);
 
@@ -143,5 +146,49 @@ class CustomerController extends Controller
 
         return redirect()->route('customers.index')
             ->with('message', 'Customer deleted successfully.');
+    }
+
+    public function updateStatus(Customer $customer, Request $request)
+    {
+        $validated = $request->validate([
+            'status' => 'required|in:active,inactive,paused',
+            'bill_date' => 'required_if:status,active|date',
+        ]);
+
+        try {
+            $customer->update($validated);
+
+            // Jika status berubah menjadi inactive atau paused, nonaktifkan invoice yang belum dibayar
+            if (in_array($validated['status'], ['inactive', 'paused'])) {
+                Invoice::where('customer_id', $customer->id)
+                    ->where('status', 'unpaid')
+                    ->update(['status' => 'cancelled']);
+            }
+
+            // Jika status berubah menjadi active, buat invoice baru
+            if ($validated['status'] === 'active' && isset($validated['bill_date'])) {
+                $package = $customer->package;
+                $dueDate = Carbon::parse($validated['bill_date'])->addMonth();
+
+                Invoice::create([
+                    'customer_id' => $customer->id,
+                    'package_id' => $package->id,
+                    'amount' => $package->price,
+                    'status' => 'unpaid',
+                    'due_date' => $dueDate,
+                    'period' => Carbon::parse($validated['bill_date']),
+                    'created_by' => Auth::id(),
+                ]);
+            }
+
+            return redirect()->back()->with('success', 'Status customer berhasil diperbarui');
+        } catch (\Exception $e) {
+            Log::error('Failed to update customer status', [
+                'customer_id' => $customer->id,
+                'error' => $e->getMessage()
+            ]);
+
+            return redirect()->back()->with('error', 'Gagal mengubah status customer');
+        }
     }
 }

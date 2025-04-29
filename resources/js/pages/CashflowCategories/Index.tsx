@@ -45,19 +45,26 @@ export default function CashflowsCategoriesIndex() {
     const baseColumns: TableColumn<CashflowCategory>[] = [
         {
             header: 'Nama',
-            value: (value: CashflowCategory) => value.name,
+            value: (value: CashflowCategory) => <span className="text-gray-900 dark:text-gray-100">{value.name}</span>,
         },
         {
             header: 'Tipe',
-            value: (value: CashflowCategory) => (value.is_out == 1 ? 'Pengeluaran' : 'Pemasukan'),
+            value: (value: CashflowCategory) =>
+                value.is_out == 1 ? (
+                    <span className="text-red-500 dark:text-red-400">Pengeluaran</span>
+                ) : (
+                    <span className="text-green-500 dark:text-green-400">Pemasukan</span>
+                ),
         },
         {
             header: 'Tanggal',
-            value: (value: CashflowCategory) => moment(value.created_at).format('DD MMMM YYYY'),
+            value: (value: CashflowCategory) => (
+                <span className="text-gray-900 dark:text-gray-100">{moment(value.created_at).format('DD MMMM YYYY')}</span>
+            ),
         },
         {
             header: 'Catatan',
-            value: (value: CashflowCategory) => value.note,
+            value: (value: CashflowCategory) => <span className="text-gray-900 dark:text-gray-100">{value.note}</span>,
         },
     ];
 
@@ -134,16 +141,16 @@ export default function CashflowsCategoriesIndex() {
                         onChange: handlePageChange,
                     }}
                 />
-                <Modal isOpen={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
+                <Modal isOpen={isCreateModalOpen} onOpenChange={setIsCreateModalOpen} size="sm">
                     <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30">
-                        <ModalContent className="relative w-full max-w-sm rounded-2xl bg-white p-0 lg:max-w-4xl">
+                        <ModalContent className="relative rounded-2xl bg-white p-0 dark:bg-gray-900">
                             <CreateCashflowCategory onClose={() => setIsCreateModalOpen(false)} />
                         </ModalContent>
                     </div>
                 </Modal>
-                <Modal isOpen={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+                <Modal isOpen={isEditModalOpen} onOpenChange={setIsEditModalOpen} size="sm">
                     <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30">
-                        <ModalContent className="relative w-full max-w-sm rounded-2xl bg-white p-0 lg:max-w-4xl">
+                        <ModalContent className="relative rounded-2xl bg-white p-0 dark:bg-gray-900">
                             {selectedCategory && <EditCashflowCategory category={selectedCategory} onClose={() => setIsEditModalOpen(false)} />}
                         </ModalContent>
                     </div>

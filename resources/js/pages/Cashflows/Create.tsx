@@ -43,9 +43,9 @@ export default function CreateCashflow({ onClose }: { onClose: () => void }) {
     };
 
     return (
-        <div className="mx-auto mt-5 h-fit w-full max-w-4xl overflow-y-auto rounded-2xl bg-white text-slate-800">
+        <div className="mx-auto mt-5 h-fit w-full max-w-4xl overflow-y-auto rounded-2xl bg-white text-slate-800 dark:bg-gray-900 dark:text-gray-100">
             <Head title="Create Cashflow" />
-            <h2 className="px-5 text-lg font-medium text-gray-900">Tambah Cashflow Baru</h2>
+            <h2 className="px-5 text-lg font-medium text-gray-900 dark:text-gray-100">Tambah Cashflow Baru</h2>
             <form onSubmit={handleSubmit} className="space-y-6 p-5">
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <div>

@@ -89,24 +89,24 @@ export default function InvoicesIndex() {
             header: 'Customer',
             value: (invoice: Invoices) => (
                 <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 overflow-hidden rounded-full bg-gray-100">
+                    <div className="h-8 w-8 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-700">
                         <img
                             src={`https://ui-avatars.com/api/?name=${invoice.customer?.name || 'Customer'}&background=random`}
                             alt={invoice.customer?.name || 'Customer'}
                             className="h-full w-full object-cover"
                         />
                     </div>
-                    <p className="text-gray-600">{invoice.customer?.name || 'N/A'}</p>
+                    <p className="text-gray-600 dark:text-gray-300">{invoice.customer?.name || 'N/A'}</p>
                 </div>
             ),
         },
         {
             header: 'Dibuat Oleh',
-            value: (invoice: Invoices) => <p className="font-medium text-gray-900">{invoice.creator?.name || 'N/A'}</p>,
+            value: (invoice: Invoices) => <p className="font-medium text-gray-900 dark:text-gray-100">{invoice.creator?.name || 'N/A'}</p>,
         },
         {
             header: 'Amount',
-            value: (invoice: Invoices) => <p className="font-medium text-gray-900">{currencyFormat(invoice.amount)}</p>,
+            value: (invoice: Invoices) => <p className="font-medium text-gray-900 dark:text-gray-100">{currencyFormat(invoice.amount)}</p>,
         },
         {
             header: 'Status',
@@ -118,11 +118,11 @@ export default function InvoicesIndex() {
         },
         {
             header: 'Due Date',
-            value: (invoice: Invoices) => <span className="text-gray-600">{moment(invoice.due_date).format('DD MMMM YYYY')}</span>,
+            value: (invoice: Invoices) => <span className="text-gray-600 dark:text-gray-300">{moment(invoice.due_date).format('DD MMMM YYYY')}</span>,
         },
         {
             header: 'Catatan',
-            value: (invoice: Invoices) => <span className="text-gray-600">{invoice.note}</span>,
+            value: (invoice: Invoices) => <span className="text-gray-600 dark:text-gray-300">{invoice.note}</span>,
         },
     ];
 
@@ -166,7 +166,7 @@ export default function InvoicesIndex() {
                     <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-center lg:justify-end">
                         <div className="relative w-full lg:w-auto">
                             <Input
-                                startContent={<MagnifyingGlass className="h-4 w-4 text-gray-500" />}
+                                startContent={<MagnifyingGlass className="h-4 w-4 text-gray-500 dark:text-gray-400" />}
                                 type="text"
                                 placeholder="Cari invoice..."
                                 value={search}
@@ -198,17 +198,17 @@ export default function InvoicesIndex() {
 
                 {auth.user.is_admin === 1 && (
                     <>
-                        <Modal isOpen={isCreateOpen} onOpenChange={onCreateOpenChange} scrollBehavior="outside" placement="center">
+                        <Modal isOpen={isCreateOpen} onOpenChange={onCreateOpenChange} size="2xl">
                             <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30">
-                                <ModalContent className="relative mt-5 w-full max-w-sm rounded-2xl bg-white p-0 lg:max-w-4xl">
+                                <ModalContent className="relative rounded-2xl bg-white p-0 dark:bg-gray-900">
                                     <CreateInvoice onClose={() => onCreateOpenChange()} />
                                 </ModalContent>
                             </div>
                         </Modal>
 
-                        <Modal isOpen={isEditOpen} onOpenChange={onEditOpenChange}>
+                        <Modal isOpen={isEditOpen} onOpenChange={onEditOpenChange} size="2xl">
                             <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30">
-                                <ModalContent className="relative w-full max-w-sm rounded-2xl bg-white p-0 lg:max-w-4xl">
+                                <ModalContent className="relative rounded-2xl bg-white p-0 dark:bg-gray-900">
                                     {selectedInvoice && (
                                         <EditInvoice
                                             customers={customers}

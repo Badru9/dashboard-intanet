@@ -4,23 +4,27 @@ import { currencyFormat } from '@/lib/utils';
 import { InternetPackage, type Customer, type PageProps } from '@/types';
 import { Button, DatePicker, Input, Select, SelectItem, Textarea } from '@heroui/react';
 import { router, useForm, usePage } from '@inertiajs/react';
-import { DateValue } from '@internationalized/date';
+import { CalendarDate } from '@internationalized/date';
 
 interface CreateCustomerPageProps extends PageProps, Record<string, any> {
     packages: InternetPackage[];
 }
 
-interface CustomerFormData extends Record<string, any> {
+interface CustomerFormData {
     [key: string]: any;
     name: string;
     status: Customer['status'];
     address: string;
     npwp: string;
     package_id: string;
-    coordinates?: Record<string, string>;
+    coordinates: {
+        latitude: string;
+        longitude: string;
+    };
     phone: string;
-    join_date?: DateValue | null;
-    email?: string;
+    join_date: CalendarDate | null;
+    bill_date: CalendarDate | null;
+    email: string;
 }
 
 export default function CreateCustomer({ onClose }: { onClose: () => void }) {
@@ -38,17 +42,20 @@ export default function CreateCustomer({ onClose }: { onClose: () => void }) {
         },
         phone: '',
         join_date: null,
+        bill_date: null,
         email: '',
     });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Konversi ke string hanya saat submit
         const payload = {
             ...data,
             join_date: data.join_date
                 ? `${data.join_date.year}-${String(data.join_date.month).padStart(2, '0')}-${String(data.join_date.day).padStart(2, '0')}`
+                : null,
+            bill_date: data.bill_date
+                ? `${data.bill_date.year}-${String(data.bill_date.month).padStart(2, '0')}-${String(data.bill_date.day).padStart(2, '0')}`
                 : null,
         };
 
@@ -64,8 +71,8 @@ export default function CreateCustomer({ onClose }: { onClose: () => void }) {
     };
 
     return (
-        <div className="mx-auto mt-5 h-fit w-full max-w-4xl overflow-y-auto rounded-2xl bg-white text-slate-800">
-            <h2 className="px-5 text-lg font-medium text-gray-900">Tambah Customer Baru</h2>
+        <div className="mx-auto mt-5 h-fit w-full max-w-4xl overflow-y-auto rounded-2xl bg-white text-slate-800 dark:bg-gray-900 dark:text-gray-100">
+            <h2 className="px-5 text-lg font-medium text-gray-900 dark:text-gray-100">Tambah Customer Baru</h2>
             <form onSubmit={handleSubmit} className="space-y-6 p-5">
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <div>
@@ -77,33 +84,6 @@ export default function CreateCustomer({ onClose }: { onClose: () => void }) {
                             onChange={(e) => setData('name', e.target.value)}
                             isInvalid={!!errors.name}
                             errorMessage={errors.name}
-                        />
-                    </div>
-
-                    <div>
-                        <Select
-                            label="Status"
-                            id="status"
-                            value={data.status}
-                            onChange={(e) => setData('status', e.target.value as Customer['status'])}
-                            isInvalid={!!errors.status}
-                            errorMessage={errors.status}
-                        >
-                            {CUSTOMER_STATUS_OPTIONS.map((status) => (
-                                <SelectItem key={status.value}>{status.label}</SelectItem>
-                            ))}
-                        </Select>
-                    </div>
-
-                    <div className="sm:col-span-2">
-                        <Textarea
-                            label="Alamat"
-                            id="address"
-                            value={data.address}
-                            onChange={(e) => setData('address', e.target.value)}
-                            rows={3}
-                            isInvalid={!!errors.address}
-                            errorMessage={errors.address}
                         />
                     </div>
                     <div>
@@ -119,6 +99,18 @@ export default function CreateCustomer({ onClose }: { onClose: () => void }) {
                         />
                     </div>
 
+                    <div className="sm:col-span-2">
+                        <Textarea
+                            label="Alamat"
+                            id="address"
+                            value={data.address}
+                            onChange={(e) => setData('address', e.target.value)}
+                            rows={3}
+                            isInvalid={!!errors.address}
+                            errorMessage={errors.address}
+                        />
+                    </div>
+
                     <div>
                         <Input
                             label="No. NPWP / NIK"
@@ -129,25 +121,6 @@ export default function CreateCustomer({ onClose }: { onClose: () => void }) {
                             isInvalid={!!errors.npwp}
                             errorMessage={errors.npwp}
                         />
-                    </div>
-
-                    <div>
-                        <Select
-                            label="Paket"
-                            id="package_id"
-                            value={data.package_id}
-                            onChange={(e) => setData('package_id', e.target.value)}
-                            isInvalid={!!errors.package_id}
-                            errorMessage={errors.package_id}
-                            placeholder="Pilih Paket"
-                            selectedKeys={data.package_id}
-                        >
-                            {packages?.map((pkg) => (
-                                <SelectItem key={pkg.id} textValue={pkg.name + ' - ' + currencyFormat(pkg.price)}>
-                                    {pkg.name} - {currencyFormat(pkg.price)}
-                                </SelectItem>
-                            ))}
-                        </Select>
                     </div>
 
                     <div>
@@ -202,12 +175,59 @@ export default function CreateCustomer({ onClose }: { onClose: () => void }) {
                         <DatePicker
                             label="Tanggal Bergabung"
                             id="join_date"
-                            value={data.join_date ?? null}
+                            value={data.join_date}
                             onChange={(value) => setData('join_date', value)}
                             isInvalid={!!errors.join_date}
                             errorMessage={errors.join_date}
                             selectorButtonPlacement="start"
                         />
+                    </div>
+
+                    <div>
+                        <DatePicker
+                            label="Tanggal Tagihan"
+                            id="bill_date"
+                            value={data.bill_date}
+                            onChange={(value) => setData('bill_date', value)}
+                            isInvalid={!!errors.bill_date}
+                            errorMessage={errors.bill_date}
+                            selectorButtonPlacement="start"
+                        />
+                        <p className="ml-2 mt-2 text-xs text-red-500">* Setiap bulan</p>
+                    </div>
+
+                    <div>
+                        <Select
+                            label="Status"
+                            id="status"
+                            value={data.status}
+                            onChange={(e) => setData('status', e.target.value as Customer['status'])}
+                            isInvalid={!!errors.status}
+                            errorMessage={errors.status}
+                            selectedKeys={[data.status]}
+                        >
+                            {CUSTOMER_STATUS_OPTIONS.map((status) => (
+                                <SelectItem key={status.value}>{status.label}</SelectItem>
+                            ))}
+                        </Select>
+                    </div>
+                    <div>
+                        <Select
+                            label="Paket"
+                            id="package_id"
+                            value={data.package_id}
+                            onChange={(e) => setData('package_id', e.target.value)}
+                            isInvalid={!!errors.package_id}
+                            errorMessage={errors.package_id}
+                            placeholder="Pilih Paket"
+                            selectedKeys={data.package_id}
+                        >
+                            {packages?.map((pkg) => (
+                                <SelectItem key={pkg.id} textValue={pkg.name + ' - ' + currencyFormat(pkg.price)}>
+                                    {pkg.name} - {currencyFormat(pkg.price)}
+                                </SelectItem>
+                            ))}
+                        </Select>
                     </div>
                 </div>
 

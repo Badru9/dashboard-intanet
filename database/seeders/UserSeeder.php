@@ -14,14 +14,22 @@ class UserSeeder extends Seeder
         User::create([
             'name' => 'Admin',
             'email' => 'admin@example.com',
-            'username' => 'admin',
             'password' => Hash::make('password'),
             'phone' => '081234567890',
             'address' => 'Jl. Admin No. 1',
-            'is_admin' => '1'
+            'is_admin' => 1,
         ]);
 
         // Create regular users using Faker
         \App\Models\User::factory(10)->create();
+
+        User::create([
+            'name' => 'User',
+            'email' => 'user@example.com',
+            'password' => Hash::make('password'),
+            'phone' => '081234567891',
+            'address' => 'Jl. User No. 1',
+            'is_admin' => 0,
+        ]);
     }
 }

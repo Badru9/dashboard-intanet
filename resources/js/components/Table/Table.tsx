@@ -28,16 +28,16 @@ export default function Table<T = Record<string, unknown>>({
     rowClassName,
 }: TableProps<T>) {
     return (
-        <div className="flex flex-col gap-4">
-            <div className="w-full rounded-lg border border-gray-200 bg-white">
-                <div className="scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 overflow-x-auto rounded-lg bg-white py-1">
+        <div className="flex flex-col gap-4 dark:bg-gray-900">
+            <div className="w-full rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
+                <div className="scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-gray-100 dark:scrollbar-track-gray-700 overflow-x-auto rounded-lg">
                     <table className={clsx('w-full whitespace-nowrap', className)}>
                         <thead>
                             {header != undefined && (
-                                <tr className="border-b border-gray-200 bg-gray-50">
+                                <tr className="border-b border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-700">
                                     {numbering ? (
                                         <th
-                                            className="bg-gray-50 px-6 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500"
+                                            className="bg-gray-50 px-6 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500 dark:bg-gray-700 dark:text-gray-300"
                                             rowSpan={2}
                                         >
                                             No.
@@ -48,16 +48,18 @@ export default function Table<T = Record<string, unknown>>({
                                             key={idx}
                                             rowSpan={h.rowSpan ?? 1}
                                             colSpan={h.colSpan ?? 1}
-                                            className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
+                                            className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300"
                                         >
                                             {h.name}
                                         </th>
                                     ))}
                                 </tr>
                             )}
-                            <tr className="border-b border-gray-200">
+                            <tr className="border-b border-gray-200 dark:border-gray-700">
                                 {numbering && header == undefined ? (
-                                    <th className="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">No.</th>
+                                    <th className="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">
+                                        No.
+                                    </th>
                                 ) : null}
                                 {column
                                     .filter((col) => col.header)
@@ -65,7 +67,7 @@ export default function Table<T = Record<string, unknown>>({
                                         <th
                                             key={'header-' + headIndex}
                                             className={clsx(
-                                                'px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500',
+                                                'px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300',
                                                 typeof col.headerClassName === 'function' ? col.headerClassName(col, headIndex) : col.headerClassName,
                                             )}
                                         >
@@ -74,19 +76,19 @@ export default function Table<T = Record<string, unknown>>({
                                     ))}
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-200 bg-white">
+                        <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
                             {data.map((dt, index) => (
                                 <tr
                                     key={'row-' + index}
                                     className={clsx(
-                                        'transition-colors hover:bg-gray-50',
+                                        'transition-colors hover:bg-gray-50 dark:hover:bg-gray-700',
                                         onClickRow !== undefined ? 'cursor-pointer' : '',
                                         rowClassName ? rowClassName(dt) : '',
                                     )}
                                     onClick={() => (onClickRow ? onClickRow(dt) : null)}
                                 >
                                     {numbering ? (
-                                        <td className="whitespace-nowrap bg-white px-6 py-4 text-center text-sm text-gray-500">
+                                        <td className="whitespace-nowrap px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
                                             {pagination ? pagination.from + index : index + 1}
                                         </td>
                                     ) : null}
@@ -96,7 +98,11 @@ export default function Table<T = Record<string, unknown>>({
                                         return (
                                             <td
                                                 key={'cell-' + index + '-' + cellIndex}
-                                                className={clsx('whitespace-nowrap px-6 py-4 text-sm text-gray-900', tdClassName)}
+                                                className={clsx(
+                                                    'whitespace-nowrap px-6 py-4 text-sm',
+                                                    'text-gray-900 dark:text-gray-100',
+                                                    tdClassName,
+                                                )}
                                             >
                                                 {value as ReactNode}
                                             </td>
@@ -108,22 +114,22 @@ export default function Table<T = Record<string, unknown>>({
                                 <tr>
                                     <td colSpan={column.length + (numbering ? 1 : 0)}>
                                         <div className="flex flex-col items-center px-6 py-16 text-center">
-                                            <ClipboardText className="text-gray-400" size={48} weight="thin" />
-                                            <span className="mt-4 text-sm text-gray-500">Tidak ada data</span>
+                                            <ClipboardText className="text-gray-400 dark:text-gray-500" size={48} weight="thin" />
+                                            <span className="mt-4 text-sm text-gray-500 dark:text-gray-400">Tidak ada data</span>
                                         </div>
                                     </td>
                                 </tr>
                             ) : null}
                         </tbody>
                         {footer != undefined && (
-                            <tfoot className="bg-gray-50">
-                                <tr className="border-t border-gray-200">
-                                    {numbering ? <th className="bg-gray-50 px-6 py-3"></th> : null}
+                            <tfoot className="bg-gray-50 dark:bg-gray-700">
+                                <tr className="border-t border-gray-200 dark:border-gray-700">
+                                    {numbering ? <th className="bg-gray-50 px-6 py-3 dark:bg-gray-700"></th> : null}
                                     {footer.map((f, idx) => (
                                         <th
                                             colSpan={f.colSpan ?? 1}
                                             key={idx}
-                                            className={clsx('px-6 py-3 text-left text-sm font-medium text-gray-900', f.className)}
+                                            className={clsx('px-6 py-3 text-left text-sm font-medium text-gray-900 dark:text-gray-100', f.className)}
                                         >
                                             {f.value}
                                         </th>

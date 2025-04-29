@@ -119,6 +119,7 @@ export interface Customer {
     join_date: string;
     paused_at?: string;
     inactive_at?: string;
+    bill_date: string;
 }
 
 export interface Invoices {

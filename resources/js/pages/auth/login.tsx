@@ -16,10 +16,10 @@ export default function Login() {
     };
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-background text-gray-900">
+        <div className="flex min-h-screen items-center justify-center text-gray-900 dark:bg-gray-900 dark:text-gray-100">
             <div className="container mx-auto flex max-w-6xl items-center justify-between px-6">
                 {/* Form Section */}
-                <div className="w-full max-w-md space-y-8 rounded-2xl bg-white p-8 shadow-lg">
+                <div className="w-full max-w-md space-y-8 rounded-2xl bg-white p-8 shadow-lg dark:border dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100">
                     {/* Logo */}
                     <div className="mb-6">
                         <img src="/images/logo/intanet-text.png" alt="Logo" className="h-8 object-contain" />
@@ -32,7 +32,7 @@ export default function Login() {
                     </div>
 
                     <form onSubmit={submit} className="space-y-6">
-                        <div className="space-y-5 text-slate-900">
+                        <div className="space-y-5 text-slate-900 dark:text-gray-100">
                             <Input
                                 type="email"
                                 label="Email"
@@ -57,14 +57,14 @@ export default function Login() {
                             />
                         </div>
 
-                        <div className="flex items-center justify-between text-slate-900">
+                        <div className="flex items-center justify-between text-slate-900 dark:text-gray-100">
                             <Checkbox
                                 checked={data.remember}
                                 color="primary"
                                 onChange={(e) => setData('remember', e.target.checked)}
                                 disabled={processing}
                             >
-                                <span className="text-slate-900">Remember Me</span>
+                                <span className="text-slate-900 dark:text-gray-100">Remember Me</span>
                             </Checkbox>
                             <a href={route('password.request')} className="hover:text-primary-dark text-sm text-primary">
                                 Forgot Password?
@@ -79,7 +79,7 @@ export default function Login() {
                             {processing ? 'Signing in...' : 'Sign In'}
                         </button>
 
-                        <div className="text-center text-sm text-gray-600">
+                        <div className="text-center text-sm text-gray-600 dark:text-gray-100">
                             Don't have an account?{' '}
                             <a href={route('register')} className="hover:text-primary-dark font-medium text-primary">
                                 Sign Up

@@ -38,8 +38,8 @@ export default function EditCashflowCategory({ category, onClose }: EditCashflow
     };
 
     return (
-        <div className="mx-auto w-full max-w-4xl rounded-2xl bg-white text-slate-800">
-            <h2 className="px-5 pt-5 text-lg font-medium text-gray-900">Edit Kategori Cashflow</h2>
+        <div className="mx-auto w-full max-w-4xl rounded-2xl bg-white text-slate-800 dark:bg-gray-900 dark:text-gray-100">
+            <h2 className="px-5 pt-5 text-lg font-medium text-gray-900 dark:text-gray-100">Edit Kategori Cashflow</h2>
             <form onSubmit={handleSubmit} className="h-fit space-y-6 p-5">
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <Input
