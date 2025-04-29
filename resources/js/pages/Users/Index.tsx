@@ -3,7 +3,7 @@ import Table from '@/components/Table/Table';
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
 import { Customer, InternetPackage, PageProps, User } from '@/types';
 import { type TableColumn } from '@/types/table';
-import { Button, Input, Modal, ModalContent, useDisclosure } from '@heroui/react';
+import { Button, Chip, Input, Modal, ModalContent, useDisclosure } from '@heroui/react';
 import { Head, router, usePage } from '@inertiajs/react';
 import { MagnifyingGlass, PencilSimple, Plus, Trash } from '@phosphor-icons/react';
 import { useMemo, useState } from 'react';
@@ -92,7 +92,7 @@ export default function UsersIndex() {
         },
         {
             header: 'Jabatan',
-            value: (user: User) => <p className="font-medium text-gray-900">{parseInt(user.is_admin.toString()) === 1 ? 'Admin' : 'User'}</p>,
+            value: (user: User) => user.is_admin === 1 && <Chip color="primary">Admin</Chip>,
         },
         {
             header: 'Email',
