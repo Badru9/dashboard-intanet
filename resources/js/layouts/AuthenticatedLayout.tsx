@@ -11,7 +11,6 @@ type SidebarItem = {
     name: string;
     Icon: IconComponent;
     href: string;
-    routeName?: string; // Ditambahkan untuk menyimpan nama route
 };
 
 type PageProps = {
@@ -25,90 +24,50 @@ type PageProps = {
     };
 };
 
-export const MoonIcon = (props: React.SVGProps<SVGSVGElement>) => {
+const MenuItem = ({ item, isOpen }: { item: SidebarItem; isOpen: boolean }) => {
     return (
-        <svg aria-hidden="true" focusable="false" height="1em" role="presentation" viewBox="0 0 24 24" width="1em" {...props}>
-            <path
-                d="M21.53 15.93c-.16-.27-.61-.69-1.73-.49a8.46 8.46 0 01-1.88.13 8.409 8.409 0 01-5.91-2.82 8.068 8.068 0 01-1.44-8.66c.44-1.01.13-1.54-.09-1.76s-.77-.55-1.83-.11a10.318 10.318 0 00-6.32 10.21 10.475 10.475 0 007.04 8.99 10 10 0 002.89.55c.16.01.32.02.48.02a10.5 10.5 0 008.47-4.27c.67-.93.49-1.519.32-1.79z"
-                fill="currentColor"
-            />
-        </svg>
-    );
-};
-
-export const SunIcon = (props: React.SVGProps<SVGSVGElement>) => {
-    return (
-        <svg aria-hidden="true" focusable="false" height="1em" role="presentation" viewBox="0 0 24 24" width="1em" {...props}>
-            <g fill="currentColor">
-                <path d="M19 12a7 7 0 11-7-7 7 7 0 017 7z" />
-                <path d="M12 22.96a.969.969 0 01-1-.96v-.08a1 1 0 012 0 1.038 1.038 0 01-1 1.04zm7.14-2.82a1.024 1.024 0 01-.71-.29l-.13-.13a1 1 0 011.41-1.41l.13.13a1 1 0 010 1.41.984.984 0 01-.7.29zm-14.28 0a1.024 1.024 0 01-.71-.29 1 1 0 010-1.41l.13-.13a1 1 0 011.41 1.41l-.13.13a1 1 0 01-.7.29zM22 13h-.08a1 1 0 010-2 1.038 1.038 0 011.04 1 .969.969 0 01-.96 1zM2.08 13H2a1 1 0 010-2 1.038 1.038 0 011.04 1 .969.969 0 01-.96 1zm16.93-7.01a1.024 1.024 0 01-.71-.29 1 1 0 010-1.41l.13-.13a1 1 0 011.41 1.41l-.13.13a.984.984 0 01-.7.29zm-14.02 0a1.024 1.024 0 01-.71-.29l-.13-.14a1 1 0 011.41-1.41l.13.13a1 1 0 010 1.41.97.97 0 01-.7.3zM12 3.04a.969.969 0 01-1-.96V2a1 1 0 012 0 1.038 1.038 0 01-1 1.04z" />
-            </g>
-        </svg>
-    );
-};
-
-const MenuItem = ({ item, isOpen, isActive = false }: { item: SidebarItem; isOpen: boolean; isActive?: boolean }) => (
-    <Link
-        href={item.href}
-        className={clsx(
-            'flex items-center rounded-full px-4 py-2 transition-all duration-300',
-            isOpen ? 'w-full' : 'w-12 justify-center',
-            isActive
-                ? 'dark:to-primary-dark bg-gradient-to-r from-purple-700 to-primary text-white dark:from-purple-600'
-                : 'dark:hover:to-primary-dark text-slate-500 hover:bg-gradient-to-r hover:from-purple-700 hover:to-primary hover:text-white dark:text-gray-300 dark:hover:from-purple-600',
-        )}
-        title={!isOpen ? item.name : undefined}
-    >
-        <item.Icon size={isOpen ? 20 : 24} weight={isActive ? 'fill' : 'regular'} />
-        <span
+        <Link
+            href={item.href}
             className={clsx(
-                'ml-5 whitespace-nowrap text-sm transition-all duration-300',
-                isOpen ? 'relative w-auto max-w-xs opacity-100 delay-300' : 'absolute w-0 max-w-0 overflow-hidden opacity-0 delay-0',
+                'flex items-center rounded-full from-purple-700 to-primary px-4 py-2 text-slate-500 transition-all duration-300 hover:bg-gradient-to-r hover:text-white',
+                isOpen ? 'w-full' : 'w-12 justify-center',
             )}
-            style={{ transitionProperty: 'opacity, width, max-width' }}
+            title={!isOpen ? item.name : undefined}
         >
-            {item.name}
-        </span>
-    </Link>
-);
+            <item.Icon size={isOpen ? 20 : 24} />
+            <span
+                className={clsx(
+                    'ml-5 whitespace-nowrap text-sm transition-all duration-300',
+                    isOpen ? 'relative w-auto max-w-xs opacity-100 delay-300' : 'absolute w-0 max-w-0 overflow-hidden opacity-0 delay-0',
+                )}
+                style={{ transitionProperty: 'opacity, width, max-width' }}
+            >
+                {item.name}
+            </span>
+        </Link>
+    );
+};
 
 const mainMenuItems: SidebarItem[] = [
-    { name: 'Dashboard', Icon: House, href: route('dashboard'), routeName: 'dashboard' },
-    { name: 'Customers', Icon: Users, href: route('customers.index'), routeName: 'customers.index' },
-    { name: 'Invoices', Icon: FileText, href: route('invoices.index'), routeName: 'invoices.index' },
-    { name: 'Cashflows', Icon: CurrencyDollar, href: route('cashflows.index'), routeName: 'cashflows.index' },
+    { name: 'Dashboard', Icon: House, href: route('dashboard') },
+    { name: 'Customers', Icon: Users, href: route('customers.index') },
+    { name: 'Invoices', Icon: FileText, href: route('invoices.index') },
+    { name: 'Cashflows', Icon: CurrencyDollar, href: route('cashflows.index') },
 ];
 
 const settingMenu: SidebarItem[] = [
-    { name: 'Internet Packages', Icon: WifiHigh, href: route('internet-packages.index'), routeName: 'internet-packages.index' },
-    { name: 'Cashflows Categories', Icon: CurrencyDollar, href: route('cashflow-categories.index'), routeName: 'cashflow-categories.index' },
+    { name: 'Internet Packages', Icon: WifiHigh, href: route('internet-packages.index') },
+    { name: 'Cashflows Categories', Icon: CurrencyDollar, href: route('cashflow-categories.index') },
 ];
-const adminMenuItems: SidebarItem[] = [...settingMenu, { name: 'Users', Icon: Users, href: route('users.index'), routeName: 'users.index' }];
+const adminMenuItems: SidebarItem[] = [...settingMenu, { name: 'Users', Icon: Users, href: route('users.index') }];
+
+// const supportItems: SidebarItem[] = [{ name: 'Settings', Icon: Gear, href: route('settings.index') }];
 
 export default function AuthenticatedLayout({ children }: PropsWithChildren) {
     const { auth } = usePage<PageProps>().props;
     const { appearance, updateAppearance } = useAppearance();
     const { post } = useForm({});
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-    const [theme, setTheme] = useState(() => {
-        if (typeof window !== 'undefined') {
-            return localStorage.getItem('theme') || 'light';
-        }
-        return 'light';
-    });
-
-    useEffect(() => {
-        if (theme === 'dark') {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
-        localStorage.setItem('theme', theme);
-    }, [theme]);
-
-    const handleThemeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setTheme(e.target.checked ? 'light' : 'dark');
-    };
 
     const handleLogout = () => {
         post(route('logout'));
@@ -118,16 +77,9 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
         setIsSidebarOpen(!isSidebarOpen);
     };
 
-    // Helper function to check if a route is active
-    const isRouteActive = (routeName: string | undefined) => {
-        if (!routeName) return false;
-
-        // Check if the current route starts with the given route name
-        // This helps with nested routes (e.g. users.edit would match with users.index)
-        return currentRoute === routeName || (currentRoute && currentRoute.startsWith(`${routeName}.`));
-    };
-
     const isAdminMenus = auth.user.is_admin === 1 ? adminMenuItems : mainMenuItems;
+
+    console.log('auth', auth);
 
     return (
         <div className="flex h-screen bg-white dark:bg-slate-900">
@@ -163,7 +115,7 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
                             </h2>
                             <nav className="mt-2 space-y-1">
                                 {mainMenuItems.map((item) => (
-                                    <MenuItem key={item.name} item={item} isOpen={isSidebarOpen} isActive={isRouteActive(item.routeName)} />
+                                    <MenuItem key={item.name} item={item} isOpen={isSidebarOpen} />
                                 ))}
                             </nav>
                             <h2
@@ -176,10 +128,20 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
                             </h2>
                             <nav className="mt-2 space-y-1">
                                 {isAdminMenus.map((item) => (
-                                    <MenuItem key={item.name} item={item} isOpen={isSidebarOpen} isActive={isRouteActive(item.routeName)} />
+                                    <MenuItem key={item.name} item={item} isOpen={isSidebarOpen} />
                                 ))}
                             </nav>
                         </div>
+
+                        {/* Support */}
+                        {/* <div>
+                            <h2 className={clsx('px-4 text-xs font-semibold text-gray-400 uppercase', !isSidebarOpen && 'hidden')}>Support</h2>
+                            <nav className="mt-4 space-y-1">
+                                {supportItems.map((item) => (
+                                    <MenuItem key={item.name} item={item} isOpen={isSidebarOpen} />
+                                ))}
+                            </nav>
+                        </div> */}
                     </div>
 
                     {/* User Menu */}
@@ -243,6 +205,17 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
                                 </DropdownItem>
                             </DropdownMenu>
                         </Dropdown>
+                        {/* <div className="flex items-center gap-3">
+                            <img
+                                src={`https://ui-avatars.com/api/?name=${auth.user.name}&background=random`}
+                                alt={auth.user.name}
+                                className="h-10 w-10 rounded-full"
+                            />
+                            <div className="flex flex-col">
+                                <span className="font-medium text-gray-900">{auth.user.name}</span>
+                                <span className="text-sm text-gray-500">{auth.user.email}</span>
+                            </div>
+                        </div> */}
                     </div>
                 </div>
 

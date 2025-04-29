@@ -8,8 +8,8 @@ export default function Dashboard() {
 
             <div className="p-8">
                 <div className="mb-6">
-                    <h2 className="text-2xl font-bold text-gray-900">Dashboard Overview</h2>
-                    <p className="mt-1 text-sm text-gray-500">Monitor your business performance and analytics</p>
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Dashboard Overview</h2>
+                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Monitor your business performance and analytics</p>
                 </div>
 
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -43,7 +43,7 @@ export default function Dashboard() {
                     {/* Quick Transfer Card */}
                     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
                         <div className="border-b border-gray-200 px-6 py-4">
-                            <h2 className="text-lg font-semibold text-gray-900">Quick Transfer</h2>
+                            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Quick Transfer</h2>
                         </div>
 
                         <div className="p-6">
@@ -59,7 +59,7 @@ export default function Dashboard() {
                                                     className="h-full w-full rounded-full object-cover"
                                                 />
                                             </div>
-                                            <span className="text-sm font-medium text-gray-700">{name}</span>
+                                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{name}</span>
                                         </button>
                                     ))}
                                 </div>
@@ -70,11 +70,11 @@ export default function Dashboard() {
                                 <div className="relative">
                                     <input
                                         type="text"
-                                        className="w-full rounded-lg border border-gray-300 px-4 py-2.5 pr-12 text-gray-900 placeholder-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none"
+                                        className="w-full rounded-lg border border-gray-300 px-4 py-2.5 pr-12 text-gray-900 placeholder-gray-500 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500 dark:bg-gray-800 dark:text-white"
                                         placeholder="Enter transfer amount"
                                         defaultValue="$534.000"
                                     />
-                                    <button className="absolute top-1/2 right-2 -translate-y-1/2 rounded-md p-1.5 text-gray-400 transition-colors hover:text-gray-600">
+                                    <button className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1.5 text-gray-400 transition-colors hover:text-gray-600">
                                         <i className="feather-repeat h-5 w-5" />
                                     </button>
                                 </div>
@@ -83,11 +83,11 @@ export default function Dashboard() {
                                     <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-100 text-green-600">
                                         <i className="feather-credit-card h-5 w-5" />
                                     </div>
-                                    <span className="flex-1 font-medium text-gray-900">Bank Indonesia</span>
+                                    <span className="flex-1 font-medium text-gray-900 dark:text-white">Bank Indonesia</span>
                                     <i className="feather-chevron-down h-5 w-5 text-gray-400" />
                                 </div>
 
-                                <button className="w-full rounded-lg bg-green-600 py-2.5 font-medium text-white transition-colors hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none">
+                                <button className="w-full rounded-lg bg-green-600 py-2.5 font-medium text-white transition-colors hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
                                     Transfer Now
                                 </button>
                             </div>
