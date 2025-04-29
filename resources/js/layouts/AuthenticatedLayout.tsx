@@ -18,6 +18,7 @@ type PageProps = {
             id: number;
             name: string;
             email: string;
+            is_admin: number;
         };
     };
 };
@@ -57,6 +58,7 @@ const settingMenu: SidebarItem[] = [
     { name: 'Internet Packages', Icon: WifiHigh, href: route('internet-packages.index') },
     { name: 'Cashflows Categories', Icon: CurrencyDollar, href: route('cashflow-categories.index') },
 ];
+const adminMenuItems: SidebarItem[] = [...settingMenu, { name: 'Users', Icon: Users, href: route('users.index') }];
 
 // const supportItems: SidebarItem[] = [{ name: 'Settings', Icon: Gear, href: route('settings.index') }];
 
@@ -72,6 +74,10 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
     };
+
+    const isAdminMenus = auth.user.is_admin === 1 ? adminMenuItems : mainMenuItems;
+
+    console.log('auth', auth);
 
     return (
         <div className="flex h-screen bg-white">
@@ -107,7 +113,7 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
                             </nav>
                             <h2 className={clsx('mt-5 px-4 text-xs font-semibold uppercase text-gray-400', !isSidebarOpen && 'hidden')}>Settings</h2>
                             <nav className="mt-2 space-y-1">
-                                {settingMenu.map((item) => (
+                                {isAdminMenus.map((item) => (
                                     <MenuItem key={item.name} item={item} isOpen={isSidebarOpen} />
                                 ))}
                             </nav>

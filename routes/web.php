@@ -8,6 +8,7 @@ use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -46,6 +47,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Cashflows Route
     Route::resource('cashflows', CashflowController::class);
+
+    // Route untuk users dengan middleware admin
+    Route::middleware('admin')->group(function () {
+        Route::resource('users', UserController::class);
+    });
 });
 
 Route::middleware('guest')->group(function () {
