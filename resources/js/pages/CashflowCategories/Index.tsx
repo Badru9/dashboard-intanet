@@ -1,10 +1,9 @@
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import Table from '@/components/Table/Table';
-import { Button } from '@/components/ui/button';
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
 import { CashflowCategory, PageProps } from '@/types';
 import { TableColumn } from '@/types/table';
-import { Modal, ModalContent, useDisclosure } from '@heroui/modal';
+import { Button, Modal, ModalContent, useDisclosure } from '@heroui/react';
 import { Head, router, usePage } from '@inertiajs/react';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 import moment from 'moment';
@@ -108,10 +107,7 @@ export default function CashflowsCategoriesIndex() {
             <div className="p-4 lg:p-8">
                 <div className="mb-6 flex flex-col items-center gap-4 lg:flex-row lg:items-center lg:justify-between">
                     <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-center lg:justify-end">
-                        <Button
-                            onClick={() => setIsCreateModalOpen(true)}
-                            className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 lg:w-auto"
-                        >
+                        <Button onClick={() => setIsCreateModalOpen(true)} color="primary">
                             <Plus className="h-5 w-5" />
                             Tambah Kategori
                         </Button>

@@ -16,16 +16,17 @@ class CashflowSeeder extends Seeder
     {
         $faker = Faker::create('id_ID');
         $users = DB::table('users')->pluck('id')->toArray();
+        $categories = DB::table('cashflow_categories')->pluck('id')->toArray();
         $invoices = DB::table('invoices')->pluck('id')->toArray();
 
         $data = [];
         foreach (range(1, 50) as $i) {
             $data[] = [
-                'invoice_id' => $faker->optional(0.7)->randomElement($invoices), // 70% kemungkinan terkait dengan invoice
+                'cashflow_category_id' => $faker->randomElement($categories),
+                'created_id' => $faker->randomElement($users),
+                'invoice_id' => $faker->optional(0.7)->randomElement($invoices),
                 'amount' => $faker->numberBetween(50000, 10000000),
-                'type' => $faker->randomElement(['income', 'expense']),
-                'description' => $faker->optional()->sentence(),
-                'created_by' => $faker->randomElement($users),
+                'note' => $faker->optional()->sentence(),
                 'created_at' => $faker->dateTimeBetween('-1 year', 'now'),
                 'updated_at' => now(),
             ];

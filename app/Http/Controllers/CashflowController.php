@@ -6,15 +6,70 @@ use App\Models\Cashflow;
 use App\Models\CashflowCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class CashflowController extends Controller
 {
     public function index()
     {
-        $cashflows = Cashflow::with(['category'])->get();
-        return inertia('Cashflows/Index', [
-            'cashflows' => $cashflows
-        ]);
+        try {
+            // Mulai dengan query base
+            $query = Cashflow::query()
+                ->with(['category', 'creator', 'invoice']);
+
+            // Log untuk melihat request yang masuk
+            Log::info('Request Data:', [
+                'category' => request()->category,
+                'date_range' => request()->date_range
+            ]);
+
+            // Filter berdasarkan kategori
+            if (request()->filled('category') && request()->category !== 'all') {
+                $query->where('cashflow_category_id', request()->category);
+            }
+
+            // Filter berdasarkan tanggal
+            if (request()->filled('date_range')) {
+                $query->whereBetween('created_at', [
+                    request()->date_range['startDate'],
+                    request()->date_range['endDate']
+                ]);
+            }
+
+            // Debug query yang dihasilkan
+            Log::info('Query Debug:', [
+                'sql' => $query->toSql(),
+                'bindings' => $query->getBindings(),
+                'count' => $query->count() // Cek jumlah data sebelum paginasi
+            ]);
+
+            // Eksekusi query dengan paginasi
+            $cashflows = $query->latest()->paginate(10);
+
+            // Debug hasil akhir
+            Log::info('Final Result:', [
+                'total_data' => $cashflows->total(),
+                'current_page' => $cashflows->currentPage(),
+                'per_page' => $cashflows->perPage()
+            ]);
+
+            return inertia('Cashflows/Index', [
+                'cashflows' => $cashflows,
+                'categories' => CashflowCategory::all(),
+                'filters' => [
+                    'category' => request()->category,
+                    'date_range' => request()->date_range
+                ]
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in Cashflow Index:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan saat memuat data.');
+        }
     }
 
     public function create()

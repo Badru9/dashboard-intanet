@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             InternetPackageSeeder::class,
             CustomerSeeder::class,
             InvoiceSeeder::class,
+            CashflowCategorySeeder::class,
             CashflowSeeder::class,
         ]);
     }

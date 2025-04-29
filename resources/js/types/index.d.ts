@@ -142,13 +142,11 @@ export interface CashflowCategory {
 
 export interface Cashflow {
     id: number;
-    description: string;
-    type: CashflowType;
     amount: number;
-    category: string;
-    date: string;
-    notes?: string;
-    cashflow_category_id: CashflowCategory;
+    created_by: User;
+    invoice: Invoices;
+    note?: string;
+    category: CashflowCategory;
     created_at: string;
     updated_at: string;
 }
