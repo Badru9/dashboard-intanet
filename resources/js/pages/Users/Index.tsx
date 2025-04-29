@@ -74,9 +74,9 @@ export default function UsersIndex() {
         }
     };
 
-    const baseColumns: TableColumn<User>[] = [
+    const columns: TableColumn<User>[] = [
         {
-            header: 'Customer',
+            header: 'Nama',
             value: (user: User) => (
                 <div className="flex items-center gap-3">
                     <div className="h-8 w-8 overflow-hidden rounded-full bg-gray-100">
@@ -91,35 +91,15 @@ export default function UsersIndex() {
             ),
         },
         {
-            header: 'Dibuat Oleh',
-            value: (user: User) => <p className="font-medium text-gray-900">{user.name || 'N/A'}</p>,
+            header: 'Jabatan',
+            value: (user: User) => <p className="font-medium text-gray-900">{parseInt(user.is_admin.toString()) === 1 ? 'Admin' : 'User'}</p>,
         },
         {
             header: 'Email',
             value: (user: User) => <p className="font-medium text-gray-900">{user.email || 'N/A'}</p>,
         },
-        // {
-        //     header: 'Status',
-        //     value: (user: User) => (
-        //         <span className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${statusColors[user.is_admin]}`}>
-        //             {user.is_admin.charAt(0).toUpperCase() + user.is_admin.slice(1)}
-        //         </span>
-        //     ),
-        // },
-        // {
-        //     header: 'Due Date',
-        //     value: (user: User) => <span className="text-gray-600">{moment(user.created_at).format('DD MMMM YYYY')}</span>,
-        // },
-        // {
-        //     header: 'Catatan',
-        //     value: (user: User) => <span className="text-gray-600">{user.note}</span>,
-        // },
-    ];
-
-    const adminColumns: TableColumn<User>[] = [
-        ...baseColumns,
         {
-            header: 'Actions',
+            header: 'Aksi',
             value: (user: User) => (
                 <div className="flex items-center gap-2">
                     <button
@@ -177,7 +157,7 @@ export default function UsersIndex() {
 
                 <Table<User>
                     data={filteredInvoices}
-                    column={auth.user.is_admin === 1 ? adminColumns : baseColumns}
+                    column={columns}
                     pagination={{
                         ...users,
                         last_page: users.last_page,

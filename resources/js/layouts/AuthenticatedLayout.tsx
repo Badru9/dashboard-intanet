@@ -64,6 +64,7 @@ const adminMenuItems: SidebarItem[] = [...settingMenu, { name: 'Users', Icon: Us
 
 export default function AuthenticatedLayout({ children }: PropsWithChildren) {
     const { auth } = usePage<PageProps>().props;
+
     const { post } = useForm({});
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 

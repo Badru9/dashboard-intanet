@@ -48,6 +48,9 @@ class UserController extends BaseController
             'is_admin' => 'required|in:0,1'
         ]);
 
+        // Cast is_admin ke integer sebelum create
+        $validated['is_admin'] = (int)$validated['is_admin'];
+
         Log::info($validated);
 
         User::create($validated);
@@ -73,6 +76,8 @@ class UserController extends BaseController
             'is_admin' => 'required|in:0,1'
         ]);
 
+        // Cast is_admin ke integer sebelum update
+        $validated['is_admin'] = (int)$validated['is_admin'];
 
         if (empty($validated['password'])) {
             unset($validated['password']);

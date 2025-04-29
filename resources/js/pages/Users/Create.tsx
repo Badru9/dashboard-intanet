@@ -8,7 +8,7 @@ interface UserFormData {
     email: string;
     password: string;
     password_confirmation: string;
-    is_admin: 0 | 1;
+    is_admin: number;
 }
 
 export default function CreateUser({ onClose }: { onClose: () => void }) {
@@ -22,6 +22,8 @@ export default function CreateUser({ onClose }: { onClose: () => void }) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
+        console.log('data', data);
 
         router.post(route('users.store'), data, {
             onSuccess: () => {
@@ -91,7 +93,7 @@ export default function CreateUser({ onClose }: { onClose: () => void }) {
                         <Select
                             label="Role"
                             value={data.is_admin.toString()}
-                            onChange={(e) => setData('is_admin', parseInt(e.target.value) as 0 | 1)}
+                            onChange={(e) => setData('is_admin', parseInt(e.target.value))}
                             isInvalid={!!errors.is_admin}
                             errorMessage={errors.is_admin}
                             required

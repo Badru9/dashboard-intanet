@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { User } from '@/types';
-import { Button, Input } from '@heroui/react';
+import { Button, Input, Select, SelectItem } from '@heroui/react';
 import { useForm } from '@inertiajs/react';
 
 interface EditInvoiceProps {
@@ -13,7 +13,7 @@ interface UserFormData {
     name: string;
     email: string;
     // password: string;
-    is_admin: 0 | 1;
+    is_admin: number;
 }
 
 export default function EditInvoice({ user, onClose }: EditInvoiceProps) {
@@ -23,7 +23,7 @@ export default function EditInvoice({ user, onClose }: EditInvoiceProps) {
         name: user.name,
         email: user.email,
         // password: user.password,
-        is_admin: user.is_admin as 0 | 1,
+        is_admin: parseInt(user.is_admin.toString()),
     });
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -66,6 +66,25 @@ export default function EditInvoice({ user, onClose }: EditInvoiceProps) {
                         isInvalid={!!errors.password}
                         errorMessage={errors.password}
                     /> */}
+                </div>
+
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    <Select
+                        label="Role"
+                        value={data.is_admin.toString()}
+                        onChange={(e) => setData('is_admin', parseInt(e.target.value))}
+                        isInvalid={!!errors.is_admin}
+                        errorMessage={errors.is_admin}
+                        selectedKeys={[data.is_admin.toString()]}
+                        required
+                    >
+                        <SelectItem key="0" textValue="Bukan Admin">
+                            Bukan Admin
+                        </SelectItem>
+                        <SelectItem key="1" textValue="Admin">
+                            Admin
+                        </SelectItem>
+                    </Select>
                 </div>
 
                 <div className="flex justify-end gap-3 border-t border-gray-200 pt-4">
