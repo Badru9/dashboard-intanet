@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
+use Carbon\Carbon;
 
 class CustomerController extends Controller
 {
@@ -71,7 +72,7 @@ class CustomerController extends Controller
 
             // Membuat invoice otomatis
             $package = InternetPackage::find($validated['package_id']);
-            $dueDate = now()->addMonth();
+            $dueDate = Carbon::parse($validated['join_date'])->addMonth();
 
             Invoice::create([
                 'customer_id' => $customer->id,
