@@ -1,23 +1,23 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { CUSTOMER_STATUS_OPTIONS } from '@/constants';
 import { currencyFormat } from '@/lib/utils';
-import { Coordinate, InternetPackage, type Customer, type PageProps } from '@/types';
+import { InternetPackage, type Customer, type PageProps } from '@/types';
 import { Button, DatePicker, Input, Select, SelectItem, Textarea } from '@heroui/react';
 import { router, useForm, usePage } from '@inertiajs/react';
 import { DateValue } from '@internationalized/date';
 
-interface CreateCustomerPageProps extends PageProps {
+interface CreateCustomerPageProps extends PageProps, Record<string, any> {
     packages: InternetPackage[];
 }
 
 interface CustomerFormData extends Record<string, any> {
-    // [key: string]: string | number | Coordinate | undefined;
+    [key: string]: any;
     name: string;
     status: Customer['status'];
     address: string;
     npwp: string;
     package_id: string;
-    coordinates?: Coordinate;
+    coordinates?: Record<string, string>;
     phone: string;
     join_date?: DateValue | null;
     email?: string;

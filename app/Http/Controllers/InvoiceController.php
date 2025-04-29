@@ -7,17 +7,23 @@ use App\Models\Invoice;
 use App\Models\InternetPackage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class InvoiceController extends Controller
 {
     public function index()
     {
         $invoices = Invoice::with(['customer', 'package', 'creator'])
+            ->whereNull('deleted_at')
             ->latest()
-            ->paginate(15);
+            ->paginate(10);
+
+        $packages = InternetPackage::all();
 
         return inertia('Invoices/Index', [
-            'invoices' => $invoices
+            'invoices' => $invoices,
+            'packages' => $packages,
+            'customers' => Customer::with('package')->get()
         ]);
     }
 
@@ -29,7 +35,7 @@ class InvoiceController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request, Customer $customer)
     {
         $validated = $request->validate([
             'customer_id' => 'required|exists:customers,id',
@@ -50,10 +56,15 @@ class InvoiceController extends Controller
 
     public function edit(Invoice $invoice)
     {
+        $invoice->load(['customer', 'package', 'creator']);
+
+        $customers = Customer::with('package')->get();
+        $packages = InternetPackage::all();
+
         return inertia('Invoices/Edit', [
-            'invoice' => $invoice->load(['customer', 'package']),
-            'customers' => Customer::with('package')->get(),
-            'packages' => InternetPackage::all()
+            'invoice' => $invoice,
+            'customers' => $customers,
+            'packages' => $packages,
         ]);
     }
 

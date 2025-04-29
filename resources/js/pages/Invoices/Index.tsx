@@ -1,51 +1,16 @@
+import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import Table from '@/components/Table/Table';
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
-import { type Invoice } from '@/types';
+import { currencyFormat } from '@/lib/utils';
+import { Customer, InternetPackage, PageProps, type Invoices } from '@/types';
 import { type TableColumn } from '@/types/table';
-import { Head } from '@inertiajs/react';
-import { Plus } from '@phosphor-icons/react';
-
-const invoices: Invoice[] = [
-    {
-        id: 1,
-        invoiceNumber: 'INV-2024-001',
-        customer: 'John Doe',
-        amount: 499000,
-        status: 'paid',
-        due_date: '2024-04-15',
-        customer_id: 0,
-        number: '',
-        date: '',
-        updated_at: '',
-        created_at: '',
-    },
-    {
-        id: 2,
-        invoiceNumber: 'INV-2024-002',
-        customer: 'Jane Smith',
-        amount: 999000,
-        status: 'unpaid',
-        due_date: '2024-04-20',
-        customer_id: 0,
-        number: '',
-        date: '',
-        updated_at: '',
-        created_at: '',
-    },
-    {
-        id: 3,
-        invoiceNumber: 'INV-2024-003',
-        customer: 'Robert Johnson',
-        amount: 299000,
-        status: 'cancelled',
-        due_date: '2024-04-10',
-        customer_id: 0,
-        number: '',
-        date: '',
-        updated_at: '',
-        created_at: '',
-    },
-];
+import { Button, Input, Modal, ModalContent, useDisclosure } from '@heroui/react';
+import { Head, router, usePage } from '@inertiajs/react';
+import { MagnifyingGlass, PencilSimple, Plus, Trash } from '@phosphor-icons/react';
+import moment from 'moment';
+import { useMemo, useState } from 'react';
+import CreateInvoice from './Create';
+import EditInvoice from './Edit';
 
 const statusColors = {
     paid: 'bg-green-100 text-green-700',
@@ -53,34 +18,94 @@ const statusColors = {
     cancelled: 'bg-red-100 text-red-700',
 };
 
+type InvoicePageProps = PageProps &
+    Record<string, unknown> & {
+        invoices: {
+            data: Invoices[];
+            current_page: number;
+            from: number;
+            last_page: number;
+            per_page: number;
+            to: number;
+            total: number;
+            prev_page_url: string | null;
+            next_page_url: string | null;
+            links: Array<{
+                url: string | null;
+                label: string;
+                active: boolean;
+            }>;
+        };
+        filters: Record<string, string>;
+        packages: InternetPackage[];
+        customers: Customer[];
+    };
+
 export default function InvoicesIndex() {
-    const columns: TableColumn<Invoice>[] = [
-        {
-            header: 'Invoice',
-            value: (invoice: Invoice) => <p className="font-medium text-gray-900">{invoice.invoiceNumber}</p>,
-        },
+    const { invoices, filters, customers, packages } = usePage<InvoicePageProps>().props;
+    const { isOpen: isCreateOpen, onOpen: onCreateOpen, onOpenChange: onCreateOpenChange } = useDisclosure();
+    const { isOpen: isEditOpen, onOpen: onEditOpen, onOpenChange: onEditOpenChange } = useDisclosure();
+    const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onOpenChange: onDeleteOpenChange } = useDisclosure();
+    const [selectedInvoice, setSelectedInvoice] = useState<Invoices | null>(null);
+    const [search, setSearch] = useState(filters?.search || '');
+
+    const filteredInvoices = useMemo(() => {
+        if (!search) return invoices.data;
+        return invoices.data.filter(
+            (invoice) =>
+                invoice.invoiceNumber.toLowerCase().includes(search.toLowerCase()) ||
+                invoice.customer?.name.toLowerCase().includes(search.toLowerCase()),
+        );
+    }, [invoices.data, search]);
+
+    const handleEdit = (invoice: Invoices) => {
+        setSelectedInvoice(invoice);
+        onEditOpen();
+    };
+
+    const handleDelete = (invoice: Invoices) => {
+        setSelectedInvoice(invoice);
+        onDeleteOpen();
+    };
+
+    const confirmDelete = () => {
+        if (selectedInvoice) {
+            router.delete(route('invoices.destroy', selectedInvoice.id), {
+                onSuccess: () => {
+                    onDeleteOpenChange();
+                    setSelectedInvoice(null);
+                },
+            });
+        }
+    };
+
+    const columns: TableColumn<Invoices>[] = [
         {
             header: 'Customer',
-            value: (invoice: Invoice) => (
+            value: (invoice: Invoices) => (
                 <div className="flex items-center gap-3">
                     <div className="h-8 w-8 overflow-hidden rounded-full bg-gray-100">
                         <img
-                            src={`https://ui-avatars.com/api/?name=${invoice.customer}&background=random`}
-                            alt={invoice.customer}
+                            src={`https://ui-avatars.com/api/?name=${invoice.customer?.name || 'Customer'}&background=random`}
+                            alt={invoice.customer?.name || 'Customer'}
                             className="h-full w-full object-cover"
                         />
                     </div>
-                    <p className="text-gray-600">{invoice.customer}</p>
+                    <p className="text-gray-600">{invoice.customer?.name || 'N/A'}</p>
                 </div>
             ),
         },
         {
+            header: 'Dibuat Oleh',
+            value: (invoice: Invoices) => <p className="font-medium text-gray-900">{invoice.creator?.name || 'N/A'}</p>,
+        },
+        {
             header: 'Amount',
-            value: (invoice: Invoice) => <p className="font-medium text-gray-900">Rp {invoice.amount.toLocaleString('id-ID')}</p>,
+            value: (invoice: Invoices) => <p className="font-medium text-gray-900">{currencyFormat(invoice.amount)}</p>,
         },
         {
             header: 'Status',
-            value: (invoice: Invoice) => (
+            value: (invoice: Invoices) => (
                 <span className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${statusColors[invoice.status]}`}>
                     {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
                 </span>
@@ -88,53 +113,103 @@ export default function InvoicesIndex() {
         },
         {
             header: 'Due Date',
-            value: (invoice: Invoice) => <span className="text-gray-600">{invoice.due_date}</span>,
+            value: (invoice: Invoices) => <span className="text-gray-600">{moment(invoice.due_date).format('DD MMMM YYYY')}</span>,
         },
         {
-            header: 'Created At',
-            value: (invoice: Invoice) => <span className="text-gray-600">{invoice.created_at}</span>,
+            header: 'Catatan',
+            value: (invoice: Invoices) => <span className="text-gray-600">{invoice.note}</span>,
         },
         {
             header: 'Actions',
-            value: () => (
+            value: (invoice: Invoices) => (
                 <div className="flex items-center gap-2">
-                    <button className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600">
-                        <i className="feather-eye h-4 w-4" />
+                    <button
+                        onClick={() => handleEdit(invoice)}
+                        className="cursor-pointer rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-yellow-500"
+                    >
+                        <PencilSimple className="h-4 w-4" />
                     </button>
-                    <button className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600">
-                        <i className="feather-printer h-4 w-4" />
-                    </button>
-                    <button className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600">
-                        <i className="feather-trash h-4 w-4" />
+                    <button
+                        onClick={() => handleDelete(invoice)}
+                        className="cursor-pointer rounded-lg p-2 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600"
+                    >
+                        <Trash className="h-4 w-4" />
                     </button>
                 </div>
             ),
         },
     ];
 
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearch(e.target.value);
+        router.get(route('invoices.index'), { search: e.target.value }, { preserveState: true, replace: true });
+    };
+
+    const handlePageChange = (page: number) => {
+        router.get(route('invoices.index'), { page }, { preserveState: true, replace: true });
+    };
+
     return (
         <AuthenticatedLayout>
             <Head title="Invoices" />
-
-            <div className="p-8">
-                {/* Header with Filters and Action */}
-                <div className="mb-6 flex items-center justify-end">
-                    <div className="flex items-center gap-4">
-                        <select className="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-900 focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none">
-                            <option value="">All Status</option>
-                            <option value="paid">Paid</option>
-                            <option value="unpaid">Unpaid</option>
-                            <option value="cancelled">Cancelled</option>
-                        </select>
-                        <button className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none">
+            <div className="p-4 lg:p-8">
+                <div className="mb-6 flex flex-col items-center gap-4 lg:flex-row lg:items-center lg:justify-between">
+                    <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-center lg:justify-end">
+                        <div className="relative w-full lg:w-auto">
+                            <Input
+                                startContent={<MagnifyingGlass className="h-4 w-4 text-gray-500" />}
+                                type="text"
+                                placeholder="Cari invoice..."
+                                value={search}
+                                onChange={handleSearch}
+                                color="default"
+                                variant="bordered"
+                                radius="md"
+                            />
+                        </div>
+                        <Button onPress={onCreateOpen} color="primary">
                             <Plus className="h-5 w-5" />
-                            Create Invoice
-                        </button>
+                            Tambah Invoice
+                        </Button>
                     </div>
                 </div>
 
-                {/* Invoices Table */}
-                <Table<Invoice> data={invoices} column={columns} />
+                <Table<Invoices>
+                    data={filteredInvoices}
+                    column={columns}
+                    pagination={{
+                        ...invoices,
+                        last_page: invoices.last_page,
+                        current_page: invoices.current_page,
+                        onChange: handlePageChange,
+                    }}
+                />
+
+                <Modal isOpen={isCreateOpen} onOpenChange={onCreateOpenChange} scrollBehavior="outside" placement="center">
+                    <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30">
+                        <ModalContent className="relative mt-5 w-full max-w-sm rounded-2xl bg-white p-0 lg:max-w-4xl">
+                            <CreateInvoice onClose={() => onCreateOpenChange()} />
+                        </ModalContent>
+                    </div>
+                </Modal>
+
+                <Modal isOpen={isEditOpen} onOpenChange={onEditOpenChange}>
+                    <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30">
+                        <ModalContent className="relative w-full max-w-sm rounded-2xl bg-white p-0 lg:max-w-4xl">
+                            {selectedInvoice && (
+                                <EditInvoice customers={customers} packages={packages} invoice={selectedInvoice} onClose={() => onEditOpenChange()} />
+                            )}
+                        </ModalContent>
+                    </div>
+                </Modal>
+
+                <DeleteConfirmationDialog
+                    isOpen={isDeleteOpen}
+                    onClose={onDeleteOpenChange}
+                    onConfirm={confirmDelete}
+                    title="Hapus Invoice"
+                    description={`Apakah Anda yakin ingin menghapus invoice ini?`}
+                />
             </div>
         </AuthenticatedLayout>
     );

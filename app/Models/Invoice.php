@@ -4,13 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Invoice extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'customer_id',
         'package_id',
-        'created_id',
+        'created_by',
         'amount',
         'status',
         'due_date',
@@ -33,6 +36,6 @@ class Invoice extends Model
 
     public function creator(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'created_id');
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

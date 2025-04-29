@@ -45,7 +45,7 @@ export default function CashflowsCategoriesIndex() {
         },
         {
             header: 'Tipe',
-            value: (value: CashflowCategory) => (value.is_out == 0 ? 'Pemasukan' : 'Pengeluaran'),
+            value: (value: CashflowCategory) => (value.is_out == 1 ? 'Pengeluaran' : 'Pemasukan'),
         },
         {
             header: 'Tanggal',

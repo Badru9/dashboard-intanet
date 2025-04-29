@@ -15,44 +15,17 @@ class CashflowSeeder extends Seeder
     public function run(): void
     {
         $faker = Faker::create('id_ID');
-        $categories = DB::table('cashflow_categories')->pluck('id', 'name');
+        $users = DB::table('users')->pluck('id')->toArray();
+        $invoices = DB::table('invoices')->pluck('id')->toArray();
 
-        // $data = [
-        //     [
-        //         'amount' => 4999000,
-        //         'cashflow_category_id' => $categories['Subscription'],
-        //         'note' => 'From 5 customers',
-        //         'created_at' => now(),
-        //         'updated_at' => now(),
-        //     ],
-        //     [
-        //         'amount' => 2500000,
-        //         'cashflow_category_id' => $categories['Equipment'],
-        //         'note' => null,
-        //         'created_at' => now(),
-        //         'updated_at' => now(),
-        //     ],
-        //     [
-        //         'amount' => 1500000,
-        //         'cashflow_category_id' => $categories['Maintenance'],
-        //         'note' => null,
-        //         'created_at' => now(),
-        //         'updated_at' => now(),
-        //     ],
-        //     [
-        //         'amount' => 1000000,
-        //         'cashflow_category_id' => $categories['Service'],
-        //         'note' => null,
-        //         'created_at' => now(),
-        //         'updated_at' => now(),
-        //     ],
-        // ];
-
+        $data = [];
         foreach (range(1, 50) as $i) {
             $data[] = [
+                'invoice_id' => $faker->optional(0.7)->randomElement($invoices), // 70% kemungkinan terkait dengan invoice
                 'amount' => $faker->numberBetween(50000, 10000000),
-                'cashflow_category_id' => $faker->randomElement($categories),
-                'note' => $faker->optional()->sentence(),
+                'type' => $faker->randomElement(['income', 'expense']),
+                'description' => $faker->optional()->sentence(),
+                'created_by' => $faker->randomElement($users),
                 'created_at' => $faker->dateTimeBetween('-1 year', 'now'),
                 'updated_at' => now(),
             ];

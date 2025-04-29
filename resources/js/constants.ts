@@ -8,6 +8,11 @@ export interface CashflowCategoryOption {
     label: string;
 }
 
+export interface InvoiceStatusOption {
+    value: 'paid' | 'unpaid' | 'cancelled';
+    label: string;
+}
+
 export const CUSTOMER_STATUS_OPTIONS: StatusOption[] = [
     {
         value: 'active',
@@ -31,5 +36,25 @@ export const CASHFLOW_CATEGORY_OPTIONS: CashflowCategoryOption[] = [
     {
         value: 1,
         label: 'Pengeluaran',
+    },
+];
+
+export enum Role {
+    ADMIN = 'admin',
+    DIRECTOR = 'director',
+}
+
+export const INVOICE_STATUS_OPTIONS: InvoiceStatusOption[] = [
+    {
+        value: 'paid',
+        label: 'Paid',
+    },
+    {
+        value: 'unpaid',
+        label: 'Unpaid',
+    },
+    {
+        value: 'cancelled',
+        label: 'Cancelled',
     },
 ];

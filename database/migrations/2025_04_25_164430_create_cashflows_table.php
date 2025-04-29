@@ -9,12 +9,12 @@ return new class extends Migration {
     {
         Schema::create('cashflows', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('cashflow_category_id')->constrained('cashflow_categories')->cascadeOnDelete();
-            $table->foreignId('created_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('invoice_id')->nullable()->constrained()->cascadeOnDelete();
             $table->decimal('amount', 10, 2);
-            $table->text('note')->nullable();
+            $table->enum('type', ['income', 'expense']);
+            $table->text('description')->nullable();
+            $table->foreignId('created_by')->nullable()->constrained('users')->cascadeOnDelete();
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 

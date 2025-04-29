@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('cashflows', function (Blueprint $table) {
-            $table->dropForeign(['created_id']);
-            $table->dropColumn('created_id');
+        Schema::table('invoices', function (Blueprint $table) {
+            $table->renameColumn('notes', 'note');
         });
     }
 
@@ -22,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('cashflows', function (Blueprint $table) {
-            $table->foreignId('created_id')->constrained('users')->cascadeOnDelete();
+        Schema::table('invoices', function (Blueprint $table) {
+            $table->renameColumn('note', 'notes');
         });
     }
 };

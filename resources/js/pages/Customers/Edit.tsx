@@ -6,10 +6,11 @@ import { Button, DatePicker, Input, Select, SelectItem, Textarea } from '@heroui
 import { useForm, usePage } from '@inertiajs/react';
 import { parseDate } from '@internationalized/date';
 
-interface EditCustomerPageProps extends PageProps {
-    customer: Customer;
-    packages: InternetPackage[];
-}
+type EditCustomerPageProps = PageProps &
+    Record<string, any> & {
+        customer: Customer;
+        packages: InternetPackage[];
+    };
 
 interface CustomerFormData extends Record<string, any> {
     // [key: string]: string | number | Coordinate | DateValue | null | undefined;
@@ -31,8 +32,6 @@ interface EditCustomerProps {
 }
 
 export default function EditCustomer({ customer, onClose }: EditCustomerProps) {
-    console.log('customer', customer);
-
     const { packages } = usePage<EditCustomerPageProps>().props;
 
     // const initialJoinDate = customer.join_date ? parseDate(customer.join_date.split('T')[0]) : null;

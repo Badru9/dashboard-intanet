@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { type InternetPackage } from '@/types';
 import { Button } from '@heroui/react';
 import { useForm } from '@inertiajs/react';
 
-interface PackageFormData {
-    [key: string]: string | number;
+interface PackageFormData extends Record<string, any> {
+    // [key: string]: string | number;
     name: string;
     speed: number;
     price: number;
@@ -17,7 +18,7 @@ interface EditPackageProps {
 export default function EditPackage({ package: pkg, onClose }: EditPackageProps) {
     const { data, setData, put, processing, errors } = useForm<PackageFormData>({
         name: pkg.name,
-        speed: pkg.speed,
+        speed: Number(pkg.speed),
         price: pkg.price,
     });
 
