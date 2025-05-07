@@ -22,7 +22,7 @@ import { Head, router, usePage } from '@inertiajs/react';
 import { CalendarDate } from '@internationalized/date';
 import { PencilSimple, Plus, Trash } from '@phosphor-icons/react';
 import moment from 'moment';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import CreateCashflow from './Create';
 import EditCashflow from './Edit';
 
@@ -58,10 +58,28 @@ export default function CashflowsIndex() {
 
     const [selectedCashflow, setSelectedCashflow] = useState<Cashflow | null>(null);
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
+    const today = new CalendarDate(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
     const [selectedDateRange, setSelectedDateRange] = useState<{ start: DateValue; end: DateValue }>({
-        start: new CalendarDate(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()),
-        end: new CalendarDate(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()),
+        start: today,
+        end: today,
     });
+
+    // Effect untuk memastikan filter tanggal hari ini saat pertama kali render
+    useEffect(() => {
+        const startDate = new Date(today.toString());
+        startDate.setHours(0, 0, 0, 0);
+        const endDate = new Date(today.toString());
+        endDate.setHours(23, 59, 59, 999);
+
+        const params = {
+            date_range: {
+                startDate: startDate.toISOString(),
+                endDate: endDate.toISOString(),
+            },
+        };
+
+        router.get(route('cashflows.index'), params, { preserveState: true });
+    }, []);
 
     // console.log(cashflows);
     // console.log('categories', categories);
@@ -123,6 +141,11 @@ export default function CashflowsIndex() {
                 end: today,
             });
 
+            const startDate = new Date(today.toString());
+            startDate.setHours(0, 0, 0, 0);
+            const endDate = new Date(today.toString());
+            endDate.setHours(23, 59, 59, 999);
+
             const params: {
                 category?: string;
                 date_range: {
@@ -131,8 +154,8 @@ export default function CashflowsIndex() {
                 };
             } = {
                 date_range: {
-                    startDate: new Date(today.toString()).toISOString(),
-                    endDate: new Date(today.toString()).toISOString(),
+                    startDate: startDate.toISOString(),
+                    endDate: endDate.toISOString(),
                 },
             };
 
@@ -149,6 +172,11 @@ export default function CashflowsIndex() {
             end: value.end,
         });
 
+        const startDate = new Date(value.start.toString());
+        startDate.setHours(0, 0, 0, 0);
+        const endDate = new Date(value.end.toString());
+        endDate.setHours(23, 59, 59, 999);
+
         const params: {
             category?: string;
             date_range: {
@@ -157,8 +185,8 @@ export default function CashflowsIndex() {
             };
         } = {
             date_range: {
-                startDate: new Date(value.start.toString()).toISOString(),
-                endDate: new Date(value.end.toString()).toISOString(),
+                startDate: startDate.toISOString(),
+                endDate: endDate.toISOString(),
             },
         };
 

@@ -155,7 +155,7 @@ class CustomerController extends Controller
                             'package_id' => $row[8] ?? null,
                             'status' => $row[9] ?? 'active',
                             'join_date' => $row[10] ? Carbon::parse($row[10])->format('Y-m-d') : null,
-                            'bill_date' => $row[11] ? Carbon::parse($row[11])->format('Y-m-d') : null,
+                            'bill_date' => $row[11] ? Carbon::parse($row[11])->format('Y-m-d') : ($row[10] ? Carbon::parse($row[10])->addMonth()->format('Y-m-d') : null),
                         ];
 
                         // Validasi data

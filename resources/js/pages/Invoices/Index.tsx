@@ -10,6 +10,7 @@ import { MagnifyingGlass, Plus, Trash } from '@phosphor-icons/react';
 import moment from 'moment';
 import { useMemo, useState } from 'react';
 import CreateInvoice from './Create';
+import Paid from './Paid';
 // import EditInvoice from './Edit';
 
 const statusColors = {
@@ -51,8 +52,11 @@ export default function InvoicesIndex() {
     const { isOpen: isCreateOpen, onOpen: onCreateOpen, onOpenChange: onCreateOpenChange } = useDisclosure();
     // const { isOpen: isEditOpen, onOpenChange: onEditOpenChange } = useDisclosure();
     const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onOpenChange: onDeleteOpenChange } = useDisclosure();
+    const { isOpen: isPaidOpen, onOpen: onPaidOpen, onOpenChange: onPaidOpenChange } = useDisclosure();
     const [selectedInvoice, setSelectedInvoice] = useState<Invoices | null>(null);
     const [search, setSearch] = useState(filters?.search || '');
+
+    console.log('selectedInvoice', selectedInvoice);
 
     const filteredInvoices = useMemo(() => {
         if (!search) return invoices.data;
@@ -82,6 +86,11 @@ export default function InvoicesIndex() {
                 },
             });
         }
+    };
+
+    const handlePaid = (invoice: Invoices) => {
+        setSelectedInvoice(invoice);
+        onPaidOpen();
     };
 
     const baseColumns: TableColumn<Invoices>[] = [
@@ -138,6 +147,9 @@ export default function InvoicesIndex() {
                     >
                         <PencilSimple className="h-4 w-4" />
                     </button> */}
+                    <Button size="sm" onPress={() => handlePaid(invoice)} color="success" className="text-white">
+                        Bayar
+                    </Button>
                     <button
                         onClick={() => handleDelete(invoice)}
                         className="cursor-pointer rounded-lg p-2 text-red-600 transition-colors hover:bg-red-600 hover:text-white"
@@ -228,6 +240,14 @@ export default function InvoicesIndex() {
                             title="Hapus Invoice"
                             description={`Apakah Anda yakin ingin menghapus invoice ini?`}
                         />
+
+                        <Modal isOpen={isPaidOpen} onOpenChange={onPaidOpenChange} size="sm">
+                            <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30">
+                                <ModalContent className="relative rounded-2xl bg-white p-0 dark:bg-gray-900">
+                                    {selectedInvoice && <Paid invoice={selectedInvoice} onClose={() => onPaidOpenChange()} />}
+                                </ModalContent>
+                            </div>
+                        </Modal>
                     </>
                 )}
             </div>
