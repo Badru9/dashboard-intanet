@@ -113,11 +113,17 @@ export default function EditCustomer({ customer, onClose }: EditCustomerProps) {
     };
 
     return (
-        <div className="mx-auto mt-5 h-fit w-full max-w-4xl overflow-y-auto rounded-2xl bg-white text-slate-800 dark:bg-gray-900 dark:text-gray-100">
-            <h2 className="px-5 pt-5 text-lg font-medium text-gray-900 dark:text-gray-100">Edit Customer</h2>
-            <form onSubmit={handleSubmit} className="space-y-6 p-5">
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                    <div>
+        <div className="mx-auto mt-36 h-screen min-h-fit w-full rounded-2xl bg-white text-slate-800 dark:bg-gray-900 dark:text-gray-100">
+            <div className="border-b border-gray-200 px-5 py-4 dark:border-gray-700">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Edit Customer</h2>
+            </div>
+            <form onSubmit={handleSubmit} className="space-y-8 p-5">
+                {/* Data Diri Section */}
+                <div className="space-y-4">
+                    <div className="flex items-center gap-2">
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Data Diri</h3>
+                    </div>
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                         <Input
                             label="Nama Customer"
                             type="text"
@@ -127,8 +133,6 @@ export default function EditCustomer({ customer, onClose }: EditCustomerProps) {
                             isInvalid={!!form.errors.name}
                             errorMessage={form.errors.name}
                         />
-                    </div>
-                    <div>
                         <Input
                             label="Email"
                             type="email"
@@ -139,21 +143,6 @@ export default function EditCustomer({ customer, onClose }: EditCustomerProps) {
                             isInvalid={!!form.errors.email}
                             errorMessage={form.errors.email}
                         />
-                    </div>
-
-                    <div className="sm:col-span-2">
-                        <Textarea
-                            label="Alamat"
-                            id="address"
-                            value={form.data.address}
-                            onChange={(e) => form.setData('address', e.target.value)}
-                            rows={3}
-                            isInvalid={!!form.errors.address}
-                            errorMessage={form.errors.address}
-                        />
-                    </div>
-
-                    <div>
                         <Input
                             label="No. NPWP / NIK"
                             type="number"
@@ -163,9 +152,6 @@ export default function EditCustomer({ customer, onClose }: EditCustomerProps) {
                             isInvalid={!!form.errors.npwp}
                             errorMessage={form.errors.npwp}
                         />
-                    </div>
-
-                    <div>
                         <Input
                             label="No. Telepon"
                             type="text"
@@ -176,44 +162,64 @@ export default function EditCustomer({ customer, onClose }: EditCustomerProps) {
                             errorMessage={form.errors.phone}
                         />
                     </div>
+                </div>
 
-                    <div>
-                        <Input
-                            label="Latitude"
-                            type="text"
-                            id="latitude"
-                            placeholder="opsional"
-                            value={form.data.coordinates.latitude}
-                            onChange={(e) =>
-                                form.setData('coordinates', {
-                                    ...form.data.coordinates,
-                                    latitude: e.target.value,
-                                })
-                            }
-                            isInvalid={!!(form.errors as any).coordinates?.latitude}
-                            errorMessage={(form.errors as any).coordinates?.latitude}
-                        />
+                {/* Alamat Section */}
+                <div className="space-y-4">
+                    <div className="flex items-center gap-2">
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Alamat</h3>
                     </div>
-
-                    <div>
-                        <Input
-                            label="Longitude"
-                            type="text"
-                            id="longitude"
-                            placeholder="opsional"
-                            value={form.data.coordinates.longitude}
-                            onChange={(e) =>
-                                form.setData('coordinates', {
-                                    ...form.data.coordinates,
-                                    longitude: e.target.value,
-                                })
-                            }
-                            isInvalid={!!(form.errors as any).coordinates?.longitude}
-                            errorMessage={(form.errors as any).coordinates?.longitude}
+                    <div className="grid grid-cols-1 gap-3">
+                        <Textarea
+                            label="Alamat"
+                            id="address"
+                            value={form.data.address}
+                            onChange={(e) => form.setData('address', e.target.value)}
+                            rows={3}
+                            isInvalid={!!form.errors.address}
+                            errorMessage={form.errors.address}
                         />
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                            <Input
+                                label="Latitude"
+                                type="text"
+                                id="latitude"
+                                placeholder="opsional"
+                                value={form.data.coordinates.latitude}
+                                onChange={(e) =>
+                                    form.setData('coordinates', {
+                                        ...form.data.coordinates,
+                                        latitude: e.target.value,
+                                    })
+                                }
+                                isInvalid={!!(form.errors as any).coordinates?.latitude}
+                                errorMessage={(form.errors as any).coordinates?.latitude}
+                            />
+                            <Input
+                                label="Longitude"
+                                type="text"
+                                id="longitude"
+                                placeholder="opsional"
+                                value={form.data.coordinates.longitude}
+                                onChange={(e) =>
+                                    form.setData('coordinates', {
+                                        ...form.data.coordinates,
+                                        longitude: e.target.value,
+                                    })
+                                }
+                                isInvalid={!!(form.errors as any).coordinates?.longitude}
+                                errorMessage={(form.errors as any).coordinates?.longitude}
+                            />
+                        </div>
                     </div>
+                </div>
 
-                    <div>
+                {/* Paket Section */}
+                <div className="space-y-4">
+                    <div className="flex items-center gap-2">
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Paket</h3>
+                    </div>
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                         <DatePicker
                             label="Tanggal Bergabung"
                             id="join_date"
@@ -226,11 +232,9 @@ export default function EditCustomer({ customer, onClose }: EditCustomerProps) {
                             }
                             isInvalid={!!form.errors.join_date}
                             errorMessage={form.errors.join_date}
+                            showMonthAndYearPickers
                             selectorButtonPlacement="start"
                         />
-                    </div>
-
-                    <div>
                         <DatePicker
                             label="Tanggal Tagihan"
                             id="bill_date"
@@ -243,12 +247,9 @@ export default function EditCustomer({ customer, onClose }: EditCustomerProps) {
                             }
                             isInvalid={!!form.errors.bill_date}
                             errorMessage={form.errors.bill_date}
+                            showMonthAndYearPickers
                             selectorButtonPlacement="start"
                         />
-                        <p className="ml-2 mt-2 text-xs text-red-500">* Setiap bulan</p>
-                    </div>
-
-                    <div>
                         <Select
                             label="Status"
                             id="status"
@@ -265,9 +266,6 @@ export default function EditCustomer({ customer, onClose }: EditCustomerProps) {
                                 </SelectItem>
                             ))}
                         </Select>
-                    </div>
-
-                    <div>
                         <Select
                             label="Paket"
                             id="package_id"
@@ -285,6 +283,7 @@ export default function EditCustomer({ customer, onClose }: EditCustomerProps) {
                             ))}
                         </Select>
                     </div>
+                    <p className="ml-2 text-xs text-red-500">* Tanggal tagihan akan diulang setiap bulan</p>
                 </div>
 
                 <div className="flex justify-end gap-3 border-t border-gray-200 pt-4">

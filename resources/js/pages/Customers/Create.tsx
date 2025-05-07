@@ -30,7 +30,7 @@ interface CustomerFormData {
 export default function CreateCustomer({ onClose }: { onClose: () => void }) {
     const { packages } = usePage<CreateCustomerPageProps>().props;
 
-    const { data, setData, processing, errors } = useForm<CustomerFormData>({
+    const { data, setData, processing, errors, setError, clearErrors } = useForm<CustomerFormData>({
         name: '',
         status: 'active',
         address: '',
@@ -48,6 +48,29 @@ export default function CreateCustomer({ onClose }: { onClose: () => void }) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        clearErrors();
+
+        if (!data.name) {
+            setError('name', 'Nama harus diisi');
+        }
+        if (!data.phone) {
+            setError('phone', 'No. Telepon harus diisi');
+        }
+        if (!data.package_id) {
+            setError('package_id', 'Paket harus dipilih');
+        }
+        if (!data.address) {
+            setError('address', 'Alamat harus diisi');
+        }
+        if (!data.status) {
+            setError('status', 'Status harus dipilih');
+        }
+        if (!data.join_date) {
+            setError('join_date', 'Tanggal bergabung harus diisi');
+        }
+        if (!data.bill_date) {
+            setError('bill_date', 'Tanggal tagihan harus diisi');
+        }
 
         const payload = {
             ...data,

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Button, Input, Textarea } from '@heroui/react';
+import { Button, Input } from '@heroui/react';
 import { useForm } from '@inertiajs/react';
 
 interface InternetPackageFormData extends Record<string, any> {
@@ -14,7 +14,6 @@ export default function CreateInternetPackage({ onClose }: { onClose: () => void
         name: '',
         speed: '',
         price: '',
-        description: '',
     });
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -57,17 +56,6 @@ export default function CreateInternetPackage({ onClose }: { onClose: () => void
                         isInvalid={!!errors.price}
                         errorMessage={errors.price}
                         color="default"
-                    />
-                    <Textarea
-                        label="Deskripsi"
-                        id="description"
-                        value={data.description}
-                        onChange={(e) => setData('description', e.target.value)}
-                        rows={3}
-                        isInvalid={!!errors.description}
-                        errorMessage={errors.description}
-                        color="default"
-                        className="sm:col-span-2"
                     />
                 </div>
                 <div className="flex justify-end gap-3 border-t border-gray-200 pt-4">

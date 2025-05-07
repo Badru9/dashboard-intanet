@@ -73,7 +73,7 @@ export default function Login() {
 
                         <button
                             type="submit"
-                            className="focus:ring-tertiary hover:bg-primary-dark w-full cursor-pointer rounded-xl bg-primary py-3.5 text-white transition duration-200 hover:bg-primary/70 focus:ring-2 focus:ring-offset-2"
+                            className="focus:ring-tertiary hover:bg-primary-dark w-full cursor-pointer rounded-xl bg-primary py-3.5 text-white transition duration-200 hover:bg-primary/70 focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                             disabled={processing}
                         >
                             {processing ? 'Signing in...' : 'Sign In'}

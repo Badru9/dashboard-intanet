@@ -13,16 +13,16 @@ export default function DeactivateCustomerDialog({ isOpen, onClose, onConfirm, c
     const config = {
         inactive: {
             title: 'Non-aktifkan Customer',
-            description: 'Apakah Anda yakin ingin menonaktifkan customer ini?',
+            description: 'Apakah Anda yakin ingin menonaktifkan langganan untuk customer ini?',
             confirmText: 'Non-aktifkan',
             icon: 'text-red-500',
             confirmButton: 'bg-red-500 hover:bg-red-600',
             iconBg: 'bg-red-100',
         },
         paused: {
-            title: 'Pause Customer',
-            description: 'Apakah Anda yakin ingin mem-pause customer ini?',
-            confirmText: 'Pause',
+            title: 'Jeda Customer',
+            description: 'Apakah Anda yakin ingin menjeda langganan untuk customer ini?',
+            confirmText: 'Jeda',
             icon: 'text-yellow-500',
             confirmButton: 'bg-yellow-500 hover:bg-yellow-600',
             iconBg: 'bg-yellow-100',
@@ -44,9 +44,6 @@ export default function DeactivateCustomerDialog({ isOpen, onClose, onConfirm, c
                                 {currentConfig.title} {customerName}
                             </h3>
                             <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">{currentConfig.description}</p>
-                            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                Customer tidak akan bisa mengakses layanan setelah {type === 'inactive' ? 'dinonaktifkan' : 'dipause'}.
-                            </p>
                         </div>
                     </div>
 

@@ -8,11 +8,12 @@ import { type Customer, type PageProps } from '@/types';
 import { type TableColumn } from '@/types/table';
 import { Button, Input, Modal, ModalContent, useDisclosure } from '@heroui/react';
 import { Head, router, usePage } from '@inertiajs/react';
-import { MagnifyingGlass, Pause, PencilSimple, Play, Plus, Power, Trash } from '@phosphor-icons/react';
+import { MagnifyingGlass, PencilSimple, Plus, Trash } from '@phosphor-icons/react';
 import moment from 'moment';
 import { useMemo, useState } from 'react';
 import CreateCustomer from './Create';
 import EditCustomer from './Edit';
+import ImportCustomer from './Import';
 
 const statusColors = {
     active: 'bg-green-100 text-green-700',
@@ -59,7 +60,7 @@ export default function CustomersIndex() {
     const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
     const [search, setSearch] = useState(filters?.search || '');
     const [statusChangeType, setStatusChangeType] = useState<'inactive' | 'paused'>('inactive');
-
+    const { isOpen: isImportOpen, onOpen: onImportOpen, onOpenChange: onImportOpenChange } = useDisclosure();
     const filteredCustomers = useMemo(() => {
         if (!search) return customers.data;
         return customers.data.filter(
@@ -69,6 +70,8 @@ export default function CustomersIndex() {
     }, [customers.data, search]);
 
     const handleEdit = (customer: Customer) => {
+        console.log('data customer', customer);
+
         setSelectedCustomer(customer);
         onEditOpen();
     };
@@ -129,33 +132,21 @@ export default function CustomersIndex() {
         if (customer.status === 'active') {
             return (
                 <>
-                    <button
-                        onClick={() => handleStatusChange(customer, 'paused')}
-                        className="cursor-pointer rounded-lg p-2 text-gray-400 transition-colors hover:bg-yellow-50 hover:text-yellow-600"
-                        title="Pause Customer"
-                    >
-                        <Pause className="h-4 w-4" />
-                    </button>
-                    <button
-                        onClick={() => handleStatusChange(customer, 'inactive')}
-                        className="cursor-pointer rounded-lg p-2 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600"
-                        title="Non-aktifkan Customer"
-                    >
-                        <Power className="h-4 w-4" />
-                    </button>
+                    <Button color="warning" className="text-white" size="sm" onPress={() => handleStatusChange(customer, 'paused')}>
+                        Jeda
+                    </Button>
+                    <Button color="danger" className="text-white" size="sm" onPress={() => handleStatusChange(customer, 'inactive')}>
+                        Non-aktifkan
+                    </Button>
                 </>
             );
         }
 
         if (customer.status === 'paused' || customer.status === 'inactive') {
             return (
-                <button
-                    onClick={() => handleStatusChange(customer, 'active')}
-                    className="cursor-pointer rounded-lg p-2 text-gray-400 transition-colors hover:bg-green-50 hover:text-green-600"
-                    title="Aktifkan Customer"
-                >
-                    <Play className="h-4 w-4" />
-                </button>
+                <Button color="success" className="text-white" size="sm" onPress={() => handleStatusChange(customer, 'active')}>
+                    Aktifkan
+                </Button>
             );
         }
 
@@ -178,6 +169,7 @@ export default function CustomersIndex() {
     const baseColumns: TableColumn<Customer>[] = [
         {
             header: 'Nama',
+            sticky: true,
             value: (customer: Customer) => (
                 <div className="flex items-center gap-3">
                     <div className="h-10 w-10 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-700">
@@ -246,6 +238,14 @@ export default function CustomersIndex() {
                 <span className="text-gray-500 dark:text-gray-300">{moment(customer.join_date).format('DD MMMM YYYY')}</span>
             ),
         },
+        {
+            header: 'Tanggal Tagihan',
+            value: (customer: Customer) => (
+                <span className="text-gray-500 dark:text-gray-300">
+                    {customer.bill_date === null ? '-' : moment(customer.bill_date).format('DD MMMM YYYY')}
+                </span>
+            ),
+        },
     ];
 
     const adminColumns: TableColumn<Customer>[] = [
@@ -257,13 +257,13 @@ export default function CustomersIndex() {
                     {renderStatusActions(customer)}
                     <button
                         onClick={() => handleEdit(customer)}
-                        className="cursor-pointer rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-yellow-500"
+                        className="cursor-pointer rounded-lg p-2 text-yellow-400 transition-colors hover:bg-yellow-400 hover:text-white"
                     >
                         <PencilSimple className="h-4 w-4" />
                     </button>
                     <button
                         onClick={() => handleDelete(customer)}
-                        className="cursor-pointer rounded-lg p-2 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600"
+                        className="cursor-pointer rounded-lg p-2 text-red-600 transition-colors hover:bg-red-600 hover:text-white"
                     >
                         <Trash className="h-4 w-4" />
                     </button>
@@ -288,6 +288,13 @@ export default function CustomersIndex() {
             <div className="p-4 lg:p-8">
                 {/* Header with Search and Action */}
                 <div className="mb-6 flex flex-col items-center gap-4 lg:flex-row lg:items-center lg:justify-between">
+                    <div>
+                        <Button onPress={onImportOpen} color="primary">
+                            <Plus className="h-5 w-5" />
+                            Import Customer
+                        </Button>
+                    </div>
+
                     <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-center lg:justify-end">
                         <div className="relative w-full lg:w-auto">
                             <Input
@@ -321,11 +328,23 @@ export default function CustomersIndex() {
                             current_page: customers.current_page,
                             onChange: handlePageChange,
                         }}
+                        rowClassName={(customer) => {
+                            if (customer.status === 'active') return 'bg-green-50 dark:bg-green-900';
+                            if (customer.status === 'paused') return 'bg-yellow-50 dark:bg-yellow-900';
+                            if (customer.status === 'inactive') return 'bg-red-50 dark:bg-red-900';
+                            return '';
+                        }}
                     />
                 </div>
 
+                <Modal isOpen={isImportOpen} onOpenChange={onImportOpenChange}>
+                    <ModalContent>
+                        <ImportCustomer onClose={() => onImportOpenChange()} />
+                    </ModalContent>
+                </Modal>
+
                 <Modal isOpen={isCreateOpen} onOpenChange={onCreateOpenChange} size="2xl">
-                    <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30 dark:bg-black/30">
+                    <div className="fixed inset-0 z-50 flex h-screen items-center justify-center bg-black/30 dark:bg-black/30">
                         <ModalContent className="relative rounded-2xl bg-white p-0 dark:bg-gray-900">
                             <CreateCustomer onClose={() => onCreateOpenChange()} />
                         </ModalContent>
@@ -333,8 +352,8 @@ export default function CustomersIndex() {
                 </Modal>
 
                 <Modal isOpen={isEditOpen} onOpenChange={onEditOpenChange} size="2xl">
-                    <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30 dark:bg-black/30">
-                        <ModalContent className="relative rounded-2xl bg-white p-0 dark:bg-gray-900">
+                    <div className="fixed inset-0 z-50 h-screen bg-black/30 dark:bg-black/30">
+                        <ModalContent>
                             {selectedCustomer && <EditCustomer customer={selectedCustomer} onClose={() => onEditOpenChange()} />}
                         </ModalContent>
                     </div>

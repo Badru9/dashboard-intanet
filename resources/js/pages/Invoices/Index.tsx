@@ -2,15 +2,15 @@ import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import Table from '@/components/Table/Table';
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
 import { currencyFormat } from '@/lib/utils';
-import { Customer, InternetPackage, PageProps, type Invoices } from '@/types';
+import { PageProps, type Invoices } from '@/types';
 import { type TableColumn } from '@/types/table';
 import { Button, Input, Modal, ModalContent, useDisclosure } from '@heroui/react';
 import { Head, router, usePage } from '@inertiajs/react';
-import { MagnifyingGlass, PencilSimple, Plus, Trash } from '@phosphor-icons/react';
+import { MagnifyingGlass, Plus, Trash } from '@phosphor-icons/react';
 import moment from 'moment';
 import { useMemo, useState } from 'react';
 import CreateInvoice from './Create';
-import EditInvoice from './Edit';
+// import EditInvoice from './Edit';
 
 const statusColors = {
     paid: 'bg-green-100 text-green-700',
@@ -37,8 +37,8 @@ type InvoicePageProps = PageProps &
             }>;
         };
         filters: Record<string, string>;
-        packages: InternetPackage[];
-        customers: Customer[];
+        // packages: InternetPackage[];
+        // customers: Customer[];
         auth: {
             user: {
                 is_admin: number;
@@ -47,9 +47,9 @@ type InvoicePageProps = PageProps &
     };
 
 export default function InvoicesIndex() {
-    const { invoices, filters, customers, packages, auth } = usePage<InvoicePageProps>().props;
+    const { invoices, filters, auth } = usePage<InvoicePageProps>().props;
     const { isOpen: isCreateOpen, onOpen: onCreateOpen, onOpenChange: onCreateOpenChange } = useDisclosure();
-    const { isOpen: isEditOpen, onOpen: onEditOpen, onOpenChange: onEditOpenChange } = useDisclosure();
+    // const { isOpen: isEditOpen, onOpenChange: onEditOpenChange } = useDisclosure();
     const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onOpenChange: onDeleteOpenChange } = useDisclosure();
     const [selectedInvoice, setSelectedInvoice] = useState<Invoices | null>(null);
     const [search, setSearch] = useState(filters?.search || '');
@@ -63,10 +63,10 @@ export default function InvoicesIndex() {
         );
     }, [invoices.data, search]);
 
-    const handleEdit = (invoice: Invoices) => {
-        setSelectedInvoice(invoice);
-        onEditOpen();
-    };
+    // const handleEdit = (invoice: Invoices) => {
+    //     setSelectedInvoice(invoice);
+    //     onEditOpen();
+    // };
 
     const handleDelete = (invoice: Invoices) => {
         setSelectedInvoice(invoice);
@@ -132,15 +132,15 @@ export default function InvoicesIndex() {
             header: 'Actions',
             value: (invoice: Invoices) => (
                 <div className="flex items-center gap-2">
-                    <button
+                    {/* <button
                         onClick={() => handleEdit(invoice)}
-                        className="cursor-pointer rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-yellow-500"
+                        className="cursor-pointer rounded-lg p-2 text-yellow-400 transition-colors hover:bg-yellow-400 hover:text-white"
                     >
                         <PencilSimple className="h-4 w-4" />
-                    </button>
+                    </button> */}
                     <button
                         onClick={() => handleDelete(invoice)}
-                        className="cursor-pointer rounded-lg p-2 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600"
+                        className="cursor-pointer rounded-lg p-2 text-red-600 transition-colors hover:bg-red-600 hover:text-white"
                     >
                         <Trash className="h-4 w-4" />
                     </button>
@@ -198,7 +198,7 @@ export default function InvoicesIndex() {
 
                 {auth.user.is_admin === 1 && (
                     <>
-                        <Modal isOpen={isCreateOpen} onOpenChange={onCreateOpenChange} size="2xl">
+                        <Modal isOpen={isCreateOpen} onOpenChange={onCreateOpenChange} size="sm">
                             <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30">
                                 <ModalContent className="relative rounded-2xl bg-white p-0 dark:bg-gray-900">
                                     <CreateInvoice onClose={() => onCreateOpenChange()} />
@@ -206,7 +206,7 @@ export default function InvoicesIndex() {
                             </div>
                         </Modal>
 
-                        <Modal isOpen={isEditOpen} onOpenChange={onEditOpenChange} size="2xl">
+                        {/* <Modal isOpen={isEditOpen} onOpenChange={onEditOpenChange} size="sm">
                             <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30">
                                 <ModalContent className="relative rounded-2xl bg-white p-0 dark:bg-gray-900">
                                     {selectedInvoice && (
@@ -219,7 +219,7 @@ export default function InvoicesIndex() {
                                     )}
                                 </ModalContent>
                             </div>
-                        </Modal>
+                        </Modal> */}
 
                         <DeleteConfirmationDialog
                             isOpen={isDeleteOpen}

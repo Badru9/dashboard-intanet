@@ -3,6 +3,7 @@ export type TableColumn<T = Record<string, unknown>> = {
     value: keyof T | ((data: T, index: number) => React.ReactNode);
     className?: string | ((data: T, index: number) => string);
     headerClassName?: string | ((column: TableColumn<T>, index: number) => string);
+    sticky?: boolean;
 };
 
 export type TableHeader = Array<{

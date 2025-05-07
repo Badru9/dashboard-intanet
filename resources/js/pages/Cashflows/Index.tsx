@@ -5,7 +5,19 @@ import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
 import { currencyFormat } from '@/lib/utils';
 import { Cashflow, CashflowCategory, PageProps } from '@/types';
 import { TableColumn } from '@/types/table';
-import { Button, DateRangePicker, DateValue, Modal, ModalContent, Select, SelectItem, useDisclosure } from '@heroui/react';
+import {
+    Button,
+    Card,
+    CardBody,
+    CardHeader,
+    DateRangePicker,
+    DateValue,
+    Modal,
+    ModalContent,
+    Select,
+    SelectItem,
+    useDisclosure,
+} from '@heroui/react';
 import { Head, router, usePage } from '@inertiajs/react';
 import { CalendarDate } from '@internationalized/date';
 import { PencilSimple, Plus, Trash } from '@phosphor-icons/react';
@@ -37,6 +49,8 @@ type CashflowPageProps = PageProps & {
 export default function CashflowsIndex() {
     // Ambil data cashflows dari props
     const { cashflows, categories, auth } = usePage<CashflowPageProps>().props;
+
+    console.log('cashflows with date range', cashflows);
 
     const { isOpen: isCreateOpen, onOpen: onCreateOpen, onOpenChange: onCreateOpenChange } = useDisclosure();
     const { isOpen: isEditOpen, onOpen: onEditOpen, onOpenChange: onEditOpenChange } = useDisclosure();
@@ -101,13 +115,27 @@ export default function CashflowsIndex() {
     };
 
     const handleDateRangeChange = (value: { start: DateValue; end: DateValue } | null) => {
+        const today = new CalendarDate(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+
         if (!value) {
             setSelectedDateRange({
-                start: new CalendarDate(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()),
-                end: new CalendarDate(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()),
+                start: today,
+                end: today,
             });
 
-            const params: { category?: string } = {};
+            const params: {
+                category?: string;
+                date_range: {
+                    startDate: string;
+                    endDate: string;
+                };
+            } = {
+                date_range: {
+                    startDate: new Date(today.toString()).toISOString(),
+                    endDate: new Date(today.toString()).toISOString(),
+                },
+            };
+
             if (selectedCategory !== 'all') {
                 params.category = selectedCategory;
             }
@@ -174,6 +202,21 @@ export default function CashflowsIndex() {
         },
     ];
 
+    // Hitung total income dan outcome
+    const totals = cashflows.data.reduce(
+        (acc, curr) => {
+            if (curr.category?.is_out === 1) {
+                acc.outcome += Number(curr.amount);
+            } else {
+                acc.income += Number(curr.amount);
+            }
+            return acc;
+        },
+        { income: 0, outcome: 0 },
+    );
+
+    const totalBalance = totals.income - totals.outcome;
+
     const adminColumns: TableColumn<Cashflow>[] = [
         ...columns,
         {
@@ -182,13 +225,13 @@ export default function CashflowsIndex() {
                 <div className="flex items-center gap-2">
                     <button
                         onClick={() => handleEdit(cashflow)}
-                        className="cursor-pointer rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-yellow-500"
+                        className="cursor-pointer rounded-lg p-2 text-yellow-400 transition-colors hover:bg-yellow-400 hover:text-white"
                     >
                         <PencilSimple className="h-4 w-4" />
                     </button>
                     <button
                         onClick={() => handleDelete(cashflow)}
-                        className="cursor-pointer rounded-lg p-2 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600"
+                        className="cursor-pointer rounded-lg p-2 text-red-600 transition-colors hover:bg-red-600 hover:text-white"
                     >
                         <Trash className="h-4 w-4" />
                     </button>
@@ -229,6 +272,7 @@ export default function CashflowsIndex() {
                                 showMonthAndYearPickers
                                 label="Filter Tanggal"
                                 color="default"
+                                visibleMonths={2}
                                 selectorButtonPlacement="start"
                                 value={selectedDateRange}
                                 onChange={(value) => handleDateRangeChange(value as { start: DateValue; end: DateValue } | null)}
@@ -264,6 +308,40 @@ export default function CashflowsIndex() {
                         onChange: handlePageChange,
                     }}
                 />
+                <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
+                    <Card className="bg-green-50 dark:bg-green-900/20">
+                        <CardHeader className="pb-0">
+                            <h3 className="text-sm font-medium text-green-800 dark:text-green-400">Total Pemasukan</h3>
+                        </CardHeader>
+                        <CardBody>
+                            <p className="text-2xl font-semibold text-green-600 dark:text-green-400">{currencyFormat(totals.income)}</p>
+                        </CardBody>
+                    </Card>
+                    <Card className="bg-red-50 dark:bg-red-900/20">
+                        <CardHeader className="pb-0">
+                            <h3 className="text-sm font-medium text-red-800 dark:text-red-400">Total Pengeluaran</h3>
+                        </CardHeader>
+                        <CardBody>
+                            <p className="text-2xl font-semibold text-red-600 dark:text-red-400">{currencyFormat(totals.outcome)}</p>
+                        </CardBody>
+                    </Card>
+                    <Card className={totalBalance >= 0 ? 'bg-blue-50 dark:bg-blue-900/20' : 'bg-orange-50 dark:bg-orange-900/20'}>
+                        <CardHeader className="pb-0">
+                            <h3
+                                className={`text-sm font-medium ${totalBalance >= 0 ? 'text-blue-800 dark:text-blue-400' : 'text-orange-800 dark:text-orange-400'}`}
+                            >
+                                Total Saldo
+                            </h3>
+                        </CardHeader>
+                        <CardBody>
+                            <p
+                                className={`text-2xl font-semibold ${totalBalance >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-orange-600 dark:text-orange-400'}`}
+                            >
+                                {currencyFormat(totalBalance)}
+                            </p>
+                        </CardBody>
+                    </Card>
+                </div>
             </div>
 
             <Modal isOpen={isCreateOpen} onOpenChange={onCreateOpenChange} size="sm">
@@ -275,7 +353,7 @@ export default function CashflowsIndex() {
             </Modal>
             <Modal isOpen={isEditOpen} onOpenChange={onEditOpenChange} size="sm">
                 <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30 dark:bg-black/30">
-                    <ModalContent className="relative w-full max-w-sm rounded-2xl bg-white p-0 dark:bg-gray-900 lg:max-w-4xl">
+                    <ModalContent className="relative w-full max-w-sm rounded-2xl bg-white p-0 lg:max-w-4xl dark:bg-gray-900">
                         <EditCashflow cashflow={selectedCashflow} onClose={() => onEditOpenChange()} />
                     </ModalContent>
                 </div>

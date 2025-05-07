@@ -73,6 +73,10 @@ export default function InternetPackagesIndex() {
 
     const baseColumns: TableColumn<InternetPackage>[] = [
         {
+            header: 'ID',
+            value: (pkg: InternetPackage) => <span className="font-medium text-gray-900 dark:text-gray-100">{pkg.id}</span>,
+        },
+        {
             header: 'Nama Paket',
             value: (pkg: InternetPackage) => <span className="font-medium text-gray-900 dark:text-gray-100">{pkg.name}</span>,
         },
@@ -94,13 +98,13 @@ export default function InternetPackagesIndex() {
                 <div className="flex items-center gap-2">
                     <button
                         onClick={() => handleEdit(pkg)}
-                        className="cursor-pointer rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-yellow-500"
+                        className="cursor-pointer rounded-lg p-2 text-yellow-400 transition-colors hover:bg-yellow-400 hover:text-white"
                     >
                         <PencilSimple className="h-4 w-4" />
                     </button>
                     <button
                         onClick={() => handleDelete(pkg)}
-                        className="cursor-pointer rounded-lg p-2 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600"
+                        className="cursor-pointer rounded-lg p-2 text-red-600 transition-colors hover:bg-red-600 hover:text-white"
                     >
                         <Trash className="h-4 w-4" />
                     </button>

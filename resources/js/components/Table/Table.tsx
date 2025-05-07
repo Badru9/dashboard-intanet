@@ -69,6 +69,7 @@ export default function Table<T = Record<string, unknown>>({
                                             className={clsx(
                                                 'px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300',
                                                 typeof col.headerClassName === 'function' ? col.headerClassName(col, headIndex) : col.headerClassName,
+                                                col.sticky ? 'sticky left-0 z-10 bg-gray-50 dark:bg-gray-800' : '',
                                             )}
                                         >
                                             {col.header}
@@ -81,7 +82,7 @@ export default function Table<T = Record<string, unknown>>({
                                 <tr
                                     key={'row-' + index}
                                     className={clsx(
-                                        'transition-colors hover:bg-gray-50 dark:hover:bg-gray-700',
+                                        'group transition-colors hover:bg-gray-50 dark:hover:bg-gray-700',
                                         onClickRow !== undefined ? 'cursor-pointer' : '',
                                         rowClassName ? rowClassName(dt) : '',
                                     )}
@@ -95,6 +96,17 @@ export default function Table<T = Record<string, unknown>>({
                                     {column.map((col, cellIndex) => {
                                         const value = typeof col.value === 'function' ? col.value(dt, index) : dt[col.value as keyof T];
                                         const tdClassName = typeof col.className === 'function' ? col.className(dt, index) : col.className;
+
+                                        // Deteksi background dari rowClassName
+                                        let stickyBg = '';
+                                        if (col.sticky && rowClassName) {
+                                            const rowBg = rowClassName(dt);
+                                            if (rowBg?.includes('bg-green-50')) stickyBg = 'bg-green-50 dark:bg-green-900';
+                                            else if (rowBg?.includes('bg-yellow-50')) stickyBg = 'bg-yellow-50 dark:bg-yellow-900';
+                                            else if (rowBg?.includes('bg-red-50')) stickyBg = 'bg-red-50 dark:bg-red-900';
+                                            else stickyBg = 'bg-white dark:bg-gray-800';
+                                        }
+
                                         return (
                                             <td
                                                 key={'cell-' + index + '-' + cellIndex}
@@ -102,6 +114,9 @@ export default function Table<T = Record<string, unknown>>({
                                                     'whitespace-nowrap px-6 py-4 text-sm',
                                                     'text-gray-900 dark:text-gray-100',
                                                     tdClassName,
+                                                    col.sticky
+                                                        ? `z-10 lg:sticky lg:left-0 ${stickyBg} group-hover:bg-gray-50 dark:group-hover:bg-gray-700`
+                                                        : '',
                                                 )}
                                             >
                                                 {value as ReactNode}

@@ -33,7 +33,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('customers/{customer}', [CustomerController::class, 'update'])->name('customers.update');
     Route::delete('customers/{customer}', [CustomerController::class, 'destroy'])->name('customers.destroy');
     Route::put('/customers/{customer}/status', [CustomerController::class, 'updateStatus'])->name('customers.update-status');
-
+    Route::post('/customers/import', [CustomerController::class, 'import'])->name('customers.import');
     // Cashflow Category Routes
     Route::resource('cashflow-categories', CashflowCategoryController::class);
 

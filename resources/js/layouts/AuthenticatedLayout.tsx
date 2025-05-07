@@ -24,13 +24,29 @@ type PageProps = {
     };
 };
 
-const MenuItem = ({ item, isOpen }: { item: SidebarItem; isOpen: boolean }) => {
+// Tambahkan helper untuk mengambil pathname dari href
+const getPathname = (href: string): string => {
+    try {
+        // Jika href adalah absolute URL, ambil pathname-nya
+        return new URL(href, window.location.origin).pathname;
+    } catch {
+        // Jika href sudah relative, kembalikan langsung
+        return href;
+    }
+};
+
+const isRouteActive = (href: string): boolean => {
+    return window.location.pathname === getPathname(href);
+};
+
+const MenuItem = ({ item, isOpen, isActive }: { item: SidebarItem; isOpen: boolean; isActive: boolean }) => {
     return (
         <Link
             href={item.href}
             className={clsx(
                 'flex items-center rounded-full from-purple-700 to-primary px-4 py-2 text-slate-500 transition-all duration-300 hover:bg-gradient-to-r hover:text-white',
                 isOpen ? 'w-full' : 'w-12 justify-center',
+                isActive && 'bg-gradient-to-r from-primary to-purple-700 text-white shadow',
             )}
             title={!isOpen ? item.name : undefined}
         >
@@ -115,7 +131,7 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
                             </h2>
                             <nav className="mt-2 space-y-1">
                                 {mainMenuItems.map((item) => (
-                                    <MenuItem key={item.name} item={item} isOpen={isSidebarOpen} />
+                                    <MenuItem key={item.name} item={item} isOpen={isSidebarOpen} isActive={isRouteActive(item.href)} />
                                 ))}
                             </nav>
                             <h2
@@ -128,7 +144,7 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
                             </h2>
                             <nav className="mt-2 space-y-1">
                                 {isAdminMenus.map((item) => (
-                                    <MenuItem key={item.name} item={item} isOpen={isSidebarOpen} />
+                                    <MenuItem key={item.name} item={item} isOpen={isSidebarOpen} isActive={isRouteActive(item.href)} />
                                 ))}
                             </nav>
                         </div>

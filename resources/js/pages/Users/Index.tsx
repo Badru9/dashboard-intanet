@@ -91,7 +91,7 @@ export default function UsersIndex() {
             ),
         },
         {
-            header: 'Jabatan',
+            header: 'Role',
             value: (user: User) => user.is_admin === 1 && <Chip color="primary">Admin</Chip>,
         },
         {
@@ -104,13 +104,13 @@ export default function UsersIndex() {
                 <div className="flex items-center gap-2">
                     <button
                         onClick={() => handleEdit(user)}
-                        className="cursor-pointer rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-yellow-500"
+                        className="cursor-pointer rounded-lg p-2 text-yellow-400 transition-colors hover:bg-yellow-400 hover:text-white"
                     >
                         <PencilSimple className="h-4 w-4" />
                     </button>
                     <button
                         onClick={() => handleDelete(user)}
-                        className="cursor-pointer rounded-lg p-2 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600"
+                        className="cursor-pointer rounded-lg p-2 text-red-600 transition-colors hover:bg-red-600 hover:text-white"
                     >
                         <Trash className="h-4 w-4" />
                     </button>
@@ -131,7 +131,7 @@ export default function UsersIndex() {
     return (
         <AuthenticatedLayout>
             <Head title="Users" />
-            <div className="p-4 dark:bg-gray-900 lg:p-8">
+            <div className="p-4 lg:p-8 dark:bg-gray-900">
                 <div className="mb-6 flex flex-col items-center gap-4 lg:flex-row lg:items-center lg:justify-between">
                     <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-center lg:justify-end">
                         <div className="relative w-full lg:w-auto">

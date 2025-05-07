@@ -99,6 +99,124 @@ class CustomerController extends Controller
         }
     }
 
+    public function import(Request $request)
+    {
+        Log::info('Request data:', $request->all());
+
+        $validated = $request->validate([
+            'file' => 'required|file|mimes:csv,xlsx,xls',
+        ]);
+
+        $file = $validated['file'];
+        $extension = $file->getClientOriginalExtension();
+
+        try {
+            if ($extension === 'csv') {
+                $data = array_map('str_getcsv', file($file->getPathname()));
+                $headers = array_shift($data);
+
+                Log::info('CSV Headers:', $headers);
+                Log::info('CSV Data:', $data);
+            } else {
+                // Untuk file Excel (.xlsx, .xls)
+                $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file->getPathname());
+                $worksheet = $spreadsheet->getActiveSheet();
+                $data = $worksheet->toArray();
+                $headers = array_shift($data);
+
+                // Membersihkan headers dari nilai null
+                $headers = array_filter($headers, function ($value) {
+                    return $value !== null;
+                });
+
+                // Membersihkan data dari kolom kosong
+                $data = array_map(function ($row) use ($headers) {
+                    return array_slice($row, 0, count($headers));
+                }, $data);
+
+                Log::info('Excel Headers:', $headers);
+                Log::info('Excel Data:', $data);
+
+                // Proses penyimpanan data
+                $successCount = 0;
+                $errorCount = 0;
+                $errors = [];
+
+                foreach ($data as $index => $row) {
+                    try {
+                        // Konversi data sesuai format yang dibutuhkan
+                        $customerData = [
+                            'name' => $row[0] ?? null,
+                            'address' => $row[1] ?? null,
+                            'npwp' => $row[2] ?? null,
+                            'phone' => $row[4] ?? null,
+                            'email' => $row[5] ?? null,
+                            'coordinate' => $row[6] ?? null,
+                            'package_id' => $row[8] ?? null,
+                            'status' => $row[9] ?? 'active',
+                            'join_date' => $row[10] ? Carbon::parse($row[10])->format('Y-m-d') : null,
+                            'bill_date' => $row[11] ? Carbon::parse($row[11])->format('Y-m-d') : null,
+                        ];
+
+                        // Validasi data
+                        if (empty($customerData['name']) || empty($customerData['address']) || empty($customerData['package_id'])) {
+                            throw new \Exception('Data tidak lengkap');
+                        }
+
+                        // Cek apakah email sudah ada
+                        if (!empty($customerData['email'])) {
+                            $existingCustomer = Customer::where('email', $customerData['email'])->first();
+                            if ($existingCustomer) {
+                                throw new \Exception('Email sudah terdaftar');
+                            }
+                        }
+
+                        // Buat customer baru
+                        $customer = Customer::create($customerData);
+
+                        // Buat invoice jika status active
+                        if ($customerData['status'] === 'active' && $customerData['bill_date']) {
+                            $package = InternetPackage::find($customerData['package_id']);
+                            if ($package) {
+                                $dueDate = Carbon::parse($customerData['bill_date'])->addMonth();
+                                Invoice::create([
+                                    'customer_id' => $customer->id,
+                                    'package_id' => $package->id,
+                                    'amount' => $package->price,
+                                    'status' => 'unpaid',
+                                    'due_date' => $dueDate,
+                                    'period' => Carbon::parse($customerData['bill_date']),
+                                    'created_by' => Auth::id(),
+                                ]);
+                            }
+                        }
+
+                        $successCount++;
+                    } catch (\Exception $e) {
+                        $errorCount++;
+                        $errors[] = "Baris " . ($index + 2) . ": " . $e->getMessage();
+                    }
+                }
+
+                $message = "Import selesai. Berhasil: {$successCount}, Gagal: {$errorCount}";
+                if ($errorCount > 0) {
+                    $message .= ". Silakan cek log untuk detail error.";
+                    Log::error('Import errors:', $errors);
+                }
+
+                return redirect()->route('customers.index')
+                    ->with('success', $message);
+            }
+
+            return redirect()->route('customers.index')
+                ->with('error', 'Format file tidak didukung');
+        } catch (\Exception $e) {
+            Log::error('Error reading file:', ['error' => $e->getMessage()]);
+            return redirect()->route('customers.index')
+                ->with('error', 'Gagal membaca file: ' . $e->getMessage());
+        }
+    }
+
     public function edit(Customer $customer)
     {
         return Inertia::render('Customers/Edit', [
