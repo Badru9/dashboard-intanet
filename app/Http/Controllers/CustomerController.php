@@ -152,14 +152,22 @@ class CustomerController extends Controller
                             'phone' => $row[4] ?? null,
                             'email' => $row[5] ?? null,
                             'coordinate' => $row[6] ?? null,
-                            'package_id' => $row[8] ?? null,
-                            'status' => $row[9] ?? 'active',
-                            'join_date' => $row[10] ? Carbon::parse($row[10])->format('Y-m-d') : null,
-                            'bill_date' => $row[11] ? Carbon::parse($row[11])->format('Y-m-d') : ($row[10] ? Carbon::parse($row[10])->addMonth()->format('Y-m-d') : null),
+                            'package_id' => $row[7] ?? null,
+                            'status' => $row[8] ?? 'active',
+                            'join_date' => $row[9] ? Carbon::parse($row[9])->format('Y-m-d') : null,
+                            'bill_date' => $row[10] ? Carbon::parse($row[10])->format('Y-m-d') : ($row[9] ? Carbon::parse($row[9])->addMonth()->format('Y-m-d') : null),
                         ];
+
+                        // Tambahkan logging untuk debugging
+                        Log::info('Customer data before validation:', $customerData);
 
                         // Validasi data
                         if (empty($customerData['name']) || empty($customerData['address']) || empty($customerData['package_id'])) {
+                            Log::error('Validation failed:', [
+                                'name' => $customerData['name'],
+                                'address' => $customerData['address'],
+                                'package_id' => $customerData['package_id']
+                            ]);
                             throw new \Exception('Data tidak lengkap');
                         }
 
