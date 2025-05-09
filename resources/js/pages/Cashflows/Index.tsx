@@ -14,6 +14,7 @@ import {
     DateValue,
     Modal,
     ModalContent,
+    ModalHeader,
     Select,
     SelectItem,
     useDisclosure,
@@ -226,7 +227,7 @@ export default function CashflowsIndex() {
         },
         {
             header: 'Tanggal',
-            value: (row: Cashflow) => moment(row.created_at).format('DD MMMM YYYY'),
+            value: (row: Cashflow) => moment(row.date).format('DD MMMM YYYY'),
         },
     ];
 
@@ -342,13 +343,19 @@ export default function CashflowsIndex() {
             <Modal isOpen={isCreateOpen} onOpenChange={onCreateOpenChange} size="sm">
                 <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30 dark:bg-black/30">
                     <ModalContent className="relative rounded-2xl bg-white p-0 dark:bg-gray-900">
+                        <ModalHeader>
+                            <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">Tambah Cashflow</h2>
+                        </ModalHeader>
                         <CreateCashflow onClose={() => onCreateOpenChange()} />
                     </ModalContent>
                 </div>
             </Modal>
             <Modal isOpen={isEditOpen} onOpenChange={onEditOpenChange} size="sm">
                 <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30 dark:bg-black/30">
-                    <ModalContent className="relative w-full max-w-sm rounded-2xl bg-white p-0 lg:max-w-4xl dark:bg-gray-900">
+                    <ModalContent className="relative w-full max-w-sm rounded-2xl bg-white p-0 dark:bg-gray-900">
+                        <ModalHeader>
+                            <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">Edit Cashflow</h2>
+                        </ModalHeader>
                         <EditCashflow cashflow={selectedCashflow} onClose={() => onEditOpenChange()} />
                     </ModalContent>
                 </div>

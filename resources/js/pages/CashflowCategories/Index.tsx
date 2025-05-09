@@ -3,7 +3,7 @@ import Table from '@/components/Table/Table';
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
 import { CashflowCategory, PageProps } from '@/types';
 import { TableColumn } from '@/types/table';
-import { Button, Modal, ModalContent, useDisclosure } from '@heroui/react';
+import { Button, Modal, ModalContent, ModalHeader, useDisclosure } from '@heroui/react';
 import { Head, router, usePage } from '@inertiajs/react';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
@@ -143,6 +143,9 @@ export default function CashflowsCategoriesIndex() {
                 <Modal isOpen={isCreateModalOpen} onOpenChange={setIsCreateModalOpen} size="sm">
                     <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30">
                         <ModalContent className="relative rounded-2xl bg-white p-0 dark:bg-gray-900">
+                            <ModalHeader>
+                                <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">Tambah Kategori</h2>
+                            </ModalHeader>
                             <CreateCashflowCategory onClose={() => setIsCreateModalOpen(false)} />
                         </ModalContent>
                     </div>
@@ -150,6 +153,9 @@ export default function CashflowsCategoriesIndex() {
                 <Modal isOpen={isEditModalOpen} onOpenChange={setIsEditModalOpen} size="sm">
                     <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30">
                         <ModalContent className="relative rounded-2xl bg-white p-0 dark:bg-gray-900">
+                            <ModalHeader>
+                                <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">Edit Kategori</h2>
+                            </ModalHeader>
                             {selectedCategory && <EditCashflowCategory category={selectedCategory} onClose={() => setIsEditModalOpen(false)} />}
                         </ModalContent>
                     </div>

@@ -53,9 +53,6 @@ const ImportCustomer = ({ onClose }: ImportCustomerProps) => {
     return (
         <div className="flex flex-col gap-4 p-5">
             <form onSubmit={submit} className="space-y-4">
-                <label htmlFor="file" className="text-sm font-medium text-gray-700">
-                    Import Customer
-                </label>
                 <Input
                     type="file"
                     id="file"

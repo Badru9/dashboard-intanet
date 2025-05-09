@@ -4,7 +4,7 @@ import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
 import { currencyFormat } from '@/lib/utils';
 import { PageProps, type Invoices } from '@/types';
 import { type TableColumn } from '@/types/table';
-import { Button, Input, Modal, ModalContent, useDisclosure } from '@heroui/react';
+import { Button, Input, Modal, ModalContent, ModalHeader, useDisclosure } from '@heroui/react';
 import { Head, router, usePage } from '@inertiajs/react';
 import { MagnifyingGlass, Plus, Trash } from '@phosphor-icons/react';
 import moment from 'moment';
@@ -213,6 +213,9 @@ export default function InvoicesIndex() {
                         <Modal isOpen={isCreateOpen} onOpenChange={onCreateOpenChange} size="sm">
                             <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30">
                                 <ModalContent className="relative rounded-2xl bg-white p-0 dark:bg-gray-900">
+                                    <ModalHeader>
+                                        <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">Tambah Invoice</h2>
+                                    </ModalHeader>
                                     <CreateInvoice onClose={() => onCreateOpenChange()} />
                                 </ModalContent>
                             </div>
@@ -244,6 +247,9 @@ export default function InvoicesIndex() {
                         <Modal isOpen={isPaidOpen} onOpenChange={onPaidOpenChange} size="sm">
                             <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30">
                                 <ModalContent className="relative rounded-2xl bg-white p-0 dark:bg-gray-900">
+                                    <ModalHeader>
+                                        <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">Bayar Invoice</h2>
+                                    </ModalHeader>
                                     {selectedInvoice && <Paid invoice={selectedInvoice} onClose={() => onPaidOpenChange()} />}
                                 </ModalContent>
                             </div>

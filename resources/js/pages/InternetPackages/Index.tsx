@@ -4,7 +4,7 @@ import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
 import { currencyFormat } from '@/lib/utils';
 import { type InternetPackage, type PageProps } from '@/types';
 import { type TableColumn } from '@/types/table';
-import { Button, Input, Modal, ModalContent, useDisclosure } from '@heroui/react';
+import { Button, Input, Modal, ModalContent, ModalHeader, useDisclosure } from '@heroui/react';
 import { Head, router, usePage } from '@inertiajs/react';
 import { MagnifyingGlass, PencilSimple, Plus, Trash } from '@phosphor-icons/react';
 import { useMemo, useState } from 'react';
@@ -166,6 +166,9 @@ export default function InternetPackagesIndex() {
                         <Modal isOpen={isCreateOpen} onOpenChange={onCreateOpenChange} size="sm">
                             <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30">
                                 <ModalContent className="relative rounded-2xl bg-white p-0 dark:bg-gray-900">
+                                    <ModalHeader>
+                                        <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">Tambah Paket</h2>
+                                    </ModalHeader>
                                     <CreatePackage onClose={() => onCreateOpenChange()} />
                                 </ModalContent>
                             </div>
@@ -174,6 +177,9 @@ export default function InternetPackagesIndex() {
                         <Modal isOpen={isEditOpen} onOpenChange={onEditOpen} size="sm">
                             <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30">
                                 <ModalContent className="relative rounded-2xl bg-white p-0 dark:bg-gray-900">
+                                    <ModalHeader>
+                                        <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">Edit Paket</h2>
+                                    </ModalHeader>
                                     {selectedPackage && <EditPackage package={selectedPackage} onClose={() => onEditOpenChange()} />}
                                 </ModalContent>
                             </div>

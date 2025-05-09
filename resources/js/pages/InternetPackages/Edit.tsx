@@ -34,8 +34,7 @@ export default function EditPackage({ package: pkg, onClose }: EditPackageProps)
 
     return (
         <div className="mx-auto mt-5 h-fit w-full rounded-2xl bg-white text-slate-800 dark:bg-gray-900 dark:text-gray-100">
-            <h2 className="px-5 pt-5 text-lg font-medium text-gray-900 dark:text-gray-100">Edit Paket Internet</h2>
-            <form onSubmit={handleSubmit} className="space-y-6 p-5">
+            <form onSubmit={handleSubmit} className="space-y-6 px-5 pb-5">
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <div>
                         <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">

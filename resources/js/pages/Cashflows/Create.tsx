@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { CashflowCategory, PageProps } from '@/types';
-import { Button, Input, Select, SelectItem, Textarea } from '@heroui/react';
+import { Button, DatePicker, Input, Select, SelectItem, Textarea } from '@heroui/react';
 import { Head, router, useForm, usePage } from '@inertiajs/react';
+import { CalendarDate } from '@internationalized/date';
 
 interface Props extends PageProps {
     categories: CashflowCategory[];
@@ -11,6 +12,7 @@ interface Props extends PageProps {
 interface CashflowFormData {
     [key: string]: any;
     cashflow_category_id: string;
+    date: CalendarDate | null;
     amount: string;
     note: string;
 }
@@ -20,6 +22,7 @@ export default function CreateCashflow({ onClose }: { onClose: () => void }) {
 
     const { data, setData, processing, errors } = useForm<CashflowFormData>({
         cashflow_category_id: '',
+        date: new CalendarDate(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate()),
         amount: '',
         note: '',
     });
@@ -29,6 +32,7 @@ export default function CreateCashflow({ onClose }: { onClose: () => void }) {
 
         const payload = {
             ...data,
+            date: data.date ? data.date.toString() : null,
             created_id: auth.user.id,
         };
 
@@ -45,9 +49,8 @@ export default function CreateCashflow({ onClose }: { onClose: () => void }) {
     return (
         <div className="mx-auto mt-5 h-fit w-full max-w-4xl overflow-y-auto rounded-2xl bg-white text-slate-800 dark:bg-gray-900 dark:text-gray-100">
             <Head title="Create Cashflow" />
-            <h2 className="px-5 text-lg font-medium text-gray-900 dark:text-gray-100">Tambah Cashflow Baru</h2>
-            <form onSubmit={handleSubmit} className="space-y-6 p-5">
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <form onSubmit={handleSubmit} className="space-y-6 px-5 pb-5">
+                <div className="space-y-4">
                     <div>
                         <Select
                             label="Kategori"
@@ -63,6 +66,18 @@ export default function CreateCashflow({ onClose }: { onClose: () => void }) {
                                 </SelectItem>
                             ))}
                         </Select>
+                    </div>
+
+                    <div>
+                        <DatePicker
+                            label="Tanggal"
+                            value={data.date}
+                            onChange={(date) => setData('date', date)}
+                            isInvalid={!!errors.date}
+                            errorMessage={errors.date}
+                            isRequired
+                            selectorButtonPlacement="start"
+                        />
                     </div>
 
                     <div>

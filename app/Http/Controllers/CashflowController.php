@@ -30,7 +30,7 @@ class CashflowController extends Controller
 
             // Filter berdasarkan tanggal
             if (request()->filled('date_range')) {
-                $query->whereBetween('created_at', [
+                $query->whereBetween('date', [
                     request()->date_range['startDate'],
                     request()->date_range['endDate']
                 ]);
@@ -44,7 +44,7 @@ class CashflowController extends Controller
             ]);
 
             // Eksekusi query dengan paginasi
-            $cashflows = $query->latest()->paginate(10);
+            $cashflows = $query->orderBy('date', 'desc')->paginate(10);
 
             // Debug hasil akhir
             Log::info('Final Result:', [
@@ -83,6 +83,7 @@ class CashflowController extends Controller
     {
         $validated = $request->validate([
             'cashflow_category_id' => 'required|exists:cashflow_categories,id',
+            'date' => 'required|date',
             'amount' => 'required|numeric|min:0',
             'note' => 'nullable|string',
         ]);
@@ -107,6 +108,7 @@ class CashflowController extends Controller
     {
         $validated = $request->validate([
             'cashflow_category_id' => 'required|exists:cashflow_categories,id',
+            'date' => 'required|date',
             'amount' => 'required|numeric|min:0',
             'note' => 'nullable|string',
         ]);

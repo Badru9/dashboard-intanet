@@ -32,8 +32,7 @@ export default function CreateCashflowCategory({ onClose }: CreateCashflowCatego
 
     return (
         <div className="mx-auto w-full max-w-4xl rounded-2xl bg-white text-slate-800 dark:bg-gray-900 dark:text-gray-100">
-            <h2 className="px-5 pt-5 text-lg font-medium text-gray-900 dark:text-gray-100">Tambah Kategori Cashflow</h2>
-            <form onSubmit={handleSubmit} className="h-fit space-y-6 p-5">
+            <form onSubmit={handleSubmit} className="h-fit space-y-6 px-5 pb-5">
                 <div className="grid grid-cols-1 gap-3">
                     <Input
                         label="Nama Kategori"

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { CUSTOMER_STATUS_OPTIONS } from '@/constants';
+import { BILL_DATE_LENGTH, CUSTOMER_STATUS_OPTIONS } from '@/constants';
 import { currencyFormat } from '@/lib/utils';
 import { InternetPackage, type Customer, type PageProps } from '@/types';
 import { Button, DatePicker, Input, Select, SelectItem, Textarea } from '@heroui/react';
@@ -23,7 +23,7 @@ interface CustomerFormData {
     };
     phone: string;
     join_date: CalendarDate | null;
-    bill_date: CalendarDate | null;
+    bill_date: string;
     email: string;
 }
 
@@ -42,7 +42,7 @@ export default function CreateCustomer({ onClose }: { onClose: () => void }) {
         },
         phone: '',
         join_date: null,
-        bill_date: null,
+        bill_date: '',
         email: '',
     });
 
@@ -77,9 +77,6 @@ export default function CreateCustomer({ onClose }: { onClose: () => void }) {
             join_date: data.join_date
                 ? `${data.join_date.year}-${String(data.join_date.month).padStart(2, '0')}-${String(data.join_date.day).padStart(2, '0')}`
                 : null,
-            bill_date: data.bill_date
-                ? `${data.bill_date.year}-${String(data.bill_date.month).padStart(2, '0')}-${String(data.bill_date.day).padStart(2, '0')}`
-                : null,
         };
 
         router.post(route('customers.store'), payload, {
@@ -95,8 +92,7 @@ export default function CreateCustomer({ onClose }: { onClose: () => void }) {
 
     return (
         <div className="mx-auto mt-5 h-fit w-full max-w-4xl overflow-y-auto rounded-2xl bg-white text-slate-800 dark:bg-gray-900 dark:text-gray-100">
-            <h2 className="px-5 text-lg font-medium text-gray-900 dark:text-gray-100">Tambah Customer Baru</h2>
-            <form onSubmit={handleSubmit} className="space-y-6 p-5">
+            <form onSubmit={handleSubmit} className="space-y-6 px-5 pb-5">
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <div>
                         <Input
@@ -207,15 +203,22 @@ export default function CreateCustomer({ onClose }: { onClose: () => void }) {
                     </div>
 
                     <div>
-                        <DatePicker
+                        <Select
                             label="Tanggal Tagihan"
                             id="bill_date"
                             value={data.bill_date}
-                            onChange={(value) => setData('bill_date', value)}
+                            onChange={(e) => setData('bill_date', e.target.value)}
                             isInvalid={!!errors.bill_date}
                             errorMessage={errors.bill_date}
-                            selectorButtonPlacement="start"
-                        />
+                            placeholder="Pilih Tanggal"
+                            selectedKeys={data.bill_date ? [data.bill_date] : []}
+                        >
+                            {Array.from({ length: BILL_DATE_LENGTH }, (_, i) => i + 1).map((day) => (
+                                <SelectItem key={day.toString()} textValue={day.toString()}>
+                                    {day}
+                                </SelectItem>
+                            ))}
+                        </Select>
                         <p className="ml-2 mt-2 text-xs text-red-500">* Setiap bulan</p>
                     </div>
 

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Cashflow;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -21,17 +22,20 @@ class CashflowSeeder extends Seeder
 
         $data = [];
         foreach (range(1, 50) as $i) {
+            $date = $faker->dateTimeBetween('-1 year', 'now');
+
             $data[] = [
                 'cashflow_category_id' => $faker->randomElement($categories),
                 'created_id' => $faker->randomElement($users),
                 'invoice_id' => $faker->optional(0.7)->randomElement($invoices),
+                'date' => $date->format('Y-m-d'),
                 'amount' => $faker->numberBetween(50000, 10000000),
                 'note' => $faker->optional()->sentence(),
-                'created_at' => $faker->dateTimeBetween('-1 year', 'now'),
+                'created_at' => $date,
                 'updated_at' => now(),
             ];
         }
 
-        DB::table('cashflows')->insert($data);
+        Cashflow::insert($data);
     }
 }

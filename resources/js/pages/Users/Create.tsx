@@ -38,8 +38,7 @@ export default function CreateUser({ onClose }: { onClose: () => void }) {
     return (
         <div className="mx-auto mt-5 h-fit w-full max-w-4xl overflow-y-auto rounded-2xl bg-white text-slate-800 dark:bg-gray-900 dark:text-gray-100">
             <Head title="Tambah User" />
-            <h2 className="px-5 text-lg font-medium text-gray-900 dark:text-gray-100">Tambah User Baru</h2>
-            <form onSubmit={handleSubmit} className="space-y-6 p-5">
+            <form onSubmit={handleSubmit} className="space-y-6 px-5 pb-5">
                 <div className="grid grid-cols-1 gap-3">
                     <div>
                         <Input

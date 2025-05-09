@@ -6,7 +6,7 @@ import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
 import { currencyFormat } from '@/lib/utils';
 import { type Customer, type PageProps } from '@/types';
 import { type TableColumn } from '@/types/table';
-import { Button, Input, Modal, ModalContent, useDisclosure } from '@heroui/react';
+import { Button, Input, Modal, ModalContent, ModalHeader, useDisclosure } from '@heroui/react';
 import { Head, router, usePage } from '@inertiajs/react';
 import { MagnifyingGlass, PencilSimple, Plus, Trash } from '@phosphor-icons/react';
 import moment from 'moment';
@@ -339,6 +339,9 @@ export default function CustomersIndex() {
 
                 <Modal isOpen={isImportOpen} onOpenChange={onImportOpenChange}>
                     <ModalContent>
+                        <ModalHeader>
+                            <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">Import Customer</h2>
+                        </ModalHeader>
                         <ImportCustomer onClose={() => onImportOpenChange()} />
                     </ModalContent>
                 </Modal>
@@ -346,6 +349,9 @@ export default function CustomersIndex() {
                 <Modal isOpen={isCreateOpen} onOpenChange={onCreateOpenChange} size="2xl">
                     <div className="fixed inset-0 z-50 flex h-screen items-center justify-center bg-black/30 dark:bg-black/30">
                         <ModalContent className="relative rounded-2xl bg-white p-0 dark:bg-gray-900">
+                            <ModalHeader>
+                                <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">Tambah Customer</h2>
+                            </ModalHeader>
                             <CreateCustomer onClose={() => onCreateOpenChange()} />
                         </ModalContent>
                     </div>
@@ -353,7 +359,10 @@ export default function CustomersIndex() {
 
                 <Modal isOpen={isEditOpen} onOpenChange={onEditOpenChange} size="2xl">
                     <div className="fixed inset-0 z-50 h-screen bg-black/30 dark:bg-black/30">
-                        <ModalContent>
+                        <ModalContent className="relative rounded-2xl bg-white p-0 dark:bg-gray-900">
+                            <ModalHeader>
+                                <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">Edit Customer</h2>
+                            </ModalHeader>
                             {selectedCustomer && <EditCustomer customer={selectedCustomer} onClose={() => onEditOpenChange()} />}
                         </ModalContent>
                     </div>

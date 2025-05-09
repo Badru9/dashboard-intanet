@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { CUSTOMER_STATUS_OPTIONS } from '@/constants';
+import { BILL_DATE_LENGTH, CUSTOMER_STATUS_OPTIONS } from '@/constants';
 import { currencyFormat } from '@/lib/utils';
 import { InternetPackage, type Customer, type PageProps } from '@/types';
 import { Button, DatePicker, Input, Select, SelectItem, Textarea } from '@heroui/react';
@@ -113,11 +113,8 @@ export default function EditCustomer({ customer, onClose }: EditCustomerProps) {
     };
 
     return (
-        <div className="mx-auto mt-36 h-screen min-h-fit w-full rounded-2xl bg-white text-slate-800 dark:bg-gray-900 dark:text-gray-100">
-            <div className="border-b border-gray-200 px-5 py-4 dark:border-gray-700">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Edit Customer</h2>
-            </div>
-            <form onSubmit={handleSubmit} className="space-y-8 p-5">
+        <div className="mx-auto min-h-fit w-full rounded-2xl bg-white text-slate-800 dark:bg-gray-900 dark:text-gray-100">
+            <form onSubmit={handleSubmit} className="space-y-8 px-5 pb-5">
                 {/* Data Diri Section */}
                 <div className="space-y-4">
                     <div className="flex items-center gap-2">
@@ -235,21 +232,22 @@ export default function EditCustomer({ customer, onClose }: EditCustomerProps) {
                             showMonthAndYearPickers
                             selectorButtonPlacement="start"
                         />
-                        <DatePicker
+                        <Select
                             label="Tanggal Tagihan"
                             id="bill_date"
-                            value={form.data.bill_date ? parseDate(form.data.bill_date) : null}
-                            onChange={(value) =>
-                                form.setData(
-                                    'bill_date',
-                                    value ? `${value.year}-${String(value.month).padStart(2, '0')}-${String(value.day).padStart(2, '0')}` : '',
-                                )
-                            }
+                            value={form.data.bill_date}
+                            onChange={(e) => form.setData('bill_date', e.target.value)}
                             isInvalid={!!form.errors.bill_date}
                             errorMessage={form.errors.bill_date}
-                            showMonthAndYearPickers
-                            selectorButtonPlacement="start"
-                        />
+                            placeholder="Pilih Tanggal"
+                            selectedKeys={form.data.bill_date ? [form.data.bill_date] : []}
+                        >
+                            {Array.from({ length: BILL_DATE_LENGTH }, (_, i) => i + 1).map((day) => (
+                                <SelectItem key={day.toString()} textValue={day.toString()}>
+                                    {day}
+                                </SelectItem>
+                            ))}
+                        </Select>
                         <Select
                             label="Status"
                             id="status"

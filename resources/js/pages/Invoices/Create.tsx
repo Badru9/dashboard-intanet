@@ -42,8 +42,7 @@ export default function CreateInvoice({ onClose }: { onClose: () => void }) {
     return (
         <div className="mx-auto mt-5 h-fit w-full overflow-y-auto rounded-2xl bg-white text-slate-800 dark:bg-gray-900 dark:text-gray-100">
             <Head title="Generate Invoices" />
-            <h2 className="px-5 text-lg font-medium text-gray-900 dark:text-gray-100">Generate Invoices</h2>
-            <form onSubmit={handleSubmit} className="space-y-6 p-5">
+            <form onSubmit={handleSubmit} className="space-y-6 px-5 pb-5">
                 <div className="w-full">
                     <Input
                         type="month"

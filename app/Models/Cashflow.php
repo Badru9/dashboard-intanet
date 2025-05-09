@@ -12,6 +12,7 @@ class Cashflow extends Model
 
     protected $fillable = [
         'cashflow_category_id',
+        'date',
         'created_id',
         'amount',
         'note',

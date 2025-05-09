@@ -58,3 +58,5 @@ export const INVOICE_STATUS_OPTIONS: InvoiceStatusOption[] = [
         label: 'Cancelled',
     },
 ];
+
+export const BILL_DATE_LENGTH = 28;

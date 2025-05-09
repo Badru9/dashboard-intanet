@@ -157,6 +157,7 @@ export interface Cashflow {
     category: CashflowCategory;
     created_at: string;
     updated_at: string;
+    date: string;
 }
 
 // Settings Types
