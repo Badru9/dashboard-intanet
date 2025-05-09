@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class InvoiceController extends Controller
 {
@@ -40,35 +41,60 @@ class InvoiceController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'customer_id' => 'required|exists:customers,id',
             'period' => 'required|date_format:Y-m',
-            'note' => 'nullable|string',
         ]);
 
-        $customer = Customer::with('package')->findOrFail($validated['customer_id']);
-
-        // Hitung due date berdasarkan active_date customer
-        $activeDate = Carbon::parse($customer->active_date);
         $periodDate = Carbon::createFromFormat('Y-m', $validated['period']);
-        $dueDate = Carbon::create(
-            $periodDate->year,
-            $periodDate->month,
-            $activeDate->day
-        );
 
-        Invoice::create([
-            'customer_id' => $customer->id,
-            'package_id' => $customer->package_id,
-            'amount' => $customer->package->price,
-            'status' => 'unpaid',
-            'due_date' => $dueDate,
-            'period' => $periodDate,
-            'note' => $validated['note'],
-            'created_by' => Auth::id(),
-        ]);
+        // Ambil semua customer yang aktif
+        $activeCustomers = Customer::with('package')
+            ->where('status', 'active')
+            ->get();
+
+        $createdCount = 0;
+        $errors = [];
+
+        foreach ($activeCustomers as $customer) {
+            try {
+                // Hitung due date berdasarkan bill_date customer
+                $billDate = Carbon::parse($customer->bill_date);
+                $dueDate = Carbon::create(
+                    $periodDate->year,
+                    $periodDate->month,
+                    $billDate->day
+                );
+
+                // Cek apakah invoice untuk periode ini sudah ada
+                $existingInvoice = Invoice::where('customer_id', $customer->id)
+                    ->whereYear('period', $periodDate->year)
+                    ->whereMonth('period', $periodDate->month)
+                    ->first();
+
+                if (!$existingInvoice) {
+                    Invoice::create([
+                        'customer_id' => $customer->id,
+                        'package_id' => $customer->package_id,
+                        'amount' => $customer->package->price,
+                        'status' => 'unpaid',
+                        'due_date' => $dueDate,
+                        'period' => $periodDate,
+                        'created_by' => Auth::id(),
+                    ]);
+                    $createdCount++;
+                }
+            } catch (\Exception $e) {
+                $errors[] = "Gagal membuat invoice untuk customer {$customer->name}: " . $e->getMessage();
+            }
+        }
+
+        $message = "Berhasil membuat {$createdCount} invoice baru.";
+        if (count($errors) > 0) {
+            $message .= " Terdapat " . count($errors) . " error.";
+            Log::error('Invoice generation errors:', $errors);
+        }
 
         return redirect()->route('invoices.index')
-            ->with('message', 'Invoice created successfully.');
+            ->with('message', $message);
     }
 
     public function edit(Invoice $invoice)

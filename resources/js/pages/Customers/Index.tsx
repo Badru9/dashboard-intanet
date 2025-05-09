@@ -288,8 +288,8 @@ export default function CustomersIndex() {
             <div className="p-4 lg:p-8">
                 {/* Header with Search and Action */}
                 <div className="mb-6 flex flex-col items-center gap-4 lg:flex-row lg:items-center lg:justify-between">
-                    <div>
-                        <Button onPress={onImportOpen} color="primary">
+                    <div className="w-full">
+                        <Button onPress={onImportOpen} color="primary" fullWidth>
                             <Plus className="h-5 w-5" />
                             Import Customer
                         </Button>
