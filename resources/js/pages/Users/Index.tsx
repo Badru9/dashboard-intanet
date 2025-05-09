@@ -91,12 +91,12 @@ export default function UsersIndex() {
             ),
         },
         {
-            header: 'Role',
-            value: (user: User) => user.is_admin === 1 && <Chip color="primary">Admin</Chip>,
-        },
-        {
             header: 'Email',
             value: (user: User) => <p className="font-medium text-gray-900 dark:text-gray-100">{user.email || 'N/A'}</p>,
+        },
+        {
+            header: 'Role',
+            value: (user: User) => user.is_admin === 1 && <Chip color="primary">Admin</Chip>,
         },
         {
             header: 'Aksi',

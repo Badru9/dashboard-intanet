@@ -6,7 +6,6 @@ import { TableColumn } from '@/types/table';
 import { Button, Modal, ModalContent, useDisclosure } from '@heroui/react';
 import { Head, router, usePage } from '@inertiajs/react';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
-import moment from 'moment';
 import { useState } from 'react';
 import CreateCashflowCategory from './Create';
 import EditCashflowCategory from './Edit';
@@ -56,12 +55,12 @@ export default function CashflowsCategoriesIndex() {
                     <span className="text-green-500 dark:text-green-400">Pemasukan</span>
                 ),
         },
-        {
-            header: 'Tanggal',
-            value: (value: CashflowCategory) => (
-                <span className="text-gray-900 dark:text-gray-100">{moment(value.created_at).format('DD MMMM YYYY')}</span>
-            ),
-        },
+        // {
+        //     header: 'Tanggal',
+        //     value: (value: CashflowCategory) => (
+        //         <span className="text-gray-900 dark:text-gray-100">{moment(value.created_at).format('DD MMMM YYYY')}</span>
+        //     ),
+        // },
         {
             header: 'Catatan',
             value: (value: CashflowCategory) => <span className="text-gray-900 dark:text-gray-100">{value.note}</span>,
@@ -79,7 +78,7 @@ export default function CashflowsCategoriesIndex() {
                             setSelectedCategory(value);
                             setIsEditModalOpen(true);
                         }}
-                        className="cursor-pointer rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-yellow-500"
+                        className="cursor-pointer rounded-lg p-2 text-yellow-400 transition-colors hover:bg-yellow-400 hover:text-white"
                     >
                         <Pencil className="h-4 w-4" />
                     </button>
@@ -87,7 +86,7 @@ export default function CashflowsCategoriesIndex() {
                         onClick={() => {
                             handleDelete(value);
                         }}
-                        className="cursor-pointer rounded-lg p-2 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600"
+                        className="cursor-pointer rounded-lg p-2 text-red-600 transition-colors hover:bg-red-600 hover:text-white"
                     >
                         <Trash2 className="h-4 w-4" />
                     </button>

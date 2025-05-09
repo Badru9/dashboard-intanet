@@ -46,12 +46,20 @@ const ImportCustomer = ({ onClose }: ImportCustomerProps) => {
         });
     };
 
+    const handleDownloadTemplate = () => {
+        window.open('/template/template_customers.xlsx', '_blank');
+    };
+
     return (
         <div className="flex flex-col gap-4 p-5">
-            <form onSubmit={submit}>
+            <form onSubmit={submit} className="space-y-4">
+                <label htmlFor="file" className="text-sm font-medium text-gray-700">
+                    Import Customer
+                </label>
                 <Input
                     type="file"
-                    label="Import Customer"
+                    id="file"
+                    label="Pilih file"
                     variant="flat"
                     radius="md"
                     color="primary"
@@ -67,6 +75,9 @@ const ImportCustomer = ({ onClose }: ImportCustomerProps) => {
                         }
                     }}
                 />
+                <Button color="default" variant="flat" size="sm" onPress={() => handleDownloadTemplate()}>
+                    Download Template
+                </Button>
                 <div className="mt-3 flex justify-end gap-2">
                     <Button onPress={onClose} color="default">
                         Batal

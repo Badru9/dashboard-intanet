@@ -288,7 +288,7 @@ export default function CustomersIndex() {
             <div className="p-4 lg:p-8">
                 {/* Header with Search and Action */}
                 <div className="mb-6 flex flex-col items-center gap-4 lg:flex-row lg:items-center lg:justify-between">
-                    <div className="w-full">
+                    <div className="w-full md:w-auto">
                         <Button onPress={onImportOpen} color="primary" fullWidth>
                             <Plus className="h-5 w-5" />
                             Import Customer
@@ -329,10 +329,10 @@ export default function CustomersIndex() {
                             onChange: handlePageChange,
                         }}
                         rowClassName={(customer) => {
-                            if (customer.status === 'active') return 'bg-green-50 dark:bg-green-900';
+                            if (customer.status === 'active') return 'bg-white dark:bg-gray-800';
                             if (customer.status === 'paused') return 'bg-yellow-50 dark:bg-yellow-900';
                             if (customer.status === 'inactive') return 'bg-red-50 dark:bg-red-900';
-                            return '';
+                            return 'bg-white dark:bg-gray-800';
                         }}
                     />
                 </div>

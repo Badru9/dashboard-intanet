@@ -326,6 +326,7 @@ export default function CashflowsIndex() {
                         </div>
                     )}
                 </div>
+                <Summary totals={totals} totalBalance={totalBalance} />
                 <Table<Cashflow>
                     column={auth.user.is_admin === 1 ? adminColumns : columns}
                     data={cashflows.data}
@@ -336,40 +337,6 @@ export default function CashflowsIndex() {
                         onChange: handlePageChange,
                     }}
                 />
-                <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
-                    <Card className="bg-green-50 dark:bg-green-900/20">
-                        <CardHeader className="pb-0">
-                            <h3 className="text-sm font-medium text-green-800 dark:text-green-400">Total Pemasukan</h3>
-                        </CardHeader>
-                        <CardBody>
-                            <p className="text-2xl font-semibold text-green-600 dark:text-green-400">{currencyFormat(totals.income)}</p>
-                        </CardBody>
-                    </Card>
-                    <Card className="bg-red-50 dark:bg-red-900/20">
-                        <CardHeader className="pb-0">
-                            <h3 className="text-sm font-medium text-red-800 dark:text-red-400">Total Pengeluaran</h3>
-                        </CardHeader>
-                        <CardBody>
-                            <p className="text-2xl font-semibold text-red-600 dark:text-red-400">{currencyFormat(totals.outcome)}</p>
-                        </CardBody>
-                    </Card>
-                    <Card className={totalBalance >= 0 ? 'bg-blue-50 dark:bg-blue-900/20' : 'bg-orange-50 dark:bg-orange-900/20'}>
-                        <CardHeader className="pb-0">
-                            <h3
-                                className={`text-sm font-medium ${totalBalance >= 0 ? 'text-blue-800 dark:text-blue-400' : 'text-orange-800 dark:text-orange-400'}`}
-                            >
-                                Total Saldo
-                            </h3>
-                        </CardHeader>
-                        <CardBody>
-                            <p
-                                className={`text-2xl font-semibold ${totalBalance >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-orange-600 dark:text-orange-400'}`}
-                            >
-                                {currencyFormat(totalBalance)}
-                            </p>
-                        </CardBody>
-                    </Card>
-                </div>
             </div>
 
             <Modal isOpen={isCreateOpen} onOpenChange={onCreateOpenChange} size="sm">
@@ -397,3 +364,42 @@ export default function CashflowsIndex() {
         </AuthenticatedLayout>
     );
 }
+
+const Summary = ({ totals, totalBalance }: { totals: { income: number; outcome: number }; totalBalance: number }) => {
+    return (
+        <div className="my-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
+            <Card className="bg-white dark:bg-slate-900" shadow="none">
+                <CardHeader className="pb-0">
+                    <h3 className="text-sm font-medium text-green-800 dark:text-green-400">Total Pemasukan</h3>
+                </CardHeader>
+                <CardBody>
+                    <p className="text-2xl font-semibold text-green-600 dark:text-green-400">{currencyFormat(totals.income)}</p>
+                </CardBody>
+            </Card>
+            <Card className="bg-white dark:bg-slate-900" shadow="none">
+                <CardHeader className="pb-0">
+                    <h3 className="text-sm font-medium text-red-800 dark:text-red-400">Total Pengeluaran</h3>
+                </CardHeader>
+                <CardBody>
+                    <p className="text-2xl font-semibold text-red-600 dark:text-red-400">{currencyFormat(totals.outcome)}</p>
+                </CardBody>
+            </Card>
+            <Card className="bg-white dark:bg-slate-900" shadow="none">
+                <CardHeader className="pb-0">
+                    <h3
+                        className={`text-sm font-medium ${totalBalance >= 0 ? 'text-blue-800 dark:text-blue-400' : 'text-orange-800 dark:text-orange-400'}`}
+                    >
+                        Total Saldo
+                    </h3>
+                </CardHeader>
+                <CardBody>
+                    <p
+                        className={`text-2xl font-semibold ${totalBalance >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-orange-600 dark:text-orange-400'}`}
+                    >
+                        {currencyFormat(totalBalance)}
+                    </p>
+                </CardBody>
+            </Card>
+        </div>
+    );
+};

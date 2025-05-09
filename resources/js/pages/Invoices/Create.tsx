@@ -14,7 +14,7 @@ interface InvoicesFormData extends Record<string, any> {
 }
 
 export default function CreateInvoice({ onClose }: { onClose: () => void }) {
-    const { customers, packages, auth } = usePage<Props>().props;
+    const { auth } = usePage<Props>().props;
 
     const { data, setData, processing, errors } = useForm<InvoicesFormData>({
         creator: auth.user.id,

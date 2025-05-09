@@ -101,7 +101,7 @@ export default function Table<T = Record<string, unknown>>({
                                         let stickyBg = '';
                                         if (col.sticky && rowClassName) {
                                             const rowBg = rowClassName(dt);
-                                            if (rowBg?.includes('bg-green-50')) stickyBg = 'bg-green-50 dark:bg-green-900';
+                                            if (rowBg?.includes('bg-white')) stickyBg = 'bg-white dark:bg-gray-800';
                                             else if (rowBg?.includes('bg-yellow-50')) stickyBg = 'bg-yellow-50 dark:bg-yellow-900';
                                             else if (rowBg?.includes('bg-red-50')) stickyBg = 'bg-red-50 dark:bg-red-900';
                                             else stickyBg = 'bg-white dark:bg-gray-800';

@@ -138,7 +138,7 @@ export default function InvoicesIndex() {
     const adminColumns: TableColumn<Invoices>[] = [
         ...baseColumns,
         {
-            header: 'Actions',
+            header: 'Aksi',
             value: (invoice: Invoices) => (
                 <div className="flex items-center gap-2">
                     {/* <button
