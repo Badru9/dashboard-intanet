@@ -122,8 +122,6 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
 
     const isAdminMenus = auth.user.is_admin === 1 ? adminMenuItems : mainMenuItems;
 
-    console.log('auth', auth);
-
     return (
         <div className="flex h-screen bg-white dark:bg-slate-900">
             {/* Desktop Sidebar */}

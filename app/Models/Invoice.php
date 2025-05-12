@@ -18,12 +18,16 @@ class Invoice extends Model
         'status',
         'due_date',
         'note',
-        'period',
+        'payment_proof_path',
+        'invoice_id',
+        'ppn',
+        'total_amount',
+        'period_month',
+        'period_year',
     ];
 
     protected $casts = [
         'due_date' => 'date',
-        'period' => 'date',
     ];
 
     public function customer(): BelongsTo

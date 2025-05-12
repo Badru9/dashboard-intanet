@@ -2,7 +2,7 @@ import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import Table from '@/components/Table/Table';
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
 import { currencyFormat } from '@/lib/utils';
-import { PageProps, type Invoices } from '@/types';
+import { Invoices, PageProps } from '@/types';
 import { type TableColumn } from '@/types/table';
 import { Button, Input, Modal, ModalContent, ModalHeader, useDisclosure } from '@heroui/react';
 import { Head, router, usePage } from '@inertiajs/react';
@@ -56,7 +56,7 @@ export default function InvoicesIndex() {
     const [selectedInvoice, setSelectedInvoice] = useState<Invoices | null>(null);
     const [search, setSearch] = useState(filters?.search || '');
 
-    console.log('selectedInvoice', selectedInvoice);
+    console.log('invoices', invoices);
 
     const filteredInvoices = useMemo(() => {
         if (!search) return invoices.data;
@@ -95,6 +95,11 @@ export default function InvoicesIndex() {
 
     const baseColumns: TableColumn<Invoices>[] = [
         {
+            header: 'Invoice ID',
+            value: (invoice: Invoices) => <p className="font-medium text-gray-900 dark:text-gray-100">{invoice.invoice_id || '-'}</p>,
+        },
+
+        {
             header: 'Customer',
             value: (invoice: Invoices) => (
                 <div className="flex items-center gap-3">
@@ -110,20 +115,22 @@ export default function InvoicesIndex() {
             ),
         },
         {
-            header: 'Dibuat Oleh',
-            value: (invoice: Invoices) => <p className="font-medium text-gray-900 dark:text-gray-100">{invoice.creator?.name || 'N/A'}</p>,
+            header: 'Paket',
+            value: (invoice: Invoices) => <p className="font-medium text-gray-900 dark:text-gray-100">{invoice.package?.name || '-'}</p>,
         },
         {
-            header: 'Amount',
-            value: (invoice: Invoices) => <p className="font-medium text-gray-900 dark:text-gray-100">{currencyFormat(invoice.amount)}</p>,
-        },
-        {
-            header: 'Status',
+            header: 'Harga Paket',
             value: (invoice: Invoices) => (
-                <span className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${statusColors[invoice.status]}`}>
-                    {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
-                </span>
+                <p className="font-medium text-gray-900 dark:text-gray-100">{currencyFormat(invoice.package?.price || 0)}</p>
             ),
+        },
+        {
+            header: 'PPN',
+            value: (invoice: Invoices) => <p className="font-medium text-gray-900 dark:text-gray-100">{invoice.ppn || '-'}</p>,
+        },
+        {
+            header: 'Total',
+            value: (invoice: Invoices) => <p className="font-medium text-gray-900 dark:text-gray-100">{currencyFormat(invoice.total_amount || 0)}</p>,
         },
         {
             header: 'Due Date',
@@ -132,6 +139,24 @@ export default function InvoicesIndex() {
         {
             header: 'Catatan',
             value: (invoice: Invoices) => <span className="text-gray-600 dark:text-gray-300">{invoice.note}</span>,
+        },
+        {
+            header: 'Period',
+            value: (invoice: Invoices) => (
+                <p className="font-medium text-gray-900 dark:text-gray-100">{moment(invoice.created_at).format('DD MMMM YYYY')}</p>
+            ),
+        },
+        {
+            header: 'Dibuat Oleh',
+            value: (invoice: Invoices) => <p className="font-medium text-gray-900 dark:text-gray-100">{invoice.creator?.name || 'N/A'}</p>,
+        },
+        {
+            header: 'Status',
+            value: (invoice: Invoices) => (
+                <span className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${statusColors[invoice.status]}`}>
+                    {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
+                </span>
+            ),
         },
     ];
 
@@ -147,9 +172,11 @@ export default function InvoicesIndex() {
                     >
                         <PencilSimple className="h-4 w-4" />
                     </button> */}
-                    <Button size="sm" onPress={() => handlePaid(invoice)} color="success" className="text-white">
-                        Bayar
-                    </Button>
+                    {invoice.status === 'unpaid' && (
+                        <Button size="sm" onPress={() => handlePaid(invoice)} color="success" className="text-white">
+                            Bayar
+                        </Button>
+                    )}
                     <button
                         onClick={() => handleDelete(invoice)}
                         className="cursor-pointer rounded-lg p-2 text-red-600 transition-colors hover:bg-red-600 hover:text-white"
@@ -191,7 +218,7 @@ export default function InvoicesIndex() {
                         {auth.user.is_admin === 1 && (
                             <Button onPress={onCreateOpen} color="primary">
                                 <Plus className="h-5 w-5" />
-                                Tambah Invoice
+                                Buat Invoice
                             </Button>
                         )}
                     </div>
@@ -248,7 +275,7 @@ export default function InvoicesIndex() {
                             <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30">
                                 <ModalContent className="relative rounded-2xl bg-white p-0 dark:bg-gray-900">
                                     <ModalHeader>
-                                        <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">Bayar Invoice</h2>
+                                        <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">Konfirmasi Pembayaran</h2>
                                     </ModalHeader>
                                     {selectedInvoice && <Paid invoice={selectedInvoice} onClose={() => onPaidOpenChange()} />}
                                 </ModalContent>

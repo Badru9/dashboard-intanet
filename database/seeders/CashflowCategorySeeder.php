@@ -14,7 +14,6 @@ class CashflowCategorySeeder extends Seeder
     public function run(): void
     {
         $categories = [
-            ['name' => 'Subscription', 'is_out' => '0', 'note' => 'Langganan bulanan', 'created_at' => now(), 'updated_at' => now()],
             ['name' => 'Equipment', 'is_out' => '1', 'note' => 'Pembelian alat', 'created_at' => now(), 'updated_at' => now()],
             ['name' => 'Maintenance', 'is_out' => '1', 'note' => 'Perawatan jaringan', 'created_at' => now(), 'updated_at' => now()],
             ['name' => 'Service', 'is_out' => '0', 'note' => 'Jasa pemasangan', 'created_at' => now(), 'updated_at' => now()],

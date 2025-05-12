@@ -52,6 +52,7 @@ type CustomerStatus = 'online' | 'inactive' | 'offline';
 
 export default function CustomersIndex() {
     const { customers, filters, auth } = usePage<CustomerPageProps>().props;
+
     const { isOpen: isCreateOpen, onOpen: onCreateOpen, onOpenChange: onCreateOpenChange } = useDisclosure();
     const { isOpen: isEditOpen, onOpen: onEditOpen, onOpenChange: onEditOpenChange } = useDisclosure();
     const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onOpenChange: onDeleteOpenChange } = useDisclosure();
@@ -110,7 +111,7 @@ export default function CustomersIndex() {
         );
     };
 
-    const handleActivateConfirm = (billDate: string) => {
+    const handleActivateConfirm = (billDate: number) => {
         if (!selectedCustomer) return;
 
         router.put(
@@ -189,17 +190,14 @@ export default function CustomersIndex() {
             ),
         },
         {
+            header: 'ID Pelanggan',
+            value: (customer: Customer) => <span className="text-gray-500 dark:text-gray-300">{customer.customer_id || '-'}</span>,
+        },
+        {
             header: 'Email',
             value: (customer: Customer) => <span className="text-gray-500 dark:text-gray-300">{customer.email || '-'}</span>,
         },
-        {
-            header: 'Status',
-            value: (customer: Customer) => (
-                <span className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${statusColors[customer.status]}`}>
-                    {customer.status.charAt(0).toUpperCase() + customer.status.slice(1)}
-                </span>
-            ),
-        },
+
         {
             header: 'Alamat',
             value: (customer: Customer) => <span className="text-gray-500 dark:text-gray-300">{customer.address}</span>,
@@ -247,6 +245,14 @@ export default function CustomersIndex() {
                 <span className="text-gray-500 dark:text-gray-300">{customer.bill_date === null ? '-' : customer.bill_date}</span>
             ),
         },
+        {
+            header: 'Status',
+            value: (customer: Customer) => (
+                <span className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${statusColors[customer.status]}`}>
+                    {customer.status.charAt(0).toUpperCase() + customer.status.slice(1)}
+                </span>
+            ),
+        },
     ];
 
     const adminColumns: TableColumn<Customer>[] = [
@@ -289,7 +295,7 @@ export default function CustomersIndex() {
             <div className="p-4 lg:p-8">
                 {/* Header with Search and Action */}
                 <div className="mb-6 flex flex-col items-center gap-4 lg:flex-row lg:items-center lg:justify-between">
-                    <div className="w-full md:w-auto">
+                    <div className="w-full lg:w-auto">
                         <Button onPress={onImportOpen} color="primary" fullWidth>
                             <Plus className="h-5 w-5" />
                             Import Customer

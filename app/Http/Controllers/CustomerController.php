@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Carbon\Carbon;
+use Illuminate\Validation\ValidationException;
 
 class CustomerController extends Controller
 {
@@ -45,6 +46,7 @@ class CustomerController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'customer_id' => 'required|string|max:255',
             'status' => 'required|in:online,inactive,offline',
             'address' => 'required|string',
             'phone' => 'required|string|max:255',
@@ -63,6 +65,7 @@ class CustomerController extends Controller
         try {
             $customer = Customer::create([
                 'name' => $validated['name'],
+                'customer_id' => $validated['customer_id'],
                 'status' => $validated['status'],
                 'address' => $validated['address'],
                 'phone' => $validated['phone'],
@@ -75,32 +78,7 @@ class CustomerController extends Controller
                 'bill_date' => $validated['bill_date'],
             ]);
 
-            // Membuat invoice otomatis
-            $package = InternetPackage::find($validated['package_id']);
-            $billDay = (int) $validated['bill_date'];
-            $joinDate = Carbon::parse($validated['join_date']);
 
-            // Gunakan bulan dan tahun dari join_date, tapi tanggal dari bill_date
-            $billDate = Carbon::create(
-                $joinDate->year,
-                $joinDate->month,
-                $billDay,
-                0,
-                0,
-                0
-            )->addMonth(); // Selalu buat invoice untuk bulan berikutnya
-
-            // $dueDate = $billDate->copy()->addMonth();
-
-            Invoice::create([
-                'customer_id' => $customer->id,
-                'package_id' => $validated['package_id'],
-                'amount' => $package->price,
-                'status' => 'unpaid',
-                'due_date' => $billDate,
-                'period' => $billDate,
-                'created_by' => Auth::id(),
-            ]);
 
             Log::info('Customer created successfully', ['customer' => $customer]);
 
@@ -157,34 +135,40 @@ class CustomerController extends Controller
                 $successCount = 0;
                 $errorCount = 0;
                 $errors = [];
+                $validatedData = [];
 
+                // Validasi semua data terlebih dahulu
                 foreach ($data as $index => $row) {
                     try {
                         // Konversi data sesuai format yang dibutuhkan
                         $customerData = [
                             'name' => $row[0] ?? null,
-                            'address' => $row[1] ?? null,
-                            'npwp' => $row[2] ?? null,
-                            'phone' => $row[4] ?? null,
-                            'email' => $row[5] ?? null,
-                            'coordinate' => $row[6] ?? null,
-                            'package_id' => $row[7] ?? null,
-                            'status' => $row[8] ?? 'online',
-                            'join_date' => $row[9] ? Carbon::parse($row[9])->format('Y-m-d') : null,
-                            'bill_date' => $row[10] ? Carbon::parse($row[10])->day : ($row[9] ? Carbon::parse($row[9])->addMonth()->day : null),
+                            'customer_id' => $row[1] ?? null,
+                            'address' => $row[2] ?? null,
+                            'npwp' => $row[3] ?? null,
+                            'tax_invoice_number' => $row[4] ?? null,
+                            'phone' => $row[5] ?? null,
+                            'email' => $row[6] ?? null,
+                            'coordinate' => $row[7] ?? null,
+                            'package_id' => $row[8] ?? null,
+                            'status' => $row[9] ?? 'online',
+                            'join_date' => $row[10] ? Carbon::parse($row[10])->format('Y-m-d') : null,
+                            'bill_date' => $row[11] ? (int)$row[11] : null,
                         ];
 
-                        // Tambahkan logging untuk debugging
-                        Log::info('Customer data before validation:', $customerData);
-
-                        // Validasi data
+                        // Validasi data wajib
                         if (empty($customerData['name']) || empty($customerData['address']) || empty($customerData['package_id'])) {
-                            Log::error('Validation failed:', [
-                                'name' => $customerData['name'],
-                                'address' => $customerData['address'],
-                                'package_id' => $customerData['package_id']
-                            ]);
-                            throw new \Exception('Data tidak lengkap');
+                            throw new \Exception('Data tidak lengkap (nama, alamat, atau paket)');
+                        }
+
+                        // Validasi bill_date
+                        if (empty($customerData['bill_date'])) {
+                            throw new \Exception('Tanggal tagihan (bill_date) harus diisi');
+                        }
+
+                        // Validasi range bill_date (1-28)
+                        if ($customerData['bill_date'] < 1 || $customerData['bill_date'] > 28) {
+                            throw new \Exception('Tanggal tagihan (bill_date) harus antara 1-28');
                         }
 
                         // Cek apakah email sudah ada
@@ -195,6 +179,26 @@ class CustomerController extends Controller
                             }
                         }
 
+                        $validatedData[] = $customerData;
+                    } catch (\Exception $e) {
+                        $errorCount++;
+                        $errors[] = "Baris " . ($index + 2) . ": " . $e->getMessage();
+                    }
+                }
+
+                // Jika ada error, hentikan proses import
+                if ($errorCount > 0) {
+                    $message = "Import dibatalkan. Terdapat {$errorCount} error:";
+                    Log::error('Import errors:', $errors);
+                    throw ValidationException::withMessages([
+                        'import_errors' => $errors,
+                        'message' => $message,
+                    ]);
+                }
+
+                // Jika semua data valid, lakukan import
+                foreach ($validatedData as $customerData) {
+                    try {
                         // Buat customer baru
                         $customer = Customer::create($customerData);
 
@@ -214,7 +218,6 @@ class CustomerController extends Controller
                                     0,
                                     0
                                 )->addMonth();
-
 
                                 // Cek apakah invoice untuk periode ini sudah ada
                                 $existingInvoice = Invoice::where('customer_id', $customer->id)
@@ -239,7 +242,7 @@ class CustomerController extends Controller
                         $successCount++;
                     } catch (\Exception $e) {
                         $errorCount++;
-                        $errors[] = "Baris " . ($index + 2) . ": " . $e->getMessage();
+                        $errors[] = "Gagal menyimpan data: " . $e->getMessage();
                     }
                 }
 
@@ -250,15 +253,17 @@ class CustomerController extends Controller
                 }
 
                 return redirect()->route('customers.index')
-                    ->with('success', $message);
+                    ->with('message', $message);
             }
 
-            return redirect()->route('customers.index')
-                ->with('error', 'Format file tidak didukung');
+            return response()->json([
+                'message' => 'Format file tidak didukung',
+            ], 422);
         } catch (\Exception $e) {
             Log::error('Error reading file:', ['error' => $e->getMessage()]);
-            return redirect()->route('customers.index')
-                ->with('error', 'Gagal membaca file: ' . $e->getMessage());
+            throw ValidationException::withMessages([
+                'import_errors' => ['Gagal membaca file: ' . $e->getMessage()],
+            ]);
         }
     }
 
@@ -274,7 +279,8 @@ class CustomerController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'status' => 'required|string|in:active,inactive,paused',
+            'customer_id' => 'required|string|max:255',
+            'status' => 'required|string|in:online,inactive,offline',
             'address' => 'required|string',
             'email' => 'nullable|email|unique:customers,email,' . $customer->id,
             'npwp' => 'nullable|string|max:255',
@@ -284,10 +290,14 @@ class CustomerController extends Controller
             'coordinates.latitude' => 'nullable|string',
             'coordinates.longitude' => 'nullable|string',
             'join_date' => 'required|date',
+            'bill_date' => 'required|integer|min:1|max:28',
         ]);
+
+        Log::info('Validated update data:', $validated);
 
         $customer->update([
             'name' => $validated['name'],
+            'customer_id' => $validated['customer_id'],
             'status' => $validated['status'],
             'address' => $validated['address'],
             'email' => $validated['email'] ?: null,
@@ -297,6 +307,7 @@ class CustomerController extends Controller
             'coordinate' => isset($validated['coordinates']) ?
                 $validated['coordinates']['latitude'] . ',' . $validated['coordinates']['longitude'] : null,
             'join_date' => $validated['join_date'],
+            'bill_date' => $validated['bill_date'],
         ]);
 
         return redirect()->route('customers.index')

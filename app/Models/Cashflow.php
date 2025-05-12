@@ -16,6 +16,8 @@ class Cashflow extends Model
         'created_id',
         'amount',
         'note',
+        'invoice_id',
+        'customer_id',
     ];
 
     public function category(): BelongsTo
@@ -31,5 +33,10 @@ class Cashflow extends Model
     public function invoice(): BelongsTo
     {
         return $this->belongsTo(Invoice::class, 'invoice_id');
+    }
+
+    public function customer(): BelongsTo
+    {
+        return $this->belongsTo(Customer::class, 'customer_id');
     }
 }

@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import Table from '@/components/Table/Table';
+import { DEFAULT_CASHFLOW } from '@/constants';
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
 import { currencyFormat } from '@/lib/utils';
 import { Cashflow, CashflowCategory, PageProps } from '@/types';
@@ -58,12 +59,14 @@ export default function CashflowsIndex() {
     const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onOpenChange: onDeleteOpenChange } = useDisclosure();
 
     const [selectedCashflow, setSelectedCashflow] = useState<Cashflow | null>(null);
-    const [selectedCategory, setSelectedCategory] = useState<string>('all');
+    const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
     const today = new CalendarDate(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
     const [selectedDateRange, setSelectedDateRange] = useState<{ start: DateValue; end: DateValue }>({
         start: today,
         end: today,
     });
+
+    const allCategories: CashflowCategory[] = [...DEFAULT_CASHFLOW, ...categories];
 
     // Effect untuk memastikan filter tanggal hari ini saat pertama kali render
     useEffect(() => {
@@ -107,28 +110,20 @@ export default function CashflowsIndex() {
         }
     };
 
-    const handleCategoryChange = (categoryId: string) => {
+    const handleCategoryChange = (categoryId: string | null) => {
         setSelectedCategory(categoryId);
-        const params: {
-            category?: string;
-            date_range?: {
-                startDate: string;
-                endDate: string;
-            };
-        } = {};
+        const params: any = {};
 
-        if (categoryId !== 'all') {
+        // Filter kategori
+        if (categoryId && categoryId !== 'all') {
             params.category = categoryId;
         }
 
-        if (
-            selectedDateRange.start.toString() !== new CalendarDate(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()).toString()
-        ) {
-            params.date_range = {
-                startDate: selectedDateRange.start.toString(),
-                endDate: selectedDateRange.end.toString(),
-            };
-        }
+        // Reset date range ke null
+        setSelectedDateRange({
+            start: today,
+            end: today,
+        });
 
         router.get(route('cashflows.index'), params, { preserveState: true });
     };
@@ -148,7 +143,7 @@ export default function CashflowsIndex() {
             endDate.setHours(23, 59, 59, 999);
 
             const params: {
-                category?: string;
+                category?: string | null;
                 date_range: {
                     startDate: string;
                     endDate: string;
@@ -179,7 +174,7 @@ export default function CashflowsIndex() {
         endDate.setHours(23, 59, 59, 999);
 
         const params: {
-            category?: string;
+            category?: string | null;
             date_range: {
                 startDate: string;
                 endDate: string;
@@ -211,7 +206,20 @@ export default function CashflowsIndex() {
     const columns: TableColumn<Cashflow>[] = [
         {
             header: 'Kategori',
-            value: (row: Cashflow) => row.category?.name,
+            value: (row: Cashflow) => {
+                if (!row.category) {
+                    return DEFAULT_CASHFLOW[1].name;
+                }
+                return row.category.name;
+            },
+        },
+        {
+            header: 'Invoice',
+            value: (row: Cashflow) => row.invoice?.invoice_id,
+        },
+        {
+            header: 'Customer',
+            value: (row: Cashflow) => row.customer?.name,
         },
         {
             header: 'Amount',
@@ -285,12 +293,12 @@ export default function CashflowsIndex() {
                                 placeholder="Pilih Kategori"
                                 className="w-full"
                                 color="default"
-                                items={[{ id: 'all', name: 'Semua' }, ...categories]}
-                                selectedKeys={[selectedCategory]}
-                                onSelectionChange={(keys) => handleCategoryChange(Array.from(keys)[0] as string)}
+                                items={allCategories}
+                                selectedKeys={selectedCategory ? [selectedCategory] : []}
+                                onSelectionChange={(keys) => handleCategoryChange(Array.from(keys)[0] as string | null)}
                             >
                                 {(item) => (
-                                    <SelectItem key={item.id} textValue={item.name}>
+                                    <SelectItem key={String(item.id)} textValue={item.name}>
                                         {item.name}
                                     </SelectItem>
                                 )}

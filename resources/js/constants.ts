@@ -1,3 +1,5 @@
+import { CashflowCategory } from './types';
+
 export interface StatusOption {
     value: 'online' | 'inactive' | 'offline';
     label: string;
@@ -7,6 +9,21 @@ export interface CashflowCategoryOption {
     value: 0 | 1;
     label: string;
 }
+
+export const DEFAULT_CASHFLOW: CashflowCategory[] = [
+    {
+        id: 'all',
+        name: 'Semua',
+        is_out: 0,
+        note: 'Semua kategori',
+    },
+    {
+        id: 'null',
+        name: 'Subscription',
+        is_out: 0,
+        note: 'Layanan internet bulanan',
+    },
+];
 
 export interface InvoiceStatusOption {
     value: 'paid' | 'unpaid' | 'cancelled';

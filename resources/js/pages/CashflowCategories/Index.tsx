@@ -1,5 +1,6 @@
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import Table from '@/components/Table/Table';
+import { DEFAULT_CASHFLOW } from '@/constants';
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
 import { CashflowCategory, PageProps } from '@/types';
 import { TableColumn } from '@/types/table';
@@ -102,7 +103,7 @@ export default function CashflowsCategoriesIndex() {
 
     const confirmDelete = () => {
         if (selectedCategory) {
-            router.delete(route('cashflow-categories.destroy', selectedCategory.id), {
+            router.delete(`/cashflow-categories/${selectedCategory.id}`, {
                 onSuccess: () => {
                     onDeleteOpenChange();
                     setSelectedCategory(null);
@@ -132,7 +133,7 @@ export default function CashflowsCategoriesIndex() {
                 )}
                 <Table
                     column={auth.user.is_admin === 1 ? adminColumns : baseColumns}
-                    data={categories.data}
+                    data={[DEFAULT_CASHFLOW[0], ...categories.data]}
                     pagination={{
                         ...categories,
                         last_page: categories.last_page,

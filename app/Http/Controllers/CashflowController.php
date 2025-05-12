@@ -15,7 +15,7 @@ class CashflowController extends Controller
         try {
             // Mulai dengan query base
             $query = Cashflow::query()
-                ->with(['category', 'creator', 'invoice']);
+                ->with(['category', 'creator', 'invoice', 'customer']);
 
             // Log untuk melihat request yang masuk
             Log::info('Request Data:', [
@@ -25,7 +25,11 @@ class CashflowController extends Controller
 
             // Filter berdasarkan kategori
             if (request()->filled('category') && request()->category !== 'all') {
-                $query->where('cashflow_category_id', request()->category);
+                if (request()->category === 'null') {
+                    $query->whereNull('cashflow_category_id');
+                } else {
+                    $query->where('cashflow_category_id', request()->category);
+                }
             }
 
             // Filter berdasarkan tanggal
@@ -82,7 +86,7 @@ class CashflowController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'cashflow_category_id' => 'required|exists:cashflow_categories,id',
+            'cashflow_category_id' => 'nullable|exists:cashflow_categories,id',
             'date' => 'required|date',
             'amount' => 'required|numeric|min:0',
             'note' => 'nullable|string',

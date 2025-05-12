@@ -108,6 +108,7 @@ export interface InternetPackage {
 export interface Customer {
     id: number;
     name: string;
+    customer_id: string;
     email?: string;
     phone: string;
     address: string;
@@ -124,11 +125,16 @@ export interface Customer {
 
 export interface Invoices {
     id: number;
+    invoice_id: string;
     customer_id: number;
     package_id: number;
     created_by: User;
     creator: User;
+    ppn: number;
+    total_amount: number;
     invoiceNumber: string;
+    period_month: string;
+    period_year: string;
     customer: Customer;
     package: InternetPackage;
     note?: string;
@@ -140,12 +146,12 @@ export interface Invoices {
 }
 
 export interface CashflowCategory {
-    id: number;
+    id: number | string;
     name: string;
     is_out: 0 | 1;
     note?: string;
-    created_at: string;
-    updated_at: string;
+    created_at?: string;
+    updated_at?: string;
 }
 
 export interface Cashflow {
@@ -153,6 +159,7 @@ export interface Cashflow {
     amount: number;
     created_by: User;
     invoice: Invoices;
+    customer: Customer;
     note?: string;
     category: CashflowCategory;
     created_at: string;

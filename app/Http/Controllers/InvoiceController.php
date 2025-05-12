@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use App\Models\Setting;
+use App\Models\Cashflow;
+use App\Models\CashflowCategory;
 
 class InvoiceController extends Controller
 {
@@ -33,7 +36,7 @@ class InvoiceController extends Controller
     {
         return inertia('Invoices/Create', [
             'customers' => Customer::with('package')
-                ->where('status', 'active')
+                ->where('status', 'online')
                 ->get()
         ]);
     }
@@ -41,17 +44,26 @@ class InvoiceController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'period' => 'required|date_format:Y-m',
+            'period_month' => 'required|integer|min:1|max:12',
+            'period_year' => 'required|integer|min:2000',
         ]);
 
-        $periodDate = Carbon::createFromFormat('Y-m', $validated['period']);
+        $periodMonth = (int) $validated['period_month'];
+        $periodYear = (int) $validated['period_year'];
+
+        Log::info('validated period' . $periodMonth . ' ' . $periodYear);
+
+        // Ambil nilai PPN dari settings
+        $ppnSetting = Setting::where('key', 'ppn')->first();
+        $ppn = $ppnSetting ? (float)$ppnSetting->value : 11;
 
         // Ambil semua customer yang aktif
         $activeCustomers = Customer::with('package')
-            ->where('status', 'active')
+            ->where('status', 'online')
             ->get();
 
-        Log::info('activeCustomers' . $activeCustomers);
+        Log::info('active customers', $activeCustomers->toArray());
+
 
         $createdCount = 0;
         $errors = [];
@@ -59,28 +71,70 @@ class InvoiceController extends Controller
         foreach ($activeCustomers as $customer) {
             try {
                 // Hitung due date berdasarkan bill_date customer
-                $billDate = Carbon::parse($customer->bill_date);
+                $billDay = (int) $customer->bill_date;
+                $joinDate = Carbon::parse($customer->join_date);
+
+                // Buat due date berdasarkan join_date (bulan dan tahun) dan bill_date (tanggal)
                 $dueDate = Carbon::create(
-                    $periodDate->year,
-                    $periodDate->month,
-                    $billDate->day
+                    $joinDate->year,
+                    $joinDate->month,
+                    $billDay
                 );
+
+                // Pengecekan: status harus online
+                if ($customer->status !== 'online') {
+                    continue;
+                }
+
+                if ($customer->bill_date == '') {
+                    continue;
+                }
+
+
+                // Cek apakah customer join di bulan yang dipilih
+                // Jika join_date adalah bulan Mei, maka tidak boleh digenerate invoice untuk bulan Juni
+                if ($joinDate->month != $periodMonth) {
+                    continue;
+                }
 
                 // Cek apakah invoice untuk periode ini sudah ada
                 $existingInvoice = Invoice::where('customer_id', $customer->id)
-                    ->whereYear('period', $periodDate->year)
-                    ->whereMonth('period', $periodDate->month)
+                    ->where('period_month', $periodMonth)
+                    ->where('period_year', $periodYear)
                     ->first();
 
+                Log::info('existing invoice ' . $existingInvoice);
+
+
                 if (!$existingInvoice) {
+                    $amount = $customer->package->price;
+                    $totalAmount = $amount + ($amount * $ppn / 100);
+
+                    // Hitung jumlah invoice di bulan & tahun yang sama
+                    $lastInvoice = Invoice::where('period_year', $periodYear)
+                        ->where('period_month', $periodMonth)
+                        ->orderByDesc('invoice_id')
+                        ->first();
+
+                    if ($lastInvoice && preg_match('/INV\/\d{6}\/(\d{4})$/', $lastInvoice->invoice_id, $matches)) {
+                        $increment = (int)$matches[1] + 1;
+                    } else {
+                        $increment = 1;
+                    }
+                    $invoiceId = sprintf('INV/%04d%02d/%04d', $periodYear, $periodMonth, $increment);
+
                     Invoice::create([
                         'customer_id' => $customer->id,
                         'package_id' => $customer->package_id,
-                        'amount' => $customer->package->price,
+                        'amount' => $amount,
+                        'ppn' => $ppn,
+                        'total_amount' => $totalAmount,
                         'status' => 'unpaid',
                         'due_date' => $dueDate,
-                        'period' => $periodDate,
+                        'period_month' => $periodMonth,
+                        'period_year' => $periodYear,
                         'created_by' => Auth::id(),
+                        'invoice_id' => $invoiceId,
                     ]);
                     $createdCount++;
                 }
@@ -88,6 +142,9 @@ class InvoiceController extends Controller
                 $errors[] = "Gagal membuat invoice untuk customer {$customer->name}: " . $e->getMessage();
             }
         }
+
+        Log::info('created count' . $createdCount);
+        Log::info('errors' . json_encode($errors));
 
         $message = "Berhasil membuat {$createdCount} invoice baru.";
         if (count($errors) > 0) {
@@ -138,9 +195,40 @@ class InvoiceController extends Controller
             ->with('message', 'Invoice deleted successfully.');
     }
 
-    public function markAsPaid(Invoice $invoice)
+    public function markAsPaid(Request $request, Invoice $invoice)
     {
-        $invoice->update(['status' => 'paid']);
+        $validated = $request->validate([
+            'payment_proof' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'note' => 'nullable|string',
+        ]);
+
+
+        if ($request->hasFile('payment_proof')) {
+            $path = $request->file('payment_proof')->store('payment_proofs', 'public');
+            $validated['payment_proof_path'] = $path;
+        }
+
+        Log::info('validated invoice', $invoice->toArray());
+
+        $invoice->status = 'paid';
+        $invoice->note = $validated['note'] ?? null;
+        if (isset($validated['payment_proof_path'])) {
+            $invoice->payment_proof_path = $validated['payment_proof_path'];
+        }
+        $invoice->save();
+
+        if ($invoice->status === 'paid') {
+
+            Cashflow::create([
+                'cashflow_category_id' =>  null,
+                'date' => now(),
+                'created_id' => Auth::id(),
+                'amount' => $invoice->total_amount,
+                'note' => 'Pembayaran invoice ' . $invoice->invoice_id,
+                'invoice_id' => $invoice->id,
+                'customer_id' => $invoice->customer_id,
+            ]);
+        }
 
         return back()->with('message', 'Invoice marked as paid successfully.');
     }

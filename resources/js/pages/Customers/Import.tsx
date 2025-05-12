@@ -11,7 +11,7 @@ type ImportCustomerForm = {
 };
 
 const ImportCustomer = ({ onClose }: ImportCustomerProps) => {
-    const { data, setData, post, processing } = useForm<ImportCustomerForm>({
+    const { data, setData, post, processing, errors } = useForm<ImportCustomerForm>({
         file: null,
     });
 
@@ -37,12 +37,24 @@ const ImportCustomer = ({ onClose }: ImportCustomerProps) => {
                 onClose();
             },
             onError: (error) => {
-                console.log(error);
-                addToast({
-                    title: 'Error',
-                    description: error.message || 'Terjadi kesalahan saat membaca file',
-                    color: 'danger',
-                });
+                console.log('error', error);
+
+                if (error.import_errors) {
+                    const errors = Array.isArray(error.import_errors) ? error.import_errors : [error.import_errors];
+                    errors.forEach((err: string) => {
+                        addToast({
+                            title: 'Import Customer Gagal',
+                            description: err,
+                            color: 'danger',
+                        });
+                    });
+                } else {
+                    addToast({
+                        title: 'Error',
+                        description: error.message || 'Terjadi kesalahan saat membaca file',
+                        color: 'danger',
+                    });
+                }
             },
         });
     };
@@ -72,6 +84,8 @@ const ImportCustomer = ({ onClose }: ImportCustomerProps) => {
                             });
                         }
                     }}
+                    isInvalid={!!errors.file}
+                    errorMessage={errors.file}
                 />
                 <Button color="default" variant="flat" size="sm" onPress={() => handleDownloadTemplate()}>
                     Download Template

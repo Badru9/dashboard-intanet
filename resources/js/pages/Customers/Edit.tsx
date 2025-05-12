@@ -19,6 +19,7 @@ type EditCustomerPageProps = PageProps & {
 interface CustomerFormData {
     [key: string]: string | number | boolean | File | Blob | null | undefined | Record<string, any>;
     name: string;
+    customer_id: string;
     status: Customer['status'];
     address: string;
     npwp: string;
@@ -44,6 +45,7 @@ export default function EditCustomer({ customer, onClose }: EditCustomerProps) {
 
     const form = useForm<CustomerFormData>({
         name: customer.name,
+        customer_id: customer.customer_id,
         status: customer.status,
         address: customer.address,
         npwp: customer.npwp,
@@ -59,7 +61,7 @@ export default function EditCustomer({ customer, onClose }: EditCustomerProps) {
               },
         phone: customer.phone,
         join_date: customer?.join_date ? customer.join_date.split('T')[0] : '',
-        bill_date: customer?.bill_date ? customer.bill_date.split('T')[0] : '',
+        bill_date: customer?.bill_date?.toString() || '',
         email: customer.email || '',
     });
 
@@ -67,6 +69,8 @@ export default function EditCustomer({ customer, onClose }: EditCustomerProps) {
         e.preventDefault();
 
         form.clearErrors();
+
+        console.log(form.data);
 
         if (!form.data.name) {
             form.setError('name', 'Nama customer wajib diisi');
@@ -113,7 +117,7 @@ export default function EditCustomer({ customer, onClose }: EditCustomerProps) {
     };
 
     return (
-        <div className="mx-auto min-h-fit w-full rounded-2xl bg-white text-slate-800 dark:bg-gray-900 dark:text-gray-100">
+        <div className="mx-auto mt-5 max-h-[75vh] w-full overflow-y-auto rounded-2xl bg-white text-slate-800 dark:bg-gray-900 dark:text-gray-100">
             <form onSubmit={handleSubmit} className="space-y-8 px-5 pb-5">
                 {/* Data Diri Section */}
                 <div className="space-y-4">
@@ -129,6 +133,15 @@ export default function EditCustomer({ customer, onClose }: EditCustomerProps) {
                             onChange={(e) => form.setData('name', e.target.value)}
                             isInvalid={!!form.errors.name}
                             errorMessage={form.errors.name}
+                        />
+                        <Input
+                            label="ID Pelanggan"
+                            type="text"
+                            id="customer_id"
+                            value={form.data.customer_id}
+                            onChange={(e) => form.setData('customer_id', e.target.value)}
+                            isInvalid={!!form.errors.customer_id}
+                            errorMessage={form.errors.customer_id}
                         />
                         <Input
                             label="Email"
@@ -216,7 +229,7 @@ export default function EditCustomer({ customer, onClose }: EditCustomerProps) {
                     <div className="flex items-center gap-2">
                         <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Paket</h3>
                     </div>
-                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-2">
                         <DatePicker
                             label="Tanggal Bergabung"
                             id="join_date"
