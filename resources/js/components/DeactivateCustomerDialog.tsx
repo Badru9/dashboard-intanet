@@ -6,7 +6,7 @@ interface DeactivateCustomerDialogProps {
     onClose: () => void;
     onConfirm: () => void;
     customerName: string;
-    type: 'inactive' | 'paused';
+    type: 'inactive' | 'offline';
 }
 
 export default function DeactivateCustomerDialog({ isOpen, onClose, onConfirm, customerName, type }: DeactivateCustomerDialogProps) {
@@ -19,7 +19,7 @@ export default function DeactivateCustomerDialog({ isOpen, onClose, onConfirm, c
             confirmButton: 'bg-red-500 hover:bg-red-600',
             iconBg: 'bg-red-100',
         },
-        paused: {
+        offline: {
             title: 'Jeda Customer',
             description: 'Apakah Anda yakin ingin menjeda langganan untuk customer ini?',
             confirmText: 'Jeda',

@@ -51,6 +51,8 @@ class InvoiceController extends Controller
             ->where('status', 'active')
             ->get();
 
+        Log::info('activeCustomers' . $activeCustomers);
+
         $createdCount = 0;
         $errors = [];
 

@@ -2,43 +2,37 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Setting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class SettingsController extends Controller
 {
     public function index()
     {
-        return Inertia::render('Settings/Index');
+        $settings = Setting::all();
+        return Inertia::render('Settings/Index', compact('settings'));
     }
 
-    public function profile()
+    public function update(Request $request)
     {
-        return Inertia::render('Settings/Profile');
-    }
+        $validated = $request->validate([
+            'ppn' => 'required|numeric|min:0',
+            'bph' => 'required|numeric|min:0',
+            'uso' => 'required|numeric|min:0',
+            'pph' => 'required|numeric|min:0',
+            'admin' => 'required|numeric|min:0',
+            'prtg' => 'required|numeric|min:0',
+            'noc_24_jam' => 'required|numeric|min:0',
+        ]);
 
-    public function company()
-    {
-        return Inertia::render('Settings/Company');
-    }
+        foreach ($validated as $key => $value) {
+            Setting::where('key', $key)->update(['value' => $value]);
+        }
 
-    public function billing()
-    {
-        return Inertia::render('Settings/Billing');
-    }
+        // Log::info('Settings updated: ' . json_encode($validated));
 
-    public function notifications()
-    {
-        return Inertia::render('Settings/Notifications');
-    }
-
-    public function security()
-    {
-        return Inertia::render('Settings/Security');
-    }
-
-    public function appearance()
-    {
-        return Inertia::render('Settings/Appearance');
+        return redirect()->route('settings.index')->with('success', 'Settings updated successfully');
     }
 }

@@ -14,7 +14,7 @@ class CustomerSeeder extends Seeder
     {
         $faker = Faker::create('id_ID');
         $packages = InternetPackage::all();
-        $statuses = ['active', 'inactive', 'paused'];
+        $statuses = ['online', 'inactive', 'offline'];
         $companyTypes = ['PT', 'CV', 'UD'];
         $cities = [
             'Jakarta',

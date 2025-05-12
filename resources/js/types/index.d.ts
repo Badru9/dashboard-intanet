@@ -114,7 +114,7 @@ export interface Customer {
     npwp: string;
     coordinate?: string;
     tax_invoice_number: string;
-    status: 'active' | 'inactive' | 'paused';
+    status: 'online' | 'inactive' | 'offline';
     package?: InternetPackage;
     join_date: string;
     paused_at?: string;

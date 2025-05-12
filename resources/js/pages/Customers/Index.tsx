@@ -16,9 +16,9 @@ import EditCustomer from './Edit';
 import ImportCustomer from './Import';
 
 const statusColors = {
-    active: 'bg-green-100 text-green-700',
+    online: 'bg-green-100 text-green-700',
     inactive: 'bg-red-100 text-red-700',
-    paused: 'bg-yellow-100 text-yellow-700',
+    offline: 'bg-yellow-100 text-yellow-700',
 };
 
 type CustomerPageProps = PageProps &
@@ -48,7 +48,7 @@ type CustomerPageProps = PageProps &
     };
 
 // Pertama, buat type untuk status yang valid
-type CustomerStatus = 'active' | 'inactive' | 'paused';
+type CustomerStatus = 'online' | 'inactive' | 'offline';
 
 export default function CustomersIndex() {
     const { customers, filters, auth } = usePage<CustomerPageProps>().props;
@@ -59,7 +59,7 @@ export default function CustomersIndex() {
     const { isOpen: isStatusChangeOpen, onOpen: onStatusChangeOpen, onOpenChange: onStatusChangeOpenChange } = useDisclosure();
     const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
     const [search, setSearch] = useState(filters?.search || '');
-    const [statusChangeType, setStatusChangeType] = useState<'inactive' | 'paused'>('inactive');
+    const [statusChangeType, setStatusChangeType] = useState<'inactive' | 'offline'>('inactive');
     const { isOpen: isImportOpen, onOpen: onImportOpen, onOpenChange: onImportOpenChange } = useDisclosure();
     const filteredCustomers = useMemo(() => {
         if (!search) return customers.data;
@@ -82,7 +82,7 @@ export default function CustomersIndex() {
     };
 
     const handleStatusChange = (customer: Customer, newStatus: CustomerStatus) => {
-        if (newStatus === 'active') {
+        if (newStatus === 'online') {
             setSelectedCustomer(customer);
             onActivateOpen();
             return;
@@ -116,7 +116,7 @@ export default function CustomersIndex() {
         router.put(
             route('customers.update-status', selectedCustomer.id),
             {
-                status: 'active',
+                status: 'online',
                 bill_date: billDate,
             },
             {
@@ -124,15 +124,18 @@ export default function CustomersIndex() {
                     onActivateOpenChange();
                     setSelectedCustomer(null);
                 },
+                onError: (error) => {
+                    console.log('error', error);
+                },
             },
         );
     };
 
     const renderStatusActions = (customer: Customer) => {
-        if (customer.status === 'active') {
+        if (customer.status === 'online') {
             return (
                 <>
-                    <Button color="warning" className="text-white" size="sm" onPress={() => handleStatusChange(customer, 'paused')}>
+                    <Button color="warning" className="text-white" size="sm" onPress={() => handleStatusChange(customer, 'offline')}>
                         Jeda
                     </Button>
                     <Button color="danger" className="text-white" size="sm" onPress={() => handleStatusChange(customer, 'inactive')}>
@@ -142,9 +145,9 @@ export default function CustomersIndex() {
             );
         }
 
-        if (customer.status === 'paused' || customer.status === 'inactive') {
+        if (customer.status === 'offline' || customer.status === 'inactive') {
             return (
-                <Button color="success" className="text-white" size="sm" onPress={() => handleStatusChange(customer, 'active')}>
+                <Button color="success" className="text-white" size="sm" onPress={() => handleStatusChange(customer, 'online')}>
                     Aktifkan
                 </Button>
             );
@@ -241,9 +244,7 @@ export default function CustomersIndex() {
         {
             header: 'Tanggal Tagihan',
             value: (customer: Customer) => (
-                <span className="text-gray-500 dark:text-gray-300">
-                    {customer.bill_date === null ? '-' : moment(customer.bill_date).format('DD MMMM YYYY')}
-                </span>
+                <span className="text-gray-500 dark:text-gray-300">{customer.bill_date === null ? '-' : customer.bill_date}</span>
             ),
         },
     ];
@@ -329,8 +330,8 @@ export default function CustomersIndex() {
                             onChange: handlePageChange,
                         }}
                         rowClassName={(customer) => {
-                            if (customer.status === 'active') return 'bg-white dark:bg-gray-800';
-                            if (customer.status === 'paused') return 'bg-yellow-50 dark:bg-yellow-900';
+                            if (customer.status === 'online') return 'bg-white dark:bg-gray-800';
+                            if (customer.status === 'offline') return 'bg-yellow-50 dark:bg-yellow-900';
                             if (customer.status === 'inactive') return 'bg-red-50 dark:bg-red-900';
                             return 'bg-white dark:bg-gray-800';
                         }}
@@ -347,7 +348,7 @@ export default function CustomersIndex() {
                 </Modal>
 
                 <Modal isOpen={isCreateOpen} onOpenChange={onCreateOpenChange} size="2xl">
-                    <div className="fixed inset-0 z-50 flex h-screen items-center justify-center bg-black/30 dark:bg-black/30">
+                    <div className="fixed inset-0 z-50 h-screen bg-black/30 dark:bg-black/30">
                         <ModalContent className="relative rounded-2xl bg-white p-0 dark:bg-gray-900">
                             <ModalHeader>
                                 <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">Tambah Customer</h2>

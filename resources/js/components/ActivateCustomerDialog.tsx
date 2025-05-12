@@ -1,22 +1,19 @@
-import { Button, DatePicker, Modal, ModalContent } from '@heroui/react';
-import { CalendarDate, today } from '@internationalized/date';
+import { BILL_DATE_LENGTH } from '@/constants';
+import { Button, Modal, ModalContent, Select, SelectItem } from '@heroui/react';
 import { useState } from 'react';
 
 interface ActivateCustomerDialogProps {
     isOpen: boolean;
     onClose: () => void;
-    onConfirm: (billDate: string) => void;
+    onConfirm: (billDate: number) => void;
     customerName: string;
 }
 
 export default function ActivateCustomerDialog({ isOpen, onClose, onConfirm, customerName }: ActivateCustomerDialogProps) {
-    const [billDate, setBillDate] = useState<CalendarDate | null>(today('Asia/Jakarta'));
-
-    const handleDateChange = (value: CalendarDate | null) => setBillDate(value);
+    const [billDate, setBillDate] = useState<string>('1');
 
     const handleConfirm = () => {
-        const formattedDate = `${billDate?.year}-${String(billDate?.month).padStart(2, '0')}-${String(billDate?.day).padStart(2, '0')}`;
-        onConfirm(formattedDate);
+        onConfirm(parseInt(billDate));
     };
 
     return (
@@ -27,7 +24,20 @@ export default function ActivateCustomerDialog({ isOpen, onClose, onConfirm, cus
                     <div className="mt-4">
                         <p className="text-sm text-gray-500 dark:text-gray-400">Pilih tanggal tagihan untuk mengaktifkan customer ini.</p>
                         <div className="mt-4">
-                            <DatePicker label="Tanggal Tagihan" value={billDate} onChange={handleDateChange} selectorButtonPlacement="start" />
+                            <Select
+                                label="Tanggal Tagihan"
+                                id="bill_date"
+                                value={billDate}
+                                onChange={(e) => setBillDate(e.target.value)}
+                                placeholder="Pilih Tanggal"
+                                selectedKeys={billDate ? [billDate] : []}
+                            >
+                                {Array.from({ length: BILL_DATE_LENGTH }, (_, i) => i + 1).map((day) => (
+                                    <SelectItem key={day.toString()} textValue={day.toString()}>
+                                        {day}
+                                    </SelectItem>
+                                ))}
+                            </Select>
                         </div>
                     </div>
                     <div className="mt-6 flex justify-end gap-3">

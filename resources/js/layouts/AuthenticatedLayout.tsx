@@ -74,10 +74,9 @@ const mainMenuItems: SidebarItem[] = [
 const settingMenu: SidebarItem[] = [
     { name: 'Internet Packages', Icon: WifiHigh, href: route('internet-packages.index') },
     { name: 'Cashflows Categories', Icon: CurrencyDollar, href: route('cashflow-categories.index') },
+    { name: 'Settings', Icon: Gear, href: route('settings.index') },
 ];
 const adminMenuItems: SidebarItem[] = [...settingMenu, { name: 'Users', Icon: Users, href: route('users.index') }];
-
-// const supportItems: SidebarItem[] = [{ name: 'Settings', Icon: Gear, href: route('settings.index') }];
 
 const MobileMenuItem = ({ item, isActive }: { item: SidebarItem; isActive: boolean }) => {
     return (
@@ -176,16 +175,6 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
                                 ))}
                             </nav>
                         </div>
-
-                        {/* Support */}
-                        {/* <div>
-                            <h2 className={clsx('px-4 text-xs font-semibold text-gray-400 uppercase', !isSidebarOpen && 'hidden')}>Support</h2>
-                            <nav className="mt-4 space-y-1">
-                                {supportItems.map((item) => (
-                                    <MenuItem key={item.name} item={item} isOpen={isSidebarOpen} />
-                                ))}
-                            </nav>
-                        </div> */}
                     </div>
 
                     {/* User Menu */}

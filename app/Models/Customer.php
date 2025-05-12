@@ -29,7 +29,7 @@ class Customer extends Model
     protected $casts = [
         'join_date' => 'date',
         'inactive_at' => 'date',
-        'bill_date' => 'date',
+        'bill_date' => 'integer',
     ];
 
     protected $attributes = [

@@ -21,7 +21,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Settings Route
-    Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
+    Route::get('settings', [SettingsController::class, 'index'])->name('settings.index');
+    Route::patch('settings', [SettingsController::class, 'update'])->name('settings.update');
 
     // Internet Package Routes
     Route::resource('internet-packages', InternetPackageController::class);

@@ -25,7 +25,10 @@ class CustomerController extends Controller
             });
         }
 
-        $customers = $query->with('package')->paginate(10)->withQueryString();
+        $customers = $query->with('package')
+            ->orderBy('join_date', 'desc')
+            ->paginate(10)
+            ->withQueryString();
 
         $packages = InternetPackage::select('id', 'name', 'price')->get();
 
@@ -42,7 +45,7 @@ class CustomerController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'status' => 'required|in:active,inactive,paused',
+            'status' => 'required|in:online,inactive,offline',
             'address' => 'required|string',
             'phone' => 'required|string|max:255',
             'npwp' => 'required|string|max:255',
@@ -52,7 +55,7 @@ class CustomerController extends Controller
             'coordinates.longitude' => 'nullable|string',
             'join_date' => 'required|date',
             'email' => 'nullable|email|unique:customers,email',
-            'bill_date' => 'required|date',
+            'bill_date' => 'required|integer|min:1|max:28',
         ]);
 
         Log::info('Validated data:', $validated);
@@ -74,15 +77,28 @@ class CustomerController extends Controller
 
             // Membuat invoice otomatis
             $package = InternetPackage::find($validated['package_id']);
-            $dueDate = Carbon::parse($validated['bill_date'])->addMonth();
+            $billDay = (int) $validated['bill_date'];
+            $joinDate = Carbon::parse($validated['join_date']);
+
+            // Gunakan bulan dan tahun dari join_date, tapi tanggal dari bill_date
+            $billDate = Carbon::create(
+                $joinDate->year,
+                $joinDate->month,
+                $billDay,
+                0,
+                0,
+                0
+            )->addMonth(); // Selalu buat invoice untuk bulan berikutnya
+
+            // $dueDate = $billDate->copy()->addMonth();
 
             Invoice::create([
                 'customer_id' => $customer->id,
                 'package_id' => $validated['package_id'],
                 'amount' => $package->price,
                 'status' => 'unpaid',
-                'due_date' => $dueDate,
-                'period' => Carbon::parse($validated['bill_date']),
+                'due_date' => $billDate,
+                'period' => $billDate,
                 'created_by' => Auth::id(),
             ]);
 
@@ -153,9 +169,9 @@ class CustomerController extends Controller
                             'email' => $row[5] ?? null,
                             'coordinate' => $row[6] ?? null,
                             'package_id' => $row[7] ?? null,
-                            'status' => $row[8] ?? 'active',
+                            'status' => $row[8] ?? 'online',
                             'join_date' => $row[9] ? Carbon::parse($row[9])->format('Y-m-d') : null,
-                            'bill_date' => $row[10] ? Carbon::parse($row[10])->format('Y-m-d') : ($row[9] ? Carbon::parse($row[9])->addMonth()->format('Y-m-d') : null),
+                            'bill_date' => $row[10] ? Carbon::parse($row[10])->day : ($row[9] ? Carbon::parse($row[9])->addMonth()->day : null),
                         ];
 
                         // Tambahkan logging untuk debugging
@@ -183,19 +199,40 @@ class CustomerController extends Controller
                         $customer = Customer::create($customerData);
 
                         // Buat invoice jika status active
-                        if ($customerData['status'] === 'active' && $customerData['bill_date']) {
+                        if ($customerData['status'] === 'online' && $customerData['bill_date']) {
                             $package = InternetPackage::find($customerData['package_id']);
                             if ($package) {
-                                $dueDate = Carbon::parse($customerData['bill_date'])->addMonth();
-                                Invoice::create([
-                                    'customer_id' => $customer->id,
-                                    'package_id' => $package->id,
-                                    'amount' => $package->price,
-                                    'status' => 'unpaid',
-                                    'due_date' => $dueDate,
-                                    'period' => Carbon::parse($customerData['bill_date']),
-                                    'created_by' => Auth::id(),
-                                ]);
+                                $billDay = (int) $customerData['bill_date'];
+                                $joinDate = Carbon::parse($customerData['join_date']);
+
+                                // Selalu gunakan bulan berikutnya setelah join_date
+                                $billDate = Carbon::create(
+                                    $joinDate->year,
+                                    $joinDate->month,
+                                    $billDay,
+                                    0,
+                                    0,
+                                    0
+                                )->addMonth();
+
+
+                                // Cek apakah invoice untuk periode ini sudah ada
+                                $existingInvoice = Invoice::where('customer_id', $customer->id)
+                                    ->whereYear('period', $billDate->year)
+                                    ->whereMonth('period', $billDate->month)
+                                    ->first();
+
+                                if (!$existingInvoice) {
+                                    Invoice::create([
+                                        'customer_id' => $customer->id,
+                                        'package_id' => $package->id,
+                                        'amount' => $package->price,
+                                        'status' => 'unpaid',
+                                        'due_date' => $billDate,
+                                        'period' => $billDate,
+                                        'created_by' => Auth::id(),
+                                    ]);
+                                }
                             }
                         }
 
@@ -277,34 +314,47 @@ class CustomerController extends Controller
     public function updateStatus(Customer $customer, Request $request)
     {
         $validated = $request->validate([
-            'status' => 'required|in:active,inactive,paused',
-            'bill_date' => 'required_if:status,active|date',
+            'status' => 'required|in:online,inactive,offline',
+            'bill_date' => 'required_if:status,online|integer|min:1|max:28',
         ]);
 
         try {
             $customer->update($validated);
 
-            // Jika status berubah menjadi inactive atau paused, nonaktifkan invoice yang belum dibayar
-            if (in_array($validated['status'], ['inactive', 'paused'])) {
+            // Jika status berubah menjadi inactive atau offline, nonaktifkan invoice yang belum dibayar
+            if (in_array($validated['status'], ['inactive', 'offline'])) {
                 Invoice::where('customer_id', $customer->id)
                     ->where('status', 'unpaid')
                     ->update(['status' => 'cancelled']);
             }
 
-            // Jika status berubah menjadi active, buat invoice baru
-            if ($validated['status'] === 'active' && isset($validated['bill_date'])) {
+            // Jika status berubah menjadi online, buat invoice baru
+            if ($validated['status'] === 'online' && isset($validated['bill_date'])) {
                 $package = $customer->package;
-                $dueDate = Carbon::parse($validated['bill_date'])->addMonth();
+                $billDay = (int) $validated['bill_date'];
+                $now = now();
 
-                Invoice::create([
-                    'customer_id' => $customer->id,
-                    'package_id' => $package->id,
-                    'amount' => $package->price,
-                    'status' => 'unpaid',
-                    'due_date' => $dueDate,
-                    'period' => Carbon::parse($validated['bill_date']),
-                    'created_by' => Auth::id(),
-                ]);
+                // Buat invoice untuk bulan berikutnya
+                $billDate = Carbon::create($now->year, $now->month, $billDay, 0, 0, 0)->addMonth();
+                $dueDate = $billDate->copy()->addMonth();
+
+                // Cek apakah invoice untuk periode ini sudah ada
+                $existingInvoice = Invoice::where('customer_id', $customer->id)
+                    ->whereYear('period', $billDate->year)
+                    ->whereMonth('period', $billDate->month)
+                    ->first();
+
+                if (!$existingInvoice) {
+                    Invoice::create([
+                        'customer_id' => $customer->id,
+                        'package_id' => $package->id,
+                        'amount' => $package->price,
+                        'status' => 'unpaid',
+                        'due_date' => $dueDate,
+                        'period' => $billDate,
+                        'created_by' => Auth::id(),
+                    ]);
+                }
             }
 
             return redirect()->back()->with('success', 'Status customer berhasil diperbarui');

@@ -2,7 +2,7 @@
 import { BILL_DATE_LENGTH, CUSTOMER_STATUS_OPTIONS } from '@/constants';
 import { currencyFormat } from '@/lib/utils';
 import { InternetPackage, type Customer, type PageProps } from '@/types';
-import { Button, DatePicker, Input, Select, SelectItem, Textarea } from '@heroui/react';
+import { addToast, Button, DatePicker, Input, Select, SelectItem, Textarea } from '@heroui/react';
 import { router, useForm, usePage } from '@inertiajs/react';
 import { CalendarDate } from '@internationalized/date';
 
@@ -32,7 +32,7 @@ export default function CreateCustomer({ onClose }: { onClose: () => void }) {
 
     const { data, setData, processing, errors, setError, clearErrors } = useForm<CustomerFormData>({
         name: '',
-        status: 'active',
+        status: 'online',
         address: '',
         npwp: '',
         package_id: '',
@@ -78,20 +78,31 @@ export default function CreateCustomer({ onClose }: { onClose: () => void }) {
                 ? `${data.join_date.year}-${String(data.join_date.month).padStart(2, '0')}-${String(data.join_date.day).padStart(2, '0')}`
                 : null,
         };
+        console.log(payload);
 
         router.post(route('customers.store'), payload, {
             onSuccess: () => {
                 onClose();
+                addToast({
+                    title: 'Success',
+                    description: 'Customer berhasil ditambahkan',
+                    color: 'success',
+                });
                 console.log('success');
             },
             onError: (error) => {
+                addToast({
+                    title: 'Error',
+                    description: 'Customer gagal ditambahkan',
+                    color: 'danger',
+                });
                 console.log('error', error);
             },
         });
     };
 
     return (
-        <div className="mx-auto mt-5 h-fit w-full max-w-4xl overflow-y-auto rounded-2xl bg-white text-slate-800 dark:bg-gray-900 dark:text-gray-100">
+        <div className="mx-auto mt-5 max-h-[90vh] w-full overflow-y-auto rounded-2xl bg-white text-slate-800 sm:max-h-none sm:overflow-visible dark:bg-gray-900 dark:text-gray-100">
             <form onSubmit={handleSubmit} className="space-y-6 px-5 pb-5">
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <div>

@@ -37,6 +37,7 @@ const ImportCustomer = ({ onClose }: ImportCustomerProps) => {
                 onClose();
             },
             onError: (error) => {
+                console.log(error);
                 addToast({
                     title: 'Error',
                     description: error.message || 'Terjadi kesalahan saat membaca file',

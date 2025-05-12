@@ -1,5 +1,5 @@
 export interface StatusOption {
-    value: 'active' | 'inactive' | 'paused';
+    value: 'online' | 'inactive' | 'offline';
     label: string;
 }
 
@@ -15,16 +15,16 @@ export interface InvoiceStatusOption {
 
 export const CUSTOMER_STATUS_OPTIONS: StatusOption[] = [
     {
-        value: 'active',
-        label: 'Active',
+        value: 'online',
+        label: 'Online',
     },
     {
         value: 'inactive',
         label: 'Inactive',
     },
     {
-        value: 'paused',
-        label: 'Paused',
+        value: 'offline',
+        label: 'Offline',
     },
 ];
 
