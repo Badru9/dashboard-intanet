@@ -81,6 +81,7 @@ class CustomerSeeder extends Seeder
 
             Customer::create([
                 'name' => $companyType . '. ' . $companyName,
+                'customer_id' => $faker->unique()->numerify('IDPEL-####'),
                 'email' => $faker->unique()->companyEmail,
                 'phone' => $areaCodes[$city] . '-' . $faker->numerify('########'),
                 'address' => 'Jl. ' . $street . ' No. ' . $addressNumber . ', ' . $city,

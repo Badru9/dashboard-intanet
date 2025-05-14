@@ -26,8 +26,8 @@ class InvoiceSeeder extends Seeder
         $packages = InternetPackage::all();
         $users = User::all();
 
-        // Ambil nilai PPN dari settings
-        $ppn = Setting::where('key', 'ppn')->first()?->value ?? 0;
+        // Ambil nilai PPN dari settings (dalam bentuk persentase)
+        $ppn = (float)Setting::where('key', 'ppn')->first()?->value ?? 0;
 
         // Buat 20 invoice dummy
         for ($i = 0; $i < 20; $i++) {
@@ -40,7 +40,7 @@ class InvoiceSeeder extends Seeder
 
             // Hitung total amount dengan PPN
             $amount = $package->price;
-            $ppnAmount = ($amount * $ppn) / 100;
+            $ppnAmount = round(($amount * $ppn) / 100, 2); // Hitung PPN dari amount
             $totalAmount = $amount + $ppnAmount;
 
             // Generate payment proof path hanya untuk invoice yang sudah dibayar
@@ -53,7 +53,7 @@ class InvoiceSeeder extends Seeder
                 'created_by' => $user->id,
                 'amount' => $amount,
                 'total_amount' => $totalAmount,
-                'ppn' => $ppnAmount,
+                'ppn' => $ppn, // Simpan nilai persentase PPN
                 'status' => $status,
                 'due_date' => $dueDate,
                 'note' => fake()->optional(0.7)->sentence(), // 70% kemungkinan ada note
