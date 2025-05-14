@@ -19,6 +19,7 @@ class CashflowSeeder extends Seeder
         $users = DB::table('users')->pluck('id')->toArray();
         $categories = DB::table('cashflow_categories')->pluck('id')->toArray();
         $invoices = DB::table('invoices')->pluck('id')->toArray();
+        $customers = DB::table('customers')->pluck('id')->toArray();
 
         $data = [];
         foreach (range(1, 50) as $i) {
@@ -27,6 +28,7 @@ class CashflowSeeder extends Seeder
             $data[] = [
                 'cashflow_category_id' => $faker->randomElement($categories),
                 'created_id' => $faker->randomElement($users),
+                'customer_id' => $faker->randomElement($customers),
                 'invoice_id' => $faker->optional(0.7)->randomElement($invoices),
                 'date' => $date->format('Y-m-d'),
                 'amount' => $faker->numberBetween(50000, 10000000),

@@ -49,6 +49,7 @@ class InvoiceSeeder extends Seeder
 
             Invoice::create([
                 'customer_id' => $customer->id,
+                'invoice_id' => Invoice::generateInvoiceId(),
                 'package_id' => $package->id,
                 'created_by' => $user->id,
                 'amount' => $amount,
@@ -56,6 +57,8 @@ class InvoiceSeeder extends Seeder
                 'ppn' => $ppn, // Simpan nilai persentase PPN
                 'status' => $status,
                 'due_date' => $dueDate,
+                'period_month' => $dueDate->format('m'),
+                'period_year' => $dueDate->format('Y'),
                 'note' => fake()->optional(0.7)->sentence(), // 70% kemungkinan ada note
                 'payment_proof_path' => $paymentProofPath,
             ]);
