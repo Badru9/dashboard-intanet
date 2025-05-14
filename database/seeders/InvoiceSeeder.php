@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Customer;
 use App\Models\Invoice;
 use App\Models\InternetPackage;
+use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -25,6 +26,9 @@ class InvoiceSeeder extends Seeder
         $packages = InternetPackage::all();
         $users = User::all();
 
+        // Ambil nilai PPN dari settings
+        $ppn = Setting::where('key', 'ppn')->first()?->value ?? 0;
+
         // Buat 20 invoice dummy
         for ($i = 0; $i < 20; $i++) {
             $customer = $customers->random();
@@ -34,14 +38,26 @@ class InvoiceSeeder extends Seeder
             // Generate tanggal jatuh tempo (antara 1-30 hari dari sekarang)
             $dueDate = now()->addDays(rand(1, 30));
 
+            // Hitung total amount dengan PPN
+            $amount = $package->price;
+            $ppnAmount = ($amount * $ppn) / 100;
+            $totalAmount = $amount + $ppnAmount;
+
+            // Generate payment proof path hanya untuk invoice yang sudah dibayar
+            $status = fake()->randomElement(['paid', 'unpaid', 'cancelled']);
+            $paymentProofPath = $status === 'paid' ? 'payment_proofs/invoice_' . fake()->uuid() . '.jpg' : null;
+
             Invoice::create([
                 'customer_id' => $customer->id,
                 'package_id' => $package->id,
                 'created_by' => $user->id,
-                'amount' => $package->price,
-                'status' => fake()->randomElement(['paid', 'unpaid', 'cancelled']),
+                'amount' => $amount,
+                'total_amount' => $totalAmount,
+                'ppn' => $ppnAmount,
+                'status' => $status,
                 'due_date' => $dueDate,
                 'note' => fake()->optional(0.7)->sentence(), // 70% kemungkinan ada note
+                'payment_proof_path' => $paymentProofPath,
             ]);
         }
     }
