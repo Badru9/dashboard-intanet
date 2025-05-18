@@ -1,10 +1,12 @@
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import Table from '@/components/Table/Table';
+import { INVOICE_STATUS_OPTIONS } from '@/constants';
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
+import { setupMomentLocale } from '@/lib/momentConfig';
 import { currencyFormat } from '@/lib/utils';
 import { Invoices, PageProps } from '@/types';
 import { type TableColumn } from '@/types/table';
-import { Button, Input, Modal, ModalContent, ModalHeader, useDisclosure } from '@heroui/react';
+import { Button, Input, Modal, ModalContent, ModalHeader, Select, SelectItem, useDisclosure } from '@heroui/react';
 import { Head, router, usePage } from '@inertiajs/react';
 import { MagnifyingGlass, Plus, Trash } from '@phosphor-icons/react';
 import moment from 'moment';
@@ -12,6 +14,8 @@ import { useMemo, useState } from 'react';
 import CreateInvoice from './Create';
 import Paid from './Paid';
 // import EditInvoice from './Edit';
+
+setupMomentLocale();
 
 const statusColors = {
     paid: 'bg-green-100 text-green-700',
@@ -55,17 +59,19 @@ export default function InvoicesIndex() {
     const { isOpen: isPaidOpen, onOpen: onPaidOpen, onOpenChange: onPaidOpenChange } = useDisclosure();
     const [selectedInvoice, setSelectedInvoice] = useState<Invoices | null>(null);
     const [search, setSearch] = useState(filters?.search || '');
-
-    console.log('invoices', invoices);
-
+    const [statusFilter, setStatusFilter] = useState<string>(filters?.status || '');
     const filteredInvoices = useMemo(() => {
-        if (!search) return invoices.data;
-        return invoices.data.filter(
-            (invoice) =>
-                invoice.invoiceNumber.toLowerCase().includes(search.toLowerCase()) ||
-                invoice.customer?.name.toLowerCase().includes(search.toLowerCase()),
-        );
-    }, [invoices.data, search]);
+        return invoices.data.filter((invoice) => {
+            const statusMatch = !statusFilter || invoice.status === statusFilter;
+
+            const searchMatch =
+                !search ||
+                invoice.invoice_id.toLowerCase().includes(search.toLowerCase()) ||
+                invoice.customer?.name.toLowerCase().includes(search.toLowerCase());
+
+            return statusMatch && searchMatch;
+        });
+    }, [invoices.data, search, statusFilter]);
 
     // const handleEdit = (invoice: Invoices) => {
     //     setSelectedInvoice(invoice);
@@ -100,7 +106,7 @@ export default function InvoicesIndex() {
         },
 
         {
-            header: 'Customer',
+            header: 'Pelanggan',
             value: (invoice: Invoices) => (
                 <div className="flex items-center gap-3">
                     <div className="h-8 w-8 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-700">
@@ -133,7 +139,7 @@ export default function InvoicesIndex() {
             value: (invoice: Invoices) => <p className="font-medium text-gray-900 dark:text-gray-100">{currencyFormat(invoice.total_amount || 0)}</p>,
         },
         {
-            header: 'Due Date',
+            header: 'Jatuh Tempo',
             value: (invoice: Invoices) => <span className="text-gray-600 dark:text-gray-300">{moment(invoice.due_date).format('DD MMMM YYYY')}</span>,
         },
         {
@@ -141,7 +147,7 @@ export default function InvoicesIndex() {
             value: (invoice: Invoices) => <span className="text-gray-600 dark:text-gray-300">{invoice.note}</span>,
         },
         {
-            header: 'Period',
+            header: 'Periode',
             value: (invoice: Invoices) => (
                 <p className="font-medium text-gray-900 dark:text-gray-100">{moment(invoice.created_at).format('DD MMMM YYYY')}</p>
             ),
@@ -149,6 +155,14 @@ export default function InvoicesIndex() {
         {
             header: 'Dibuat Oleh',
             value: (invoice: Invoices) => <p className="font-medium text-gray-900 dark:text-gray-100">{invoice.creator?.name || 'N/A'}</p>,
+        },
+        {
+            header: 'Dibayar Pada',
+            value: (invoice: Invoices) => (
+                <p className="font-medium text-gray-900 dark:text-gray-100">
+                    {invoice.paid_at ? moment(invoice.paid_at).format('DD MMMM YYYY') : '-'}
+                </p>
+            ),
         },
         {
             header: 'Status',
@@ -190,38 +204,78 @@ export default function InvoicesIndex() {
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearch(e.target.value);
-        router.get(route('invoices.index'), { search: e.target.value }, { preserveState: true, replace: true });
+        router.get(
+            route('invoices.index'),
+            {
+                search: e.target.value,
+                status: statusFilter,
+            },
+            { preserveState: true, replace: true },
+        );
+    };
+
+    const handleStatusFilter = (value: string) => {
+        setStatusFilter(value);
+        router.get(
+            route('invoices.index'),
+            {
+                search,
+                status: value,
+            },
+            { preserveState: true, replace: true },
+        );
     };
 
     const handlePageChange = (page: number) => {
-        router.get(route('invoices.index'), { page }, { preserveState: true, replace: true });
+        router.get(
+            route('invoices.index'),
+            {
+                page,
+                search,
+                status: statusFilter,
+            },
+            { preserveState: true, replace: true },
+        );
     };
 
     return (
         <AuthenticatedLayout>
             <Head title="Invoices" />
             <div className="p-4 lg:p-8">
-                <div className="mb-6 flex flex-col items-center gap-4 lg:flex-row lg:items-center lg:justify-between">
-                    <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-center lg:justify-end">
-                        <div className="relative w-full lg:w-auto">
-                            <Input
-                                startContent={<MagnifyingGlass className="h-4 w-4 text-gray-500 dark:text-gray-400" />}
-                                type="text"
-                                placeholder="Cari invoice..."
-                                value={search}
-                                onChange={handleSearch}
-                                color="default"
-                                variant="bordered"
-                                radius="md"
-                            />
-                        </div>
-                        {auth.user.is_admin === 1 && (
-                            <Button onPress={onCreateOpen} color="primary">
-                                <Plus className="h-5 w-5" />
-                                Buat Invoice
-                            </Button>
-                        )}
+                <div className="mb-6 flex flex-col items-center justify-between gap-4 lg:flex-row">
+                    <div className="flex w-full flex-col items-center justify-center gap-4 lg:w-1/2 lg:flex-row">
+                        <Select
+                            placeholder="Pilih Status"
+                            variant="bordered"
+                            radius="md"
+                            color="default"
+                            value={statusFilter}
+                            onChange={(e) => handleStatusFilter(e.target.value)}
+                        >
+                            {INVOICE_STATUS_OPTIONS.map((status) => (
+                                <SelectItem key={status.value} textValue={status.label}>
+                                    {status.label}
+                                </SelectItem>
+                            ))}
+                        </Select>
+                        <Input
+                            startContent={<MagnifyingGlass className="h-4 w-4 text-gray-500" />}
+                            type="text"
+                            placeholder="Cari invoice / nama pelanggan..."
+                            value={search}
+                            onChange={handleSearch}
+                            color="default"
+                            variant="bordered"
+                            radius="md"
+                        />
                     </div>
+
+                    {auth.user.is_admin === 1 && (
+                        <Button onPress={onCreateOpen} color="primary" className="w-full lg:w-fit">
+                            <Plus className="h-5 w-5" />
+                            Buat Invoice
+                        </Button>
+                    )}
                 </div>
 
                 <Table<Invoices>

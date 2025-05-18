@@ -26,6 +26,10 @@ class CustomerController extends Controller
             });
         }
 
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+
         $customers = $query->with('package')
             ->orderBy('join_date', 'desc')
             ->paginate(10)
@@ -36,7 +40,7 @@ class CustomerController extends Controller
         return inertia('Customers/Index', [
             'customers' => $customers,
             'packages' => $packages,
-            'filters' => $request->only('search'),
+            'filters' => $request->only(['search', 'status']),
         ]);
     }
 

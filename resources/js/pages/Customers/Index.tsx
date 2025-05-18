@@ -2,13 +2,14 @@ import ActivateCustomerDialog from '@/components/ActivateCustomerDialog';
 import DeactivateCustomerDialog from '@/components/DeactivateCustomerDialog';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import Table from '@/components/Table/Table';
+import { CUSTOMER_STATUS_OPTIONS } from '@/constants';
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
 import { currencyFormat } from '@/lib/utils';
 import { type Customer, type PageProps } from '@/types';
 import { type TableColumn } from '@/types/table';
-import { Button, Input, Modal, ModalContent, ModalHeader, useDisclosure } from '@heroui/react';
+import { Button, Input, Modal, ModalContent, ModalHeader, Select, SelectItem, useDisclosure } from '@heroui/react';
 import { Head, router, usePage } from '@inertiajs/react';
-import { MagnifyingGlass, PencilSimple, Plus, Trash } from '@phosphor-icons/react';
+import { FileXls, MagnifyingGlass, PencilSimple, Plus, Trash } from '@phosphor-icons/react';
 import moment from 'moment';
 import { useMemo, useState } from 'react';
 import CreateCustomer from './Create';
@@ -60,15 +61,22 @@ export default function CustomersIndex() {
     const { isOpen: isStatusChangeOpen, onOpen: onStatusChangeOpen, onOpenChange: onStatusChangeOpenChange } = useDisclosure();
     const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
     const [search, setSearch] = useState(filters?.search || '');
+    const [statusFilter, setStatusFilter] = useState<string>(filters?.status || '');
     const [statusChangeType, setStatusChangeType] = useState<'inactive' | 'offline'>('inactive');
     const { isOpen: isImportOpen, onOpen: onImportOpen, onOpenChange: onImportOpenChange } = useDisclosure();
     const filteredCustomers = useMemo(() => {
-        if (!search) return customers.data;
-        return customers.data.filter(
-            (customer) =>
-                customer.name.toLowerCase().includes(search.toLowerCase()) || (customer.email || '').toLowerCase().includes(search.toLowerCase()),
-        );
-    }, [customers.data, search]);
+        if (!search && !statusFilter) return customers.data;
+        if (search) {
+            return customers.data.filter(
+                (customer) =>
+                    customer.name.toLowerCase().includes(search.toLowerCase()) || (customer.email || '').toLowerCase().includes(search.toLowerCase()),
+            );
+        }
+        if (statusFilter) {
+            return customers.data.filter((customer) => customer.status === statusFilter);
+        }
+        return customers.data;
+    }, [customers.data, search, statusFilter]);
 
     const handleEdit = (customer: Customer) => {
         console.log('data customer', customer);
@@ -230,7 +238,7 @@ export default function CustomersIndex() {
             ),
         },
         {
-            header: 'Phone',
+            header: 'No. HP',
             value: (customer: Customer) => <span className="font-medium text-gray-900 dark:text-gray-100">{customer.phone}</span>,
         },
         {
@@ -281,11 +289,38 @@ export default function CustomersIndex() {
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearch(e.target.value);
-        router.get(route('customers.index'), { search: e.target.value }, { preserveState: true, replace: true });
+        router.get(
+            route('customers.index'),
+            {
+                search: e.target.value,
+                status: statusFilter, // Selalu kirim status yang aktif
+            },
+            { preserveState: true, replace: true },
+        );
+    };
+
+    const handleStatusFilter = (value: string) => {
+        setStatusFilter(value);
+        router.get(
+            route('customers.index'),
+            {
+                search,
+                status: value, // Selalu kirim status, termasuk 'all'
+            },
+            { preserveState: true, replace: true },
+        );
     };
 
     const handlePageChange = (page: number) => {
-        router.get(route('customers.index'), { page, search }, { preserveState: true, replace: true });
+        router.get(
+            route('customers.index'),
+            {
+                page,
+                search,
+                status: statusFilter, // Selalu kirim status yang aktif
+            },
+            { preserveState: true, replace: true },
+        );
     };
 
     return (
@@ -293,35 +328,48 @@ export default function CustomersIndex() {
             <Head title="Customers" />
 
             <div className="p-4 lg:p-8">
+                <h2 className="mb-5 text-2xl font-bold text-gray-900 dark:text-gray-100">Pelanggan</h2>
                 {/* Header with Search and Action */}
-                <div className="mb-6 flex flex-col items-center gap-4 lg:flex-row lg:items-center lg:justify-between">
-                    <div className="w-full lg:w-auto">
-                        <Button onPress={onImportOpen} color="primary" fullWidth>
-                            <Plus className="h-5 w-5" />
-                            Import Customer
-                        </Button>
+                <div className="mb-6 flex w-full flex-col items-center gap-4 lg:flex-row lg:items-center lg:justify-between">
+                    <div className="flex w-full flex-col items-center justify-center gap-4 lg:flex-row">
+                        <Select
+                            placeholder="Pilih Status"
+                            variant="bordered"
+                            radius="md"
+                            color="default"
+                            value={statusFilter}
+                            onChange={(e) => handleStatusFilter(e.target.value)}
+                        >
+                            {CUSTOMER_STATUS_OPTIONS.map((status) => (
+                                <SelectItem key={status.value} textValue={status.label}>
+                                    {status.label}
+                                </SelectItem>
+                            ))}
+                        </Select>
+                        <Input
+                            startContent={<MagnifyingGlass className="h-4 w-4 text-gray-500" />}
+                            type="text"
+                            placeholder="Cari nama / email pelanggan..."
+                            value={search}
+                            onChange={handleSearch}
+                            color="default"
+                            variant="bordered"
+                            radius="md"
+                        />
                     </div>
 
-                    <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-center lg:justify-end">
-                        <div className="relative w-full lg:w-auto">
-                            <Input
-                                startContent={<MagnifyingGlass className="h-4 w-4 text-gray-500" />}
-                                type="text"
-                                placeholder="Search customers..."
-                                value={search}
-                                onChange={handleSearch}
-                                color="default"
-                                variant="bordered"
-                                radius="md"
-                            />
-                        </div>
-                        {auth.user.is_admin === 1 && (
-                            <Button onPress={onCreateOpen} color="primary">
+                    {auth.user.is_admin === 1 && (
+                        <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-center lg:justify-end">
+                            <Button onPress={onCreateOpen} color="primary" variant="flat">
                                 <Plus className="h-5 w-5" />
                                 Tambah Customer
                             </Button>
-                        )}
-                    </div>
+                            <Button onPress={onImportOpen} color="primary">
+                                <FileXls className="h-5 w-5" />
+                                Import Customer
+                            </Button>
+                        </div>
+                    )}
                 </div>
 
                 {/* Customers Table */}

@@ -293,6 +293,8 @@ export default function CashflowsIndex() {
                                 placeholder="Pilih Kategori"
                                 className="w-full"
                                 color="default"
+                                variant="bordered"
+                                radius="md"
                                 items={allCategories}
                                 selectedKeys={selectedCategory ? [selectedCategory] : []}
                                 onSelectionChange={(keys) => handleCategoryChange(Array.from(keys)[0] as string | null)}
@@ -309,6 +311,8 @@ export default function CashflowsIndex() {
                                 showMonthAndYearPickers
                                 label="Filter Tanggal"
                                 color="default"
+                                variant="bordered"
+                                radius="md"
                                 visibleMonths={2}
                                 selectorButtonPlacement="start"
                                 value={selectedDateRange}

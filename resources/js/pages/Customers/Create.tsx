@@ -178,104 +178,108 @@ export default function CreateCustomer({ onClose }: { onClose: () => void }) {
                                 isInvalid={!!errors.address}
                                 errorMessage={errors.address}
                             />
+                            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                <Input
+                                    label="Latitude"
+                                    type="text"
+                                    id="latitude"
+                                    placeholder="opsional"
+                                    value={data.coordinates?.latitude}
+                                    onChange={(e) =>
+                                        setData('coordinates', {
+                                            latitude: e.target.value,
+                                            longitude: data.coordinates?.longitude || '',
+                                        })
+                                    }
+                                    isInvalid={!!errors['coordinates.latitude']}
+                                    errorMessage={errors['coordinates.latitude']}
+                                />
 
-                            <Input
-                                label="Latitude"
-                                type="text"
-                                id="latitude"
-                                placeholder="opsional"
-                                value={data.coordinates?.latitude}
-                                onChange={(e) =>
-                                    setData('coordinates', {
-                                        latitude: e.target.value,
-                                        longitude: data.coordinates?.longitude || '',
-                                    })
-                                }
-                                isInvalid={!!errors['coordinates.latitude']}
-                                errorMessage={errors['coordinates.latitude']}
-                            />
-
-                            <Input
-                                label="Longitude"
-                                type="text"
-                                id="longitude"
-                                placeholder="opsional"
-                                value={data.coordinates?.longitude}
-                                onChange={(e) =>
-                                    setData('coordinates', {
-                                        latitude: data.coordinates?.latitude || '',
-                                        longitude: e.target.value,
-                                    })
-                                }
-                                isInvalid={!!errors['coordinates.longitude']}
-                                errorMessage={errors['coordinates.longitude']}
-                            />
+                                <Input
+                                    label="Longitude"
+                                    type="text"
+                                    id="longitude"
+                                    placeholder="opsional"
+                                    value={data.coordinates?.longitude}
+                                    onChange={(e) =>
+                                        setData('coordinates', {
+                                            latitude: data.coordinates?.latitude || '',
+                                            longitude: e.target.value,
+                                        })
+                                    }
+                                    isInvalid={!!errors['coordinates.longitude']}
+                                    errorMessage={errors['coordinates.longitude']}
+                                />
+                            </div>
                         </div>
                     </div>
 
                     <div className="space-y-4">
                         <div className="flex items-center gap-2">
-                            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Paket</h3>
+                            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Langganan</h3>
                         </div>
                         <div className="grid grid-cols-1 gap-3">
-                            <DatePicker
-                                label="Tanggal Bergabung"
-                                id="join_date"
-                                value={data.join_date}
-                                onChange={(value) => setData('join_date', value)}
-                                isInvalid={!!errors.join_date}
-                                errorMessage={errors.join_date}
-                                selectorButtonPlacement="start"
-                            />
+                            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                <DatePicker
+                                    label="Tanggal Berlangganan"
+                                    id="join_date"
+                                    value={data.join_date}
+                                    onChange={(value) => setData('join_date', value)}
+                                    isInvalid={!!errors.join_date}
+                                    errorMessage={errors.join_date}
+                                    selectorButtonPlacement="start"
+                                />
 
-                            <Select
-                                label="Tanggal Tagihan"
-                                id="bill_date"
-                                value={data.bill_date}
-                                onChange={(e) => setData('bill_date', e.target.value)}
-                                isInvalid={!!errors.bill_date}
-                                errorMessage={errors.bill_date}
-                                placeholder="Pilih Tanggal"
-                                selectedKeys={data.bill_date ? [data.bill_date] : []}
-                            >
-                                {Array.from({ length: BILL_DATE_LENGTH }, (_, i) => i + 1).map((day) => (
-                                    <SelectItem key={day.toString()} textValue={day.toString()}>
-                                        {day}
-                                    </SelectItem>
-                                ))}
-                            </Select>
-                            <p className="ml-2 mt-2 text-xs text-red-500">* Setiap bulan</p>
+                                <Select
+                                    label="Tanggal Tagihan"
+                                    id="bill_date"
+                                    value={data.bill_date}
+                                    onChange={(e) => setData('bill_date', e.target.value)}
+                                    isInvalid={!!errors.bill_date}
+                                    errorMessage={errors.bill_date}
+                                    placeholder="Pilih Tanggal"
+                                    selectedKeys={data.bill_date ? [data.bill_date] : []}
+                                >
+                                    {Array.from({ length: BILL_DATE_LENGTH }, (_, i) => i + 1).map((day) => (
+                                        <SelectItem key={day.toString()} textValue={day.toString()}>
+                                            {day}
+                                        </SelectItem>
+                                    ))}
+                                </Select>
+                                <p className="ml-2 mt-2 text-xs text-red-500">* Setiap bulan</p>
+                            </div>
 
-                            <Select
-                                label="Status"
-                                id="status"
-                                value={data.status}
-                                onChange={(e) => setData('status', e.target.value as Customer['status'])}
-                                isInvalid={!!errors.status}
-                                errorMessage={errors.status}
-                                selectedKeys={[data.status]}
-                            >
-                                {CUSTOMER_STATUS_OPTIONS.map((status) => (
-                                    <SelectItem key={status.value}>{status.label}</SelectItem>
-                                ))}
-                            </Select>
-
-                            <Select
-                                label="Paket"
-                                id="package_id"
-                                value={data.package_id}
-                                onChange={(e) => setData('package_id', e.target.value)}
-                                isInvalid={!!errors.package_id}
-                                errorMessage={errors.package_id}
-                                placeholder="Pilih Paket"
-                                selectedKeys={data.package_id}
-                            >
-                                {packages?.map((pkg) => (
-                                    <SelectItem key={pkg.id} textValue={pkg.name + ' - ' + currencyFormat(pkg.price)}>
-                                        {pkg.name} - {currencyFormat(pkg.price)}
-                                    </SelectItem>
-                                ))}
-                            </Select>
+                            <div className="space-y-2">
+                                <Select
+                                    label="Paket"
+                                    id="package_id"
+                                    value={data.package_id}
+                                    onChange={(e) => setData('package_id', e.target.value)}
+                                    isInvalid={!!errors.package_id}
+                                    errorMessage={errors.package_id}
+                                    placeholder="Pilih Paket"
+                                    selectedKeys={data.package_id}
+                                >
+                                    {packages?.map((pkg) => (
+                                        <SelectItem key={pkg.id} textValue={pkg.name + ' - ' + currencyFormat(pkg.price)}>
+                                            {pkg.name} - {currencyFormat(pkg.price)}
+                                        </SelectItem>
+                                    ))}
+                                </Select>
+                                <Select
+                                    label="Status"
+                                    id="status"
+                                    value={data.status}
+                                    onChange={(e) => setData('status', e.target.value as Customer['status'])}
+                                    isInvalid={!!errors.status}
+                                    errorMessage={errors.status}
+                                    selectedKeys={[data.status]}
+                                >
+                                    {CUSTOMER_STATUS_OPTIONS.map((status) => (
+                                        <SelectItem key={status.value}>{status.label}</SelectItem>
+                                    ))}
+                                </Select>
+                            </div>
                         </div>
                     </div>
                 </div>

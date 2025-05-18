@@ -132,7 +132,6 @@ export interface Invoices {
     creator: User;
     ppn: number;
     total_amount: number;
-    invoiceNumber: string;
     period_month: string;
     period_year: string;
     customer: Customer;
@@ -141,6 +140,7 @@ export interface Invoices {
     due_date: string | null;
     amount: number;
     status: PaidStatus;
+    paid_at: string;
     created_at: string;
     updated_at: string;
 }

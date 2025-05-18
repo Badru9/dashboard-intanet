@@ -198,23 +198,25 @@ class InvoiceController extends Controller
     public function markAsPaid(Request $request, Invoice $invoice)
     {
         $validated = $request->validate([
-            'payment_proof' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            // 'payment_proof' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'note' => 'nullable|string',
+            'paid_at' => 'required|date',
         ]);
 
 
-        if ($request->hasFile('payment_proof')) {
-            $path = $request->file('payment_proof')->store('payment_proofs', 'public');
-            $validated['payment_proof_path'] = $path;
-        }
+        // if ($request->hasFile('payment_proof')) {
+        //     $path = $request->file('payment_proof')->store('payment_proofs', 'public');
+        //     $validated['payment_proof_path'] = $path;
+        // }
 
         Log::info('validated invoice', $invoice->toArray());
 
         $invoice->status = 'paid';
         $invoice->note = $validated['note'] ?? null;
-        if (isset($validated['payment_proof_path'])) {
-            $invoice->payment_proof_path = $validated['payment_proof_path'];
-        }
+        $invoice->paid_at = $validated['paid_at'];
+        // if (isset($validated['payment_proof_path'])) {
+        //     $invoice->payment_proof_path = $validated['payment_proof_path'];
+        // }
         $invoice->save();
 
         if ($invoice->status === 'paid') {

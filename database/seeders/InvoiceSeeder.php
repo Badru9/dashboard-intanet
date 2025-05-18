@@ -45,7 +45,7 @@ class InvoiceSeeder extends Seeder
 
             // Generate payment proof path hanya untuk invoice yang sudah dibayar
             $status = fake()->randomElement(['paid', 'unpaid', 'cancelled']);
-            $paymentProofPath = $status === 'paid' ? 'payment_proofs/invoice_' . fake()->uuid() . '.jpg' : null;
+            // $paymentProofPath = $status === 'paid' ? 'payment_proofs/invoice_' . fake()->uuid() . '.jpg' : null;
 
             Invoice::create([
                 'customer_id' => $customer->id,
@@ -57,10 +57,11 @@ class InvoiceSeeder extends Seeder
                 'ppn' => $ppn, // Simpan nilai persentase PPN
                 'status' => $status,
                 'due_date' => $dueDate,
+                'paid_at' => $status === 'paid' ? $dueDate : null,
                 'period_month' => $dueDate->format('m'),
                 'period_year' => $dueDate->format('Y'),
                 'note' => fake()->optional(0.7)->sentence(), // 70% kemungkinan ada note
-                'payment_proof_path' => $paymentProofPath,
+                // 'payment_proof_path' => $paymentProofPath,
             ]);
         }
     }

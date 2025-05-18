@@ -1,7 +1,7 @@
 import { Invoices } from '@/types';
-import { addToast, Button, Input, Textarea } from '@heroui/react';
+import { addToast, Button, DatePicker, Textarea } from '@heroui/react';
 import { router, useForm } from '@inertiajs/react';
-import { useState } from 'react';
+import { parseDate } from '@internationalized/date';
 
 interface PaidProps {
     invoice: Invoices;
@@ -9,39 +9,41 @@ interface PaidProps {
 }
 
 const Paid = ({ invoice, onClose }: PaidProps) => {
-    const [previewImage, setPreviewImage] = useState<string | null>(null);
+    // const [previewImage, setPreviewImage] = useState<string | null>(null);
     const { data, setData, processing, errors } = useForm({
-        payment_proof: null as File | null,
+        // payment_proof: null as File | null,
         note: '',
+        paid_at: '',
     });
 
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            setData('payment_proof', file);
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setPreviewImage(reader.result as string);
-            };
-            reader.readAsDataURL(file);
-        }
-    };
+    // const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //     const file = e.target.files?.[0];
+    //     if (file) {
+    //         setData('payment_proof', file);
+    //         const reader = new FileReader();
+    //         reader.onloadend = () => {
+    //             setPreviewImage(reader.result as string);
+    //         };
+    //         reader.readAsDataURL(file);
+    //     }
+    // };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
         const formData = new FormData();
-        if (data.payment_proof) {
-            formData.append('payment_proof', data.payment_proof);
-        }
+        // if (data.payment_proof) {
+        //     formData.append('payment_proof', data.payment_proof);
+        // }
         formData.append('note', data.note || '');
+        formData.append('paid_at', data.paid_at || '');
 
         router.post(route('invoices.mark-as-paid', invoice.id), formData, {
             forceFormData: true,
             onSuccess: () => {
                 onClose();
-                setPreviewImage(null);
-                setData({ payment_proof: null, note: '' });
+                // setPreviewImage(null);
+                setData({ note: '', paid_at: '' });
                 addToast({
                     title: 'Berhasil',
                     description: 'Invoice berhasil dikonfirmasi',
@@ -63,9 +65,20 @@ const Paid = ({ invoice, onClose }: PaidProps) => {
         <div className="mx-auto mt-5 h-fit w-full overflow-y-auto rounded-2xl bg-white text-slate-800 dark:bg-gray-900 dark:text-gray-100">
             <form onSubmit={handleSubmit} className="space-y-6 px-5 pb-5">
                 <div className="space-y-2">
-                    <label className="block text-sm font-medium">Bukti Pembayaran</label>
+                    <DatePicker
+                        label="Tanggal Pembayaran"
+                        selectorButtonPlacement="start"
+                        value={data.paid_at ? parseDate(data.paid_at) : null}
+                        onChange={(e) => e && setData('paid_at', e.toString())}
+                        isInvalid={!!errors.paid_at}
+                        errorMessage={errors.paid_at}
+                        isRequired
+                    />
+                </div>
+                {/* <div className="space-y-2">
                     <div className="flex flex-col items-center gap-4">
                         <Input
+                            label="Bukti Pembayaran"
                             type="file"
                             accept="image/*"
                             onChange={handleImageChange}
@@ -79,14 +92,13 @@ const Paid = ({ invoice, onClose }: PaidProps) => {
                             </div>
                         )}
                     </div>
-                </div>
+                </div> */}
 
                 <div className="space-y-2">
-                    <label className="block text-sm font-medium">Catatan</label>
                     <Textarea
+                        label="Catatan (Opsional)"
                         value={data.note}
                         onChange={(e) => setData('note', e.target.value)}
-                        placeholder="Tambahkan catatan jika diperlukan"
                         className="w-full"
                         color={errors.note ? 'danger' : 'default'}
                         errorMessage={errors.note}
