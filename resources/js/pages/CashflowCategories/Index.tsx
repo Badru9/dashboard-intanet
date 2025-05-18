@@ -6,7 +6,8 @@ import { CashflowCategory, PageProps } from '@/types';
 import { TableColumn } from '@/types/table';
 import { Button, Modal, ModalContent, ModalHeader, useDisclosure } from '@heroui/react';
 import { Head, router, usePage } from '@inertiajs/react';
-import { Pencil, Plus, Trash2 } from 'lucide-react';
+import { PencilSimple } from '@phosphor-icons/react';
+import { Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import CreateCashflowCategory from './Create';
 import EditCashflowCategory from './Edit';
@@ -73,7 +74,7 @@ export default function CashflowsCategoriesIndex() {
         {
             header: 'Aksi',
             value: (value: CashflowCategory) => (
-                <div className="flex items-center gap-2">
+                <div className="flex items-center justify-end gap-2">
                     <button
                         onClick={() => {
                             setSelectedCategory(value);
@@ -81,7 +82,7 @@ export default function CashflowsCategoriesIndex() {
                         }}
                         className="cursor-pointer rounded-lg p-2 text-yellow-400 transition-colors hover:bg-yellow-400 hover:text-white"
                     >
-                        <Pencil className="h-4 w-4" />
+                        <PencilSimple className="h-4 w-4" />
                     </button>
                     <button
                         onClick={() => {

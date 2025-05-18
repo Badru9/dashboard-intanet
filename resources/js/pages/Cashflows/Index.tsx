@@ -259,7 +259,7 @@ export default function CashflowsIndex() {
         {
             header: 'Aksi',
             value: (cashflow: Cashflow) => (
-                <div className="flex items-center gap-2">
+                <div className="flex items-center justify-end gap-2">
                     <button
                         onClick={() => handleEdit(cashflow)}
                         className="cursor-pointer rounded-lg p-2 text-yellow-400 transition-colors hover:bg-yellow-400 hover:text-white"

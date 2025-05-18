@@ -61,18 +61,18 @@ export default function CustomersIndex() {
     const { isOpen: isStatusChangeOpen, onOpen: onStatusChangeOpen, onOpenChange: onStatusChangeOpenChange } = useDisclosure();
     const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
     const [search, setSearch] = useState(filters?.search || '');
-    const [statusFilter, setStatusFilter] = useState<string>(filters?.status || '');
+    const [statusFilter, setStatusFilter] = useState<string>(filters?.status || 'all');
     const [statusChangeType, setStatusChangeType] = useState<'inactive' | 'offline'>('inactive');
     const { isOpen: isImportOpen, onOpen: onImportOpen, onOpenChange: onImportOpenChange } = useDisclosure();
     const filteredCustomers = useMemo(() => {
-        if (!search && !statusFilter) return customers.data;
+        if (!search && statusFilter === 'all') return customers.data;
         if (search) {
             return customers.data.filter(
                 (customer) =>
                     customer.name.toLowerCase().includes(search.toLowerCase()) || (customer.email || '').toLowerCase().includes(search.toLowerCase()),
             );
         }
-        if (statusFilter) {
+        if (statusFilter && statusFilter !== 'all') {
             return customers.data.filter((customer) => customer.status === statusFilter);
         }
         return customers.data;
@@ -143,14 +143,14 @@ export default function CustomersIndex() {
     const renderStatusActions = (customer: Customer) => {
         if (customer.status === 'online') {
             return (
-                <>
-                    <Button color="warning" className="text-white" size="sm" onPress={() => handleStatusChange(customer, 'offline')}>
-                        Jeda
-                    </Button>
-                    <Button color="danger" className="text-white" size="sm" onPress={() => handleStatusChange(customer, 'inactive')}>
-                        Non-aktifkan
-                    </Button>
-                </>
+                // <>
+                <Button color="warning" className="text-white" size="sm" onPress={() => handleStatusChange(customer, 'offline')}>
+                    Offline
+                </Button>
+                // <Button color="danger" className="text-white" size="sm" onPress={() => handleStatusChange(customer, 'inactive')}>
+                //     Non-aktifkan
+                // </Button>
+                // </>
             );
         }
 
@@ -268,7 +268,7 @@ export default function CustomersIndex() {
         {
             header: 'Aksi',
             value: (customer: Customer) => (
-                <div className="flex items-center gap-2">
+                <div className="flex items-center justify-end gap-2">
                     {renderStatusActions(customer)}
                     <button
                         onClick={() => handleEdit(customer)}
@@ -293,7 +293,7 @@ export default function CustomersIndex() {
             route('customers.index'),
             {
                 search: e.target.value,
-                status: statusFilter, // Selalu kirim status yang aktif
+                status: statusFilter,
             },
             { preserveState: true, replace: true },
         );
@@ -305,7 +305,7 @@ export default function CustomersIndex() {
             route('customers.index'),
             {
                 search,
-                status: value, // Selalu kirim status, termasuk 'all'
+                status: value,
             },
             { preserveState: true, replace: true },
         );
@@ -317,7 +317,7 @@ export default function CustomersIndex() {
             {
                 page,
                 search,
-                status: statusFilter, // Selalu kirim status yang aktif
+                status: statusFilter,
             },
             { preserveState: true, replace: true },
         );
@@ -340,7 +340,7 @@ export default function CustomersIndex() {
                             value={statusFilter}
                             onChange={(e) => handleStatusFilter(e.target.value)}
                         >
-                            {CUSTOMER_STATUS_OPTIONS.map((status) => (
+                            {[{ value: 'all', label: 'Semua' }, ...CUSTOMER_STATUS_OPTIONS].map((status) => (
                                 <SelectItem key={status.value} textValue={status.label}>
                                     {status.label}
                                 </SelectItem>

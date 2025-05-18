@@ -16,20 +16,64 @@ use App\Models\CashflowCategory;
 
 class InvoiceController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $invoices = Invoice::with(['customer', 'package', 'creator'])
-            ->whereNull('deleted_at')
-            ->latest()
-            ->paginate(10);
+        try {
+            $query = Invoice::with(['customer', 'package', 'creator'])
+                ->whereNull('deleted_at');
 
-        $packages = InternetPackage::all();
+            // Log untuk melihat request yang masuk
+            Log::info('Request Data:', [
+                'search' => $request->search,
+                'status' => $request->status
+            ]);
 
-        return inertia('Invoices/Index', [
-            'invoices' => $invoices,
-            'packages' => $packages,
-            'customers' => Customer::with('package')->get()
-        ]);
+            if ($request->filled('search')) {
+                $search = $request->input('search');
+                $query->where(function ($q) use ($search) {
+                    $q->where('invoice_id', 'like', "%{$search}%")
+                        ->orWhereHas('customer', function ($q) use ($search) {
+                            $q->where('name', 'like', "%{$search}%");
+                        });
+                });
+            }
+
+            // Filter berdasarkan status
+            if ($request->filled('status') && $request->status !== 'all') {
+                $query->where('status', $request->input('status'));
+            }
+
+            // Debug query yang dihasilkan
+            Log::info('Query Debug:', [
+                'sql' => $query->toSql(),
+                'bindings' => $query->getBindings(),
+                'count' => $query->count()
+            ]);
+
+            $invoices = $query->latest()
+                ->paginate(10)
+                ->withQueryString();
+
+            // Debug hasil akhir
+            Log::info('Final Result:', [
+                'total_data' => $invoices->total(),
+                'current_page' => $invoices->currentPage(),
+                'per_page' => $invoices->perPage()
+            ]);
+
+            return inertia('Invoices/Index', [
+                'invoices' => $invoices,
+                'filters' => $request->only(['search', 'status']),
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in Invoice Index:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan saat memuat data.');
+        }
     }
 
     public function create()

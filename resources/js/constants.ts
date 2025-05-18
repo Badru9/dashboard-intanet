@@ -37,7 +37,7 @@ export const CUSTOMER_STATUS_OPTIONS: StatusOption[] = [
     },
     {
         value: 'inactive',
-        label: 'Inactive',
+        label: 'Tidak Aktif',
     },
     {
         value: 'offline',

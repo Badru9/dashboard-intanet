@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { DEFAULT_CASHFLOW } from '@/constants';
 import { CashflowCategory, PageProps } from '@/types';
 import { Button, DatePicker, Input, Select, SelectItem, Textarea } from '@heroui/react';
 import { Head, router, useForm, usePage } from '@inertiajs/react';
@@ -47,8 +46,6 @@ export default function CreateCashflow({ onClose }: { onClose: () => void }) {
         });
     };
 
-    const allCategories: CashflowCategory[] = [...DEFAULT_CASHFLOW, ...categories];
-
     return (
         <div className="mx-auto mt-5 h-fit w-full max-w-4xl overflow-y-auto rounded-2xl bg-white text-slate-800 dark:bg-gray-900 dark:text-gray-100">
             <Head title="Create Cashflow" />
@@ -63,7 +60,7 @@ export default function CreateCashflow({ onClose }: { onClose: () => void }) {
                             errorMessage={errors.cashflow_category_id}
                             required
                         >
-                            {allCategories.map((category) => (
+                            {categories.map((category) => (
                                 <SelectItem key={String(category.id)} textValue={category.name}>
                                     {category.name}
                                 </SelectItem>

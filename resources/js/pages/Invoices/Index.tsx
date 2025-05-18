@@ -59,10 +59,10 @@ export default function InvoicesIndex() {
     const { isOpen: isPaidOpen, onOpen: onPaidOpen, onOpenChange: onPaidOpenChange } = useDisclosure();
     const [selectedInvoice, setSelectedInvoice] = useState<Invoices | null>(null);
     const [search, setSearch] = useState(filters?.search || '');
-    const [statusFilter, setStatusFilter] = useState<string>(filters?.status || '');
+    const [statusFilter, setStatusFilter] = useState<string>(filters?.status || 'all');
     const filteredInvoices = useMemo(() => {
         return invoices.data.filter((invoice) => {
-            const statusMatch = !statusFilter || invoice.status === statusFilter;
+            const statusMatch = statusFilter === 'all' || invoice.status === statusFilter;
 
             const searchMatch =
                 !search ||
@@ -179,7 +179,7 @@ export default function InvoicesIndex() {
         {
             header: 'Aksi',
             value: (invoice: Invoices) => (
-                <div className="flex items-center gap-2">
+                <div className="flex items-center justify-end gap-2">
                     {/* <button
                         onClick={() => handleEdit(invoice)}
                         className="cursor-pointer rounded-lg p-2 text-yellow-400 transition-colors hover:bg-yellow-400 hover:text-white"
@@ -252,7 +252,7 @@ export default function InvoicesIndex() {
                             value={statusFilter}
                             onChange={(e) => handleStatusFilter(e.target.value)}
                         >
-                            {INVOICE_STATUS_OPTIONS.map((status) => (
+                            {[{ value: 'all', label: 'Semua' }, ...INVOICE_STATUS_OPTIONS].map((status) => (
                                 <SelectItem key={status.value} textValue={status.label}>
                                     {status.label}
                                 </SelectItem>

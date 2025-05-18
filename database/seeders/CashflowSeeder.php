@@ -21,15 +21,24 @@ class CashflowSeeder extends Seeder
         $invoices = DB::table('invoices')->pluck('id')->toArray();
         $customers = DB::table('customers')->pluck('id')->toArray();
 
+        // Ambil ID kategori subscription
+        $subscriptionCategoryId = DB::table('cashflow_categories')
+            ->where('name', 'like', '%subscription%')
+            ->pluck('id')
+            ->first();
+
         $data = [];
         foreach (range(1, 50) as $i) {
             $date = $faker->dateTimeBetween('-1 year', 'now');
 
+            // Tentukan apakah ini adalah cashflow subscription
+            $isSubscription = $faker->boolean(30); // 30% kemungkinan adalah subscription
+
             $data[] = [
-                'cashflow_category_id' => $faker->randomElement($categories),
+                'cashflow_category_id' => $isSubscription ? $subscriptionCategoryId : $faker->randomElement($categories),
                 'created_id' => $faker->randomElement($users),
                 'customer_id' => $faker->randomElement($customers),
-                'invoice_id' => $faker->optional(0.7)->randomElement($invoices),
+                'invoice_id' => $isSubscription ? $faker->randomElement($invoices) : null,
                 'date' => $date->format('Y-m-d'),
                 'amount' => $faker->numberBetween(50000, 10000000),
                 'note' => $faker->optional()->sentence(),

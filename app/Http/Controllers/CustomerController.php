@@ -16,32 +16,63 @@ class CustomerController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Customer::query();
+        try {
+            $query = Customer::query();
 
-        if ($request->filled('search')) {
-            $search = $request->input('search');
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%");
-            });
+            // Log untuk melihat request yang masuk
+            Log::info('Request Data:', [
+                'search' => $request->search,
+                'status' => $request->status
+            ]);
+
+            if ($request->filled('search')) {
+                $search = $request->input('search');
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                });
+            }
+
+            // Filter berdasarkan status
+            if ($request->filled('status') && $request->status !== 'all') {
+                $query->where('status', $request->input('status'));
+            }
+
+            // Debug query yang dihasilkan
+            Log::info('Query Debug:', [
+                'sql' => $query->toSql(),
+                'bindings' => $query->getBindings(),
+                'count' => $query->count() // Cek jumlah data sebelum paginasi
+            ]);
+
+            $customers = $query->with('package')
+                ->orderBy('join_date', 'desc')
+                ->paginate(10)
+                ->withQueryString();
+
+            $packages = InternetPackage::select('id', 'name', 'price')->get();
+
+            // Debug hasil akhir
+            Log::info('Final Result:', [
+                'total_data' => $customers->total(),
+                'current_page' => $customers->currentPage(),
+                'per_page' => $customers->perPage()
+            ]);
+
+            return inertia('Customers/Index', [
+                'customers' => $customers,
+                'packages' => $packages,
+                'filters' => $request->only(['search', 'status']),
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in Customer Index:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan saat memuat data.');
         }
-
-        if ($request->filled('status')) {
-            $query->where('status', $request->input('status'));
-        }
-
-        $customers = $query->with('package')
-            ->orderBy('join_date', 'desc')
-            ->paginate(10)
-            ->withQueryString();
-
-        $packages = InternetPackage::select('id', 'name', 'price')->get();
-
-        return inertia('Customers/Index', [
-            'customers' => $customers,
-            'packages' => $packages,
-            'filters' => $request->only(['search', 'status']),
-        ]);
     }
 
     public function store(Request $request)
