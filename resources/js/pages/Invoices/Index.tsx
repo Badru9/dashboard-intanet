@@ -274,7 +274,7 @@ export default function InvoicesIndex() {
                     {auth.user.is_admin === 1 && (
                         <Button onPress={onCreateOpen} color="primary" className="w-full lg:w-fit">
                             <Plus className="h-5 w-5" />
-                            Buat Invoice
+                            Buat Tagihan
                         </Button>
                     )}
                 </div>

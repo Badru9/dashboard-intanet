@@ -145,7 +145,7 @@ export default function CreateCustomer({ onClose }: { onClose: () => void }) {
 
                         <Input
                             label="No. NPWP / NIK"
-                            type="number"
+                            type="text"
                             id="tax_number"
                             value={data.npwp}
                             onChange={(e) => setData('npwp', e.target.value)}

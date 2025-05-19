@@ -150,7 +150,7 @@ export default function UsersIndex() {
                         {auth.user.is_admin === 1 && (
                             <Button onPress={onCreateOpen} color="primary">
                                 <Plus className="h-5 w-5" />
-                                Tambah User
+                                Tambah Pengguna
                             </Button>
                         )}
                     </div>

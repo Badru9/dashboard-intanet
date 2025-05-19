@@ -160,12 +160,22 @@ class InvoiceController extends Controller
                         ->orderByDesc('invoice_id')
                         ->first();
 
-                    if ($lastInvoice && preg_match('/INV\/\d{6}\/(\d{4})$/', $lastInvoice->invoice_id, $matches)) {
-                        $increment = (int)$matches[1] + 1;
-                    } else {
-                        $increment = 1;
+                    // Perbaikan logika pembuatan invoice_id
+                    $increment = 1;
+                    if ($lastInvoice) {
+                        // Ekstrak nomor urut dari invoice_id terakhir
+                        $lastNumber = (int) substr($lastInvoice->invoice_id, -4);
+                        $increment = $lastNumber + 1;
                     }
+
+                    // Format: INV/YYYYMM/XXXX (XXXX adalah nomor urut 4 digit)
                     $invoiceId = sprintf('INV/%04d%02d/%04d', $periodYear, $periodMonth, $increment);
+
+                    // Cek apakah invoice_id sudah ada
+                    while (Invoice::where('invoice_id', $invoiceId)->exists()) {
+                        $increment++;
+                        $invoiceId = sprintf('INV/%04d%02d/%04d', $periodYear, $periodMonth, $increment);
+                    }
 
                     Invoice::create([
                         'customer_id' => $customer->id,

@@ -362,11 +362,11 @@ export default function CustomersIndex() {
                         <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-center lg:justify-end">
                             <Button onPress={onCreateOpen} color="primary" variant="flat">
                                 <Plus className="h-5 w-5" />
-                                Tambah Customer
+                                Tambah Pengguna
                             </Button>
                             <Button onPress={onImportOpen} color="primary">
                                 <FileXls className="h-5 w-5" />
-                                Import Customer
+                                Import Pengguna
                             </Button>
                         </div>
                     )}

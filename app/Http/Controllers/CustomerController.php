@@ -81,7 +81,7 @@ class CustomerController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'customer_id' => 'required|string|max:255',
+            'customer_id' => 'nullable|string|max:255',
             'status' => 'required|in:online,inactive,offline',
             'address' => 'required|string',
             'phone' => 'required|string|max:255',
