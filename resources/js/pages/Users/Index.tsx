@@ -132,13 +132,14 @@ export default function UsersIndex() {
         <AuthenticatedLayout>
             <Head title="Users" />
             <div className="p-4 lg:p-8 dark:bg-gray-900">
+                <h2 className="mb-5 text-2xl font-bold text-gray-900 dark:text-gray-100">Pengguna</h2>
                 <div className="mb-6 flex flex-col items-center gap-4 lg:flex-row lg:items-center lg:justify-between">
                     <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-center lg:justify-end">
                         <div className="relative w-full lg:w-auto">
                             <Input
                                 startContent={<MagnifyingGlass className="h-4 w-4 text-gray-500" />}
                                 type="text"
-                                placeholder="Cari user..."
+                                placeholder="Cari pengguna..."
                                 value={search}
                                 onChange={handleSearch}
                                 color="default"

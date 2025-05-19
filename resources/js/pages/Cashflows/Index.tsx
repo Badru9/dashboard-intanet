@@ -60,17 +60,20 @@ export default function CashflowsIndex() {
 
     const [selectedCashflow, setSelectedCashflow] = useState<Cashflow | null>(null);
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-    const today = new CalendarDate(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+    const today = new CalendarDate(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate());
+    const oneMonthAgo = new CalendarDate(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
     const [selectedDateRange, setSelectedDateRange] = useState<{ start: DateValue; end: DateValue }>({
-        start: today,
+        start: oneMonthAgo,
         end: today,
     });
 
+    console.log('selectedDateRange', selectedDateRange);
+
     const allCategories: CashflowCategory[] = [...DEFAULT_CASHFLOW, ...categories];
 
-    // Effect untuk memastikan filter tanggal hari ini saat pertama kali render
+    // Effect untuk memastikan filter tanggal 1 bulan sebelumnya saat pertama kali render
     useEffect(() => {
-        const startDate = new Date(today.toString());
+        const startDate = new Date(oneMonthAgo.toString());
         startDate.setHours(0, 0, 0, 0);
         const endDate = new Date(today.toString());
         endDate.setHours(23, 59, 59, 999);
@@ -222,7 +225,7 @@ export default function CashflowsIndex() {
             value: (row: Cashflow) => row.customer?.name,
         },
         {
-            header: 'Amount',
+            header: 'Jumlah',
             value: (row: Cashflow) => currencyFormat(row.amount),
         },
         {
@@ -285,6 +288,7 @@ export default function CashflowsIndex() {
         <AuthenticatedLayout>
             <Head title="Cashflows" />
             <div className="p-4 lg:p-8">
+                <h2 className="mb-5 text-2xl font-bold text-gray-900 dark:text-gray-100">Transaksi</h2>
                 <div className="mb-6 flex flex-col items-center gap-4 lg:flex-row lg:items-center">
                     <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-center">
                         <div className="relative w-full lg:w-64">

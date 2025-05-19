@@ -122,6 +122,7 @@ export default function CashflowsCategoriesIndex() {
         <AuthenticatedLayout>
             <Head title="Cashflows Categories" />
             <div className="p-4 lg:p-8">
+                <h2 className="mb-5 text-2xl font-bold text-gray-900 dark:text-gray-100">Kategori Transaksi</h2>
                 {auth.user.is_admin === 1 && (
                     <div className="mb-6 flex flex-col items-center gap-4 lg:flex-row lg:items-center lg:justify-between">
                         <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-center lg:justify-end">

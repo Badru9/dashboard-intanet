@@ -66,17 +66,17 @@ const MenuItem = ({ item, isOpen, isActive }: { item: SidebarItem; isOpen: boole
 
 const mainMenuItems: SidebarItem[] = [
     { name: 'Dashboard', Icon: House, href: route('dashboard') },
-    { name: 'Customers', Icon: Users, href: route('customers.index') },
-    { name: 'Invoices', Icon: FileText, href: route('invoices.index') },
-    { name: 'Cashflows', Icon: CurrencyDollar, href: route('cashflows.index') },
+    { name: 'Pengguna', Icon: Users, href: route('customers.index') },
+    { name: 'Tagihan', Icon: FileText, href: route('invoices.index') },
+    { name: 'Transaksi', Icon: CurrencyDollar, href: route('cashflows.index') },
 ];
 
 const settingMenu: SidebarItem[] = [
-    { name: 'Internet Packages', Icon: WifiHigh, href: route('internet-packages.index') },
-    { name: 'Cashflows Categories', Icon: CurrencyDollar, href: route('cashflow-categories.index') },
-    { name: 'Settings', Icon: Gear, href: route('settings.index') },
+    { name: 'Paket Internet', Icon: WifiHigh, href: route('internet-packages.index') },
+    { name: 'Kategori Transaksi', Icon: CurrencyDollar, href: route('cashflow-categories.index') },
+    { name: 'Pengaturan', Icon: Gear, href: route('settings.index') },
 ];
-const adminMenuItems: SidebarItem[] = [...settingMenu, { name: 'Users', Icon: Users, href: route('users.index') }];
+const adminMenuItems: SidebarItem[] = [...settingMenu, { name: 'Pengguna', Icon: Users, href: route('users.index') }];
 
 const MobileMenuItem = ({ item, isActive }: { item: SidebarItem; isActive: boolean }) => {
     return (

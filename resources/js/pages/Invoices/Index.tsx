@@ -242,6 +242,7 @@ export default function InvoicesIndex() {
         <AuthenticatedLayout>
             <Head title="Invoices" />
             <div className="p-4 lg:p-8">
+                <h2 className="mb-5 text-2xl font-bold text-gray-900 dark:text-gray-100">Tagihan</h2>
                 <div className="mb-6 flex flex-col items-center justify-between gap-4 lg:flex-row">
                     <div className="flex w-full flex-col items-center justify-center gap-4 lg:w-1/2 lg:flex-row">
                         <Select

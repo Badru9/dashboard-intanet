@@ -127,6 +127,7 @@ export default function InternetPackagesIndex() {
             <Head title="Internet Packages" />
 
             <div className="p-4 lg:p-8">
+                <h2 className="mb-5 text-2xl font-bold text-gray-900 dark:text-gray-100">Paket Internet</h2>
                 <div className="mb-6 flex flex-col items-center gap-4 lg:flex-row lg:items-center lg:justify-between">
                     <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-center lg:justify-end">
                         <div className="relative w-full lg:w-auto">
