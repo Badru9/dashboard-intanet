@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import InterpolationChart from '@/components/Chart/InterpolationChart';
+import IncomeChart from '@/components/Chart/IncomeChart';
+import OutcomeChart from '@/components/Chart/OutcomeChart';
 import DashboardSummary from '@/components/Dashboard/DashboardSummary';
 import MonthAndYearFilter from '@/components/Dashboard/MonthFilter';
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
@@ -39,7 +40,7 @@ export default function Dashboard() {
 
             {/* <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3"> */}
             <div className="p-4 lg:p-8">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Dashboard</h2>
+                <h2 className="mb-4 text-2xl font-bold text-gray-900 lg:mb-0 dark:text-gray-100">Dashboard</h2>
                 <div className="flex justify-end">
                     <MonthAndYearFilter selectedMonth={currentMonth} selectedYear={currentYear} onChange={handleMonthYearChange} />
                 </div>
@@ -49,7 +50,14 @@ export default function Dashboard() {
                     monthlyExpense={monthlyExpense}
                     unpaidInvoices={unpaidInvoices}
                 />
-                <InterpolationChart />
+                <div className="mt-4 flex w-full flex-col gap-4 lg:flex-row">
+                    <div className="w-full lg:w-2/3">
+                        <IncomeChart selectedMonth={currentMonth} selectedYear={currentYear} />
+                    </div>
+                    <div className="w-full lg:w-1/3">
+                        <OutcomeChart selectedMonth={currentMonth} selectedYear={currentYear} />
+                    </div>
+                </div>
             </div>
         </AuthenticatedLayout>
     );

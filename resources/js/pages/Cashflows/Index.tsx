@@ -230,7 +230,7 @@ export default function CashflowsIndex() {
         },
         {
             header: 'Tipe',
-            value: (row: Cashflow) => (row.category?.is_out ? 'Outcome' : 'Income'),
+            value: (row: Cashflow) => (row.category?.is_out === 1 ? 'Outcome' : 'Income'),
         },
         {
             header: 'Catatan',
@@ -393,7 +393,7 @@ const Summary = ({ totals, totalBalance }: { totals: { income: number; outcome: 
         <div className="my-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
             <Card className="bg-white dark:bg-slate-900" shadow="none">
                 <CardHeader className="pb-0">
-                    <h3 className="text-sm font-medium text-green-800 dark:text-green-400">Total Pemasukan</h3>
+                    <h3 className="text-sm font-medium text-green-800 dark:text-green-400">Pemasukan</h3>
                 </CardHeader>
                 <CardBody>
                     <p className="text-2xl font-semibold text-green-600 dark:text-green-400">{currencyFormat(totals.income)}</p>
@@ -401,7 +401,7 @@ const Summary = ({ totals, totalBalance }: { totals: { income: number; outcome: 
             </Card>
             <Card className="bg-white dark:bg-slate-900" shadow="none">
                 <CardHeader className="pb-0">
-                    <h3 className="text-sm font-medium text-red-800 dark:text-red-400">Total Pengeluaran</h3>
+                    <h3 className="text-sm font-medium text-red-800 dark:text-red-400">Pengeluaran</h3>
                 </CardHeader>
                 <CardBody>
                     <p className="text-2xl font-semibold text-red-600 dark:text-red-400">{currencyFormat(totals.outcome)}</p>
@@ -412,7 +412,7 @@ const Summary = ({ totals, totalBalance }: { totals: { income: number; outcome: 
                     <h3
                         className={`text-sm font-medium ${totalBalance >= 0 ? 'text-blue-800 dark:text-blue-400' : 'text-orange-800 dark:text-orange-400'}`}
                     >
-                        Total Saldo
+                        Total
                     </h3>
                 </CardHeader>
                 <CardBody>

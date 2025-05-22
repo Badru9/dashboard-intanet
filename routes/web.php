@@ -9,6 +9,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\DataController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -66,6 +67,9 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 });
+
+Route::get('/api/chart-data', [DataController::class, 'getChartData']);
+Route::get('/api/outcome-chart-data', [DataController::class, 'getOutcomeChartData']);
 
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';

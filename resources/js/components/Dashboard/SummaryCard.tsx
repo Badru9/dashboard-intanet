@@ -41,7 +41,7 @@ interface SummaryCardProps {
         | 'hand-coins';
 }
 
-export default function SummaryCard({ title, value, type = 'number', color = 'primary', icon = 'chart' }: SummaryCardProps) {
+export default function SummaryCard({ title, value = 0, type = 'number', color = 'primary', icon = 'chart' }: SummaryCardProps) {
     const colorClasses = {
         primary: 'text-blue-600 dark:text-blue-400',
         success: 'text-green-600 dark:text-green-400',
