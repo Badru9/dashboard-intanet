@@ -68,12 +68,12 @@ const mainMenuItems: SidebarItem[] = [
     { name: 'Dashboard', Icon: House, href: route('dashboard') },
     { name: 'Pengguna', Icon: Users, href: route('customers.index') },
     { name: 'Tagihan', Icon: FileText, href: route('invoices.index') },
-    { name: 'Transaksi', Icon: CurrencyDollar, href: route('cashflows.index') },
+    { name: 'Arus Kas', Icon: CurrencyDollar, href: route('cashflows.index') },
 ];
 
 const settingMenu: SidebarItem[] = [
     { name: 'Paket Internet', Icon: WifiHigh, href: route('internet-packages.index') },
-    { name: 'Kategori Transaksi', Icon: CurrencyDollar, href: route('cashflow-categories.index') },
+    { name: 'Kategori Kas', Icon: CurrencyDollar, href: route('cashflow-categories.index') },
     { name: 'Pengaturan', Icon: Gear, href: route('settings.index') },
 ];
 const adminMenuItems: SidebarItem[] = [...settingMenu, { name: 'Pengguna', Icon: Users, href: route('users.index') }];

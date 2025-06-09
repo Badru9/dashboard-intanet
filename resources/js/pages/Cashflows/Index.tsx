@@ -288,7 +288,7 @@ export default function CashflowsIndex() {
         <AuthenticatedLayout>
             <Head title="Cashflows" />
             <div className="p-4 lg:p-8">
-                <h2 className="mb-5 text-2xl font-bold text-gray-900 dark:text-gray-100">Transaksi</h2>
+                <h2 className="mb-5 text-2xl font-bold text-gray-900 dark:text-gray-100">Arus Kas</h2>
                 <div className="mb-6 flex flex-col items-center gap-4 lg:flex-row lg:items-center">
                     <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-center">
                         <div className="relative w-full lg:w-64">
@@ -338,7 +338,7 @@ export default function CashflowsIndex() {
                         <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-center lg:justify-end">
                             <Button onPress={onCreateOpen} color="primary">
                                 <Plus className="h-5 w-5" />
-                                Tambah Data
+                                Input Arus Kas
                             </Button>
                         </div>
                     )}
@@ -360,7 +360,7 @@ export default function CashflowsIndex() {
                 <div className="fixed inset-0 z-50 flex h-screen min-h-screen items-center justify-center overflow-y-auto bg-black/30 dark:bg-black/30">
                     <ModalContent className="relative rounded-2xl bg-white p-0 dark:bg-gray-900">
                         <ModalHeader>
-                            <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">Tambah Cashflow</h2>
+                            <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">Input Arus Kas</h2>
                         </ModalHeader>
                         <CreateCashflow onClose={() => onCreateOpenChange()} />
                     </ModalContent>
