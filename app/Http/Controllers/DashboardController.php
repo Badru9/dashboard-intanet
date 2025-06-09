@@ -37,6 +37,11 @@ class DashboardController extends Controller
                 ->whereBetween('date', [$startOfMonth, $endOfMonth])
                 ->sum('amount');
 
+            $onlineCustomers = Customer::where('status', 'online')
+                ->whereYear('join_date', $selectedYear)
+                ->whereMonth('join_date', $selectedMonth)
+                ->count();
+
             // Realisasi: Semua cashflow pemasukan (is_out = 0) bulan ini (bisa tambahkan filter lain jika perlu)
             $monthlyIncome = $target;
 
@@ -67,6 +72,7 @@ class DashboardController extends Controller
                 'target' => $target,
                 'monthlyIncome' => $monthlyIncome,
                 'monthlyExpense' => $monthlyExpense,
+                'onlineCustomers' => $onlineCustomers,
                 'unpaidInvoices' => $unpaidInvoices,
                 'selectedMonth' => $selectedMonth,
                 'selectedYear' => $selectedYear,
@@ -83,6 +89,7 @@ class DashboardController extends Controller
                 'monthlyIncome' => 0,
                 'monthlyExpense' => 0,
                 'unpaidInvoices' => 0,
+                'onlineCustomers' => 0,
                 'selectedMonth' => $currentDate->format('m'),
                 'selectedYear' => $currentDate->format('Y'),
             ]);

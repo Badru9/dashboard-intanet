@@ -9,7 +9,7 @@ import { Head, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
 interface DashboardProps extends PageProps {
-    activeCustomers: number;
+    onlineCustomers: number;
     monthlyIncome: number;
     monthlyExpense: number;
     unpaidInvoices: number;
@@ -19,7 +19,7 @@ interface DashboardProps extends PageProps {
 }
 
 export default function Dashboard() {
-    const { activeCustomers, monthlyIncome, monthlyExpense, unpaidInvoices, selectedMonth, selectedYear } = usePage<DashboardProps>().props;
+    const { onlineCustomers, monthlyIncome, monthlyExpense, unpaidInvoices, selectedMonth, selectedYear } = usePage<DashboardProps>().props;
 
     console.log(usePage<DashboardProps>().props);
 
@@ -45,7 +45,7 @@ export default function Dashboard() {
                     <MonthAndYearFilter selectedMonth={currentMonth} selectedYear={currentYear} onChange={handleMonthYearChange} />
                 </div>
                 <DashboardSummary
-                    activeCustomers={activeCustomers}
+                    activeCustomers={onlineCustomers}
                     monthlyIncome={monthlyIncome}
                     monthlyExpense={monthlyExpense}
                     unpaidInvoices={unpaidInvoices}
