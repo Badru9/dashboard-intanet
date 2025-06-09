@@ -37,8 +37,7 @@ class DashboardController extends Controller
                 ->whereBetween('date', [$startOfMonth, $endOfMonth])
                 ->sum('amount');
 
-            $onlineCustomers = Customer::where('status', 'online')
-                ->whereDate('join_date', '<=', $date)
+            $onlineCustomers = Customer::whereDate('join_date', '<=', $date)
                 ->count();
 
             // Realisasi: Semua cashflow pemasukan (is_out = 0) bulan ini (bisa tambahkan filter lain jika perlu)
