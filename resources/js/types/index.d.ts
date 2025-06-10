@@ -84,6 +84,18 @@ export interface SharedData {
     [key: string]: unknown;
 }
 
+export interface DuplicateCustomerInfo {
+    row?: number;
+    email?: string;
+    name?: string;
+    message?: string;
+}
+
+export interface FlashMessages {
+    success?: string;
+    duplicate_customers_info: DuplicateCustomerInfo[];
+}
+
 export type PageProps = {
     auth: {
         user: User;
@@ -92,6 +104,7 @@ export type PageProps = {
         location: string;
         query: Record<string, string | number | boolean | null>;
     };
+    flash: FlashMessages;
 };
 
 // Business Types

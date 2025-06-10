@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             InvoiceSeeder::class,
             CashflowCategorySeeder::class,
             CashflowSeeder::class,
+            CustomersOfflineSeeder::class,
         ]);
     }
 }

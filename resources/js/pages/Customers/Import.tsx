@@ -1,19 +1,25 @@
+import { PageProps } from '@/types';
 import { addToast, Button, Input } from '@heroui/react';
-import { useForm } from '@inertiajs/react';
+import { useForm, usePage } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
 
 interface ImportCustomerProps {
     onClose: () => void;
+    onDuplicateClick: () => void;
 }
 
 type ImportCustomerForm = {
     file: File | null;
 };
 
-const ImportCustomer = ({ onClose }: ImportCustomerProps) => {
+const ImportCustomer = ({ onClose, onDuplicateClick }: ImportCustomerProps) => {
     const { data, setData, post, processing, errors } = useForm<ImportCustomerForm>({
         file: null,
     });
+
+    const { flash } = usePage<PageProps>().props;
+
+    console.log('props import', flash);
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
@@ -28,16 +34,33 @@ const ImportCustomer = ({ onClose }: ImportCustomerProps) => {
         }
 
         post(route('customers.import'), {
-            onSuccess: () => {
+            onSuccess: (page) => {
+                // Baris ini sangat penting!
+                // 'page' adalah objek yang berisi props halaman terbaru setelah permintaan berhasil.
+                console.log('Flash data inside onSuccess (from page object):', page.props.flash);
+                const currentFlash = page.props.flash as PageProps['flash'];
+
+                // Gunakan 'currentFlash' untuk menentukan deskripsi toast dan endContent
+                const description =
+                    currentFlash.duplicate_customers_info === null || currentFlash.duplicate_customers_info.length === 0
+                        ? 'File berhasil dibaca'
+                        : `Terdapat ${currentFlash.duplicate_customers_info.length} duplikat data`;
+
                 addToast({
-                    title: 'Sukses',
-                    description: 'File berhasil dibaca',
+                    title: 'Import Sukses',
+                    description: description,
                     color: 'success',
+                    timeout: 5000,
+                    endContent: currentFlash.duplicate_customers_info !== null && currentFlash.duplicate_customers_info.length > 0 && (
+                        <Button size="sm" color="warning" onPress={onDuplicateClick}>
+                            Lihat Detail
+                        </Button>
+                    ),
                 });
                 onClose();
             },
             onError: (error) => {
-                console.log('error', error);
+                console.log('error import', error);
 
                 if (error.import_errors) {
                     const errors = Array.isArray(error.import_errors) ? error.import_errors : [error.import_errors];

@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Setting;
 use App\Models\Cashflow;
 use App\Models\CashflowCategory;
+use App\Models\CustomersOffline;
 
 class InvoiceController extends Controller
 {
@@ -283,6 +284,11 @@ class InvoiceController extends Controller
                 'note' => 'Pembayaran invoice ' . $invoice->invoice_id,
                 'invoice_id' => $invoice->id,
                 'customer_id' => $invoice->customer_id,
+            ]);
+
+            CustomersOffline::where('customer_id', $invoice->customer_id)->update([
+                'to' =>
+                now()
             ]);
         }
 

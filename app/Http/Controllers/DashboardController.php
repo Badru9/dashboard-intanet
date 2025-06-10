@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Customer;
 use App\Models\Cashflow;
+use App\Models\CustomersOffline;
 use App\Models\Invoice;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -25,8 +26,8 @@ class DashboardController extends Controller
             // Format bulan 2 digit
             $selectedMonth = str_pad($selectedMonth, 2, '0', STR_PAD_LEFT);
 
-            // Tanggal awal dan akhir bulan
-            $date = Carbon::createFromFormat('Y-m', $selectedYear . '-' . $selectedMonth);
+            // Tanggal awal dan akhir bulan yang dipilih
+            $date = Carbon::create($selectedYear, (int)$selectedMonth, 1);
             $startOfMonth = $date->copy()->startOfMonth();
             $endOfMonth = $date->copy()->endOfMonth();
 
@@ -37,10 +38,10 @@ class DashboardController extends Controller
                 ->whereBetween('date', [$startOfMonth, $endOfMonth])
                 ->sum('amount');
 
-            $onlineCustomers = Customer::whereDate('join_date', '<=', $date)
-                ->count();
 
-            // Realisasi: Semua cashflow pemasukan (is_out = 0) bulan ini (bisa tambahkan filter lain jika perlu)
+            $onlineCustomers = CustomersOffline::whereBetween('to', [$startOfMonth, $endOfMonth])->count();
+
+            // Realisasi: Semua cashflow pemasukan (is_out = 0) bulan ini
             $monthlyIncome = $target;
 
             // Pengeluaran: Semua cashflow pengeluaran (is_out = 1) bulan ini
@@ -63,6 +64,7 @@ class DashboardController extends Controller
                 'target' => $target,
                 'monthlyIncome' => $monthlyIncome,
                 'monthlyExpense' => $monthlyExpense,
+                'onlineCustomers' => $onlineCustomers,
                 'unpaidInvoices' => $unpaidInvoices
             ]);
 
@@ -81,7 +83,7 @@ class DashboardController extends Controller
                 'trace' => $e->getTraceAsString()
             ]);
 
-            // Return default values if there's an error
+            // Mengembalikan nilai default jika terjadi kesalahan
             return Inertia::render('Dashboard', [
                 'target' => 0,
                 'monthlyIncome' => 0,

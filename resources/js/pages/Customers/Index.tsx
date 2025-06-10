@@ -13,6 +13,7 @@ import { FileXls, MagnifyingGlass, PencilSimple, Plus, Trash } from '@phosphor-i
 import moment from 'moment';
 import { useMemo, useState } from 'react';
 import CreateCustomer from './Create';
+import Duplicate from './Duplicate';
 import EditCustomer from './Edit';
 import ImportCustomer from './Import';
 
@@ -54,16 +55,21 @@ type CustomerStatus = 'online' | 'inactive' | 'offline';
 export default function CustomersIndex() {
     const { customers, filters, auth } = usePage<CustomerPageProps>().props;
 
+    const page = usePage();
+
+    console.log('props customer', page.props);
+
     const { isOpen: isCreateOpen, onOpen: onCreateOpen, onOpenChange: onCreateOpenChange } = useDisclosure();
     const { isOpen: isEditOpen, onOpen: onEditOpen, onOpenChange: onEditOpenChange } = useDisclosure();
     const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onOpenChange: onDeleteOpenChange } = useDisclosure();
     const { isOpen: isActivateOpen, onOpen: onActivateOpen, onOpenChange: onActivateOpenChange } = useDisclosure();
     const { isOpen: isStatusChangeOpen, onOpen: onStatusChangeOpen, onOpenChange: onStatusChangeOpenChange } = useDisclosure();
+    const { isOpen: isImportOpen, onOpen: onImportOpen, onOpenChange: onImportOpenChange } = useDisclosure();
+    const { isOpen: isDuplicateOpen, onOpen: onDuplicateOpen, onOpenChange: onDuplicateOpenChange } = useDisclosure();
     const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
     const [search, setSearch] = useState(filters?.search || '');
     const [statusFilter, setStatusFilter] = useState<string>(filters?.status || 'all');
     const [statusChangeType, setStatusChangeType] = useState<'inactive' | 'offline'>('inactive');
-    const { isOpen: isImportOpen, onOpen: onImportOpen, onOpenChange: onImportOpenChange } = useDisclosure();
     const filteredCustomers = useMemo(() => {
         if (!search && statusFilter === 'all') return customers.data;
         if (search) {
@@ -79,8 +85,6 @@ export default function CustomersIndex() {
     }, [customers.data, search, statusFilter]);
 
     const handleEdit = (customer: Customer) => {
-        console.log('data customer', customer);
-
         setSelectedCustomer(customer);
         onEditOpen();
     };
@@ -175,8 +179,6 @@ export default function CustomersIndex() {
             });
         }
     };
-
-    console.log(customers);
 
     const baseColumns: TableColumn<Customer>[] = [
         {
@@ -392,12 +394,21 @@ export default function CustomersIndex() {
                     />
                 </div>
 
+                <Modal isOpen={isDuplicateOpen} onOpenChange={onDuplicateOpenChange}>
+                    <ModalContent>
+                        <ModalHeader>
+                            <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">Duplikat Email</h2>
+                        </ModalHeader>
+                        <Duplicate />
+                    </ModalContent>
+                </Modal>
+
                 <Modal isOpen={isImportOpen} onOpenChange={onImportOpenChange}>
                     <ModalContent>
                         <ModalHeader>
                             <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">Import Customer</h2>
                         </ModalHeader>
-                        <ImportCustomer onClose={() => onImportOpenChange()} />
+                        <ImportCustomer onClose={() => onImportOpenChange()} onDuplicateClick={() => onDuplicateOpen()} />
                     </ModalContent>
                 </Modal>
 
