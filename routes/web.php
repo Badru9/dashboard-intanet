@@ -70,6 +70,7 @@ Route::middleware('auth')->group(function () {
 
 Route::get('/api/chart-data', [DataController::class, 'getChartData']);
 Route::get('/api/outcome-chart-data', [DataController::class, 'getOutcomeChartData']);
+Route::get('/api/customers-distribution-data', [DataController::class, 'getCustomerPercentageData']);
 
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';

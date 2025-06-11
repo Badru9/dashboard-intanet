@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import CustomersDistributionChart from '@/components/Chart/CustomersDistribution';
 import IncomeChart from '@/components/Chart/IncomeChart';
 import OutcomeChart from '@/components/Chart/OutcomeChart';
 import DashboardSummary from '@/components/Dashboard/DashboardSummary';
@@ -21,7 +22,7 @@ interface DashboardProps extends PageProps {
 export default function Dashboard() {
     const { onlineCustomers, monthlyIncome, monthlyExpense, unpaidInvoices, selectedMonth, selectedYear } = usePage<DashboardProps>().props;
 
-    console.log(usePage<DashboardProps>().props);
+    console.log('hereeee', usePage<DashboardProps>().props);
 
     const [currentMonth, setCurrentMonth] = useState(selectedMonth);
     const [currentYear, setCurrentYear] = useState(selectedYear);
@@ -56,6 +57,9 @@ export default function Dashboard() {
                     </div>
                     <div className="w-full lg:w-1/3">
                         <OutcomeChart selectedMonth={currentMonth} selectedYear={currentYear} />
+                    </div>
+                    <div className="w-full lg:w-1/3">
+                        <CustomersDistributionChart selectedMonth={currentMonth} selectedYear={currentYear} />
                     </div>
                 </div>
             </div>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Invoice;
 use App\Models\Cashflow;
+use App\Models\Customer;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -146,6 +147,73 @@ class DataController extends Controller
                 'datasets' => [
                     [
                         'data' => $data,
+                        'backgroundColor' => $backgroundColors,
+                        'borderColor' => '#fff',
+                        'borderWidth' => 2,
+                    ]
+                ]
+            ];
+
+            return response()->json($chartData);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function getCustomerPercentageData(Request $request)
+    {
+        try {
+            $currentDate = Carbon::now();
+            $selectedYear = $request->input('year', $currentDate->format('Y'));
+            $selectedMonth = $request->input('month', $currentDate->format('m'));
+
+            // Total customers berdasarkan join_date pada bulan dan tahun yang dipilih
+            $totalCustomers = Customer::whereMonth('join_date', $selectedMonth)
+                ->whereYear('join_date', $selectedYear)
+                ->count();
+
+            // Customers dikelompokkan berdasarkan package_id dan difilter berdasarkan join_date
+            $packageData = Customer::selectRaw('package_id, COUNT(*) as total')
+                ->whereMonth('join_date', $selectedMonth)
+                ->whereYear('join_date', $selectedYear)
+                ->groupBy('package_id')
+                ->with('package')
+                ->get();
+
+            $labels = [];
+            $percentages = [];
+            $colorPalette = [
+                '#FF6384',
+                '#36A2EB',
+                '#FFCE56',
+                '#4BC0C0',
+                '#9966FF',
+                '#FF9F40',
+                '#C9CBCF',
+                '#B4FF9F',
+                '#FFB4B4',
+                '#B4D4FF',
+                '#FFD6A5',
+                '#A5FFD6',
+            ];
+            $backgroundColors = [];
+            $index = 0;
+
+            foreach ($packageData as $item) {
+                $packageName = $item->package->name ?? 'Unknown Package';
+                $labels[] = $packageName;
+                $percentage = $totalCustomers > 0 ? round(($item->total / $totalCustomers) * 100, 2) : 0;
+                $percentages[] = $percentage;
+                $backgroundColors[] = $colorPalette[$index % count($colorPalette)];
+                $index++;
+            }
+
+            $chartData = [
+                'labels' => $labels,
+                'datasets' => [
+                    [
+                        'label' => 'Persentase Pelanggan',
+                        'data' => $percentages,
                         'backgroundColor' => $backgroundColors,
                         'borderColor' => '#fff',
                         'borderWidth' => 2,
