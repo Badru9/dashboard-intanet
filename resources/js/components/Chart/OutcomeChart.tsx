@@ -48,7 +48,7 @@ const OutcomeChart: React.FC<OutcomeChartProps> = ({ selectedMonth, selectedYear
         maintainAspectRatio: false,
         plugins: {
             legend: {
-                position: 'right' as const,
+                position: 'bottom' as const,
                 labels: {
                     font: {
                         size: 14,

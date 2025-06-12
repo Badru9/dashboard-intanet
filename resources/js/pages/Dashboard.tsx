@@ -41,8 +41,8 @@ export default function Dashboard() {
 
             {/* <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3"> */}
             <div className="p-4 lg:p-8">
-                <h2 className="mb-4 text-2xl font-bold text-gray-900 lg:mb-0 dark:text-gray-100">Dashboard</h2>
-                <div className="flex justify-end">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Dashboard</h2>
+                <div className="mb-2 mt-4">
                     <MonthAndYearFilter selectedMonth={currentMonth} selectedYear={currentYear} onChange={handleMonthYearChange} />
                 </div>
                 <DashboardSummary
@@ -51,14 +51,14 @@ export default function Dashboard() {
                     monthlyExpense={monthlyExpense}
                     unpaidInvoices={unpaidInvoices}
                 />
-                <div className="mt-4 flex w-full flex-col gap-4 lg:flex-row">
-                    <div className="w-full lg:w-2/3">
+                <div className="mt-4 grid gap-4 md:grid-rows-3 lg:grid-cols-3 lg:grid-rows-4">
+                    <div className="col-span-2">
                         <IncomeChart selectedMonth={currentMonth} selectedYear={currentYear} />
                     </div>
-                    <div className="w-full lg:w-1/3">
+                    <div className="col-span-2 md:col-span-1">
                         <OutcomeChart selectedMonth={currentMonth} selectedYear={currentYear} />
                     </div>
-                    <div className="w-full lg:w-1/3">
+                    <div className="col-span-2 md:col-span-1">
                         <CustomersDistributionChart selectedMonth={currentMonth} selectedYear={currentYear} />
                     </div>
                 </div>

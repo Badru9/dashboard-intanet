@@ -51,7 +51,7 @@ const CustomersDistributionChart: React.FC<CustomersDistributionProps> = ({ sele
         cutout: '70%', // Ukuran lubang tengah pada Doughnut chart
         plugins: {
             legend: {
-                position: 'right' as const,
+                position: 'bottom' as const,
                 labels: {
                     font: {
                         size: 14,

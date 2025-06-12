@@ -129,19 +129,19 @@ export default function InternetPackagesIndex() {
             <div className="p-4 lg:p-8">
                 <h2 className="mb-5 text-2xl font-bold text-gray-900 dark:text-gray-100">Paket Internet</h2>
                 <div className="mb-6 flex flex-col items-center gap-4 lg:flex-row lg:items-center lg:justify-between">
+                    <div className="relative w-full lg:w-auto">
+                        <Input
+                            startContent={<MagnifyingGlass className="h-4 w-4 text-gray-400" />}
+                            type="text"
+                            placeholder="Cari paket..."
+                            value={search}
+                            onChange={handleSearch}
+                            color="default"
+                            variant="bordered"
+                            radius="md"
+                        />
+                    </div>
                     <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-center lg:justify-end">
-                        <div className="relative w-full lg:w-auto">
-                            <Input
-                                startContent={<MagnifyingGlass className="h-4 w-4 text-gray-400" />}
-                                type="text"
-                                placeholder="Cari paket..."
-                                value={search}
-                                onChange={handleSearch}
-                                color="default"
-                                variant="bordered"
-                                radius="md"
-                            />
-                        </div>
                         {auth.user.is_admin === 1 && (
                             <Button onPress={onCreateOpen} color="primary">
                                 <Plus className="h-5 w-5" />

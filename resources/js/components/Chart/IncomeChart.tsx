@@ -53,7 +53,7 @@ const IncomeChart: React.FC<IncomeChartProps> = ({ selectedMonth, selectedYear }
         },
         plugins: {
             legend: {
-                position: 'top' as const,
+                position: 'bottom' as const,
                 labels: {
                     usePointStyle: true,
                     padding: 20,

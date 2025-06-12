@@ -29,7 +29,7 @@ export default function MonthAndYearFilter({
     };
 
     return (
-        <div className="mb-4 flex w-full justify-end gap-2 lg:w-1/4">
+        <div className="mb-4 flex w-full justify-end gap-2 md:w-1/2 lg:w-1/4">
             <Select
                 label="Filter Bulan"
                 placeholder="Pilih Bulan"
