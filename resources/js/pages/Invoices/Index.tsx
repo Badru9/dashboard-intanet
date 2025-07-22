@@ -2,7 +2,6 @@ import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import Table from '@/components/Table/Table';
 import { INVOICE_STATUS_OPTIONS } from '@/constants';
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
-import { setupMomentLocale } from '@/lib/momentConfig';
 import { currencyFormat } from '@/lib/utils';
 import { Invoices, PageProps } from '@/types';
 import { type TableColumn } from '@/types/table';
@@ -14,8 +13,6 @@ import { useMemo, useState } from 'react';
 import CreateInvoice from './Create';
 import Paid from './Paid';
 // import EditInvoice from './Edit';
-
-setupMomentLocale();
 
 const statusColors = {
     paid: 'bg-green-100 text-green-700',

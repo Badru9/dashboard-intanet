@@ -1,7 +1,7 @@
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import Table from '@/components/Table/Table';
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
-import { Attendance, PageProps } from '@/types';
+import { Attendance, PageProps, User } from '@/types';
 import { type TableColumn } from '@/types/table';
 // Impor komponen Select dari @heroui/react
 import { Button, Chip, Input, Modal, ModalContent, ModalHeader, Select, SelectItem, useDisclosure } from '@heroui/react';
@@ -9,6 +9,7 @@ import { Head, router, usePage } from '@inertiajs/react';
 import { MagnifyingGlass, PencilSimple, Plus, Trash } from '@phosphor-icons/react';
 import moment from 'moment';
 import { useState } from 'react';
+import CreateAttendance from './Create';
 
 type AttendancePageProps = PageProps &
     Record<string, unknown> & {
@@ -28,6 +29,7 @@ type AttendancePageProps = PageProps &
                 active: boolean;
             }>;
         };
+        users: User[];
         // Perbarui filters untuk menyertakan 'status'
         filters: {
             search?: string;
@@ -42,7 +44,9 @@ type AttendancePageProps = PageProps &
     };
 
 export default function AttendancesIndex() {
-    const { attendances, filters, auth } = usePage<AttendancePageProps>().props;
+    const { attendances, users, filters, auth } = usePage<AttendancePageProps>().props;
+
+    console.log(attendances);
 
     const { isOpen: isCreateOpen, onOpen: onCreateOpen, onOpenChange: onCreateOpenChange } = useDisclosure();
     const { isOpen: isEditOpen, onOpen: onEditOpen, onOpenChange: onEditOpenChange } = useDisclosure();
@@ -117,7 +121,7 @@ export default function AttendancesIndex() {
             header: 'Waktu Masuk',
             value: (attendance: Attendance) => (
                 <p className="font-medium text-gray-900 dark:text-gray-100">
-                    {attendance.check_in_time ? moment(attendance.check_in_time).format('HH.mm') : 'N/A'}
+                    {attendance.check_in_time ? moment.utc(attendance.check_in_time).format('HH:mm') : 'N/A'}
                 </p>
             ),
         },
@@ -125,7 +129,7 @@ export default function AttendancesIndex() {
             header: 'Waktu Pulang',
             value: (attendance: Attendance) => (
                 <p className="font-medium text-gray-900 dark:text-gray-100">
-                    {attendance.check_out_time ? moment(attendance.check_out_time).format('HH.mm') : 'N/A'}
+                    {attendance.check_out_time ? moment.utc(attendance.check_out_time).format('HH:mm') : 'N/A'}
                 </p>
             ),
         },
@@ -273,7 +277,7 @@ export default function AttendancesIndex() {
                                     <ModalHeader>
                                         <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">Tambah Presensi</h2>
                                     </ModalHeader>
-                                    <div className="p-4">Form Tambah Presensi Akan Ada Di Sini</div>
+                                    <CreateAttendance onClose={onCreateOpen} users={users} />
                                 </ModalContent>
                             </div>
                         </Modal>

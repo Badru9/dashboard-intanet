@@ -69,7 +69,6 @@ const mainMenuItems: SidebarItem[] = [
     { name: 'Pelanggan', Icon: Users, href: route('customers.index') },
     { name: 'Tagihan', Icon: FileText, href: route('invoices.index') },
     { name: 'Arus Kas', Icon: CurrencyDollar, href: route('cashflows.index') },
-    { name: 'Presensi', Icon: IdentificationBadge, href: route('attendances.index') },
 ];
 
 const settingMenu: SidebarItem[] = [
@@ -77,7 +76,11 @@ const settingMenu: SidebarItem[] = [
     { name: 'Kategori Kas', Icon: CurrencyDollar, href: route('cashflow-categories.index') },
     { name: 'Pengaturan', Icon: Gear, href: route('settings.index') },
 ];
-const adminMenuItems: SidebarItem[] = [...settingMenu, { name: 'Pengguna', Icon: Users, href: route('users.index') }];
+const adminMenuItems: SidebarItem[] = [
+    ...settingMenu,
+    { name: 'Pengguna', Icon: Users, href: route('users.index') },
+    { name: 'Presensi', Icon: IdentificationBadge, href: route('attendances.index') },
+];
 
 const MobileMenuItem = ({ item, isActive }: { item: SidebarItem; isActive: boolean }) => {
     return (
@@ -160,19 +163,23 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
                                     <MenuItem key={item.name} item={item} isOpen={isSidebarOpen} isActive={isRouteActive(item.href)} />
                                 ))}
                             </nav>
-                            <h2
-                                className={clsx(
-                                    'mt-5 px-4 text-xs font-semibold uppercase text-gray-400 dark:text-gray-500',
-                                    !isSidebarOpen && 'hidden',
-                                )}
-                            >
-                                Settings
-                            </h2>
-                            <nav className="mt-2 space-y-1">
-                                {isAdminMenus.map((item) => (
-                                    <MenuItem key={item.name} item={item} isOpen={isSidebarOpen} isActive={isRouteActive(item.href)} />
-                                ))}
-                            </nav>
+                            {auth.user.is_admin === 1 && (
+                                <>
+                                    <h2
+                                        className={clsx(
+                                            'mt-5 px-4 text-xs font-semibold uppercase text-gray-400 dark:text-gray-500',
+                                            !isSidebarOpen && 'hidden',
+                                        )}
+                                    >
+                                        Settings
+                                    </h2>
+                                    <nav className="mt-2 space-y-1">
+                                        {isAdminMenus.map((item) => (
+                                            <MenuItem key={item.name} item={item} isOpen={isSidebarOpen} isActive={isRouteActive(item.href)} />
+                                        ))}
+                                    </nav>
+                                </>
+                            )}
                         </div>
                     </div>
 

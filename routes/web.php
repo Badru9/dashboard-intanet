@@ -61,6 +61,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('admin')->group(function () {
         Route::resource('attendances', AttendanceController::class);
     });
+    Route::post('/attendances/check-in', [AttendanceController::class, 'checkIn'])->name('attendances.checkIn');
+    Route::patch('/attendances/check-out', [AttendanceController::class, 'checkOut'])->name('attendances.checkOut');
 });
 
 Route::middleware('guest')->group(function () {
