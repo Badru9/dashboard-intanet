@@ -219,3 +219,23 @@ export enum CashflowType {
     INCOME = 'income',
     EXPENSE = 'expense',
 }
+
+type Attendance = {
+    id: number;
+    user_id: number;
+    user: User;
+    date: string;
+    check_in_time: string;
+    check_out_time: string | null;
+    break_start_time: string | null;
+    break_end_time: string | null;
+    status: 'PRESENT' | 'ABSENT' | 'LEAVE' | 'SICK' | 'HALF_DAY' | 'LATE';
+    notes: string | null;
+    location_check_in: string | null;
+    location_check_out: string | null;
+    photo_check_in: string | null;
+    photo_check_out: string | null;
+    created_at: string;
+    updated_at: string;
+    deleted_at: string | null;
+};

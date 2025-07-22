@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\CashflowCategoryController;
 use App\Http\Controllers\CashflowController;
 use App\Http\Controllers\CustomerController;
@@ -54,6 +55,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Route untuk users dengan middleware admin
     Route::middleware('admin')->group(function () {
         Route::resource('users', UserController::class);
+    });
+
+    // Presence
+    Route::middleware('admin')->group(function () {
+        Route::resource('attendances', AttendanceController::class);
     });
 });
 

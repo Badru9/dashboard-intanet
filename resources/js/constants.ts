@@ -128,3 +128,36 @@ export const MONTH_LABELS = [
         value: '12',
     },
 ];
+
+// export interface AttendanceStatusOptions {
+//     value: 'present' | 'absent' | 'leave' | 'sick';
+//     label: string;
+// }
+
+// export const ATTENDANCE_STATUS: AttendanceStatusOptions[] = [
+//     {
+//         value: 'present',
+//         label: 'Hadir',
+//     },
+//     {
+//         value: 'absent',
+//         label: 'Tidak Hadir',
+//     },
+//     {
+//         value: 'leave',
+//         label: 'Cuti',
+//     },
+//     {
+//         value: 'sick',
+//         label: 'Sakit',
+//     },
+// ];
+
+export enum AttendanceType {
+    PRESENT = 'Hadir',
+    SICK = 'Sakit',
+    LEAVE = 'Cuti',
+    ABSENT = 'Tidak Hadir',
+    HALF_DAY = 'Setengah Hari',
+    LATE = 'Telat',
+}

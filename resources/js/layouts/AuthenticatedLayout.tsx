@@ -1,7 +1,7 @@
 import { useAppearance } from '@/hooks/use-appearance';
 import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Popover, PopoverContent, PopoverTrigger } from '@heroui/react';
 import { Link, useForm, usePage } from '@inertiajs/react';
-import { CurrencyDollar, FileText, Gear, House, List, Moon, SignOut, Sun, User, Users, WifiHigh } from '@phosphor-icons/react';
+import { CurrencyDollar, FileText, Gear, House, IdentificationBadge, List, Moon, SignOut, Sun, User, Users, WifiHigh } from '@phosphor-icons/react';
 import clsx from 'clsx';
 import { PropsWithChildren, useState } from 'react';
 
@@ -66,9 +66,10 @@ const MenuItem = ({ item, isOpen, isActive }: { item: SidebarItem; isOpen: boole
 
 const mainMenuItems: SidebarItem[] = [
     { name: 'Dashboard', Icon: House, href: route('dashboard') },
-    { name: 'Pengguna', Icon: Users, href: route('customers.index') },
+    { name: 'Pelanggan', Icon: Users, href: route('customers.index') },
     { name: 'Tagihan', Icon: FileText, href: route('invoices.index') },
     { name: 'Arus Kas', Icon: CurrencyDollar, href: route('cashflows.index') },
+    { name: 'Presensi', Icon: IdentificationBadge, href: route('attendances.index') },
 ];
 
 const settingMenu: SidebarItem[] = [

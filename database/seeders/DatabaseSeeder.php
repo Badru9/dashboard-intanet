@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             CashflowCategorySeeder::class,
             CashflowSeeder::class,
             CustomersOfflineSeeder::class,
+            AttendanceSeeder::class
         ]);
     }
 }
