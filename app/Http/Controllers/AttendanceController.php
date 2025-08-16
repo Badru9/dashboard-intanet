@@ -169,8 +169,10 @@ class AttendanceController extends Controller
         $validatedData = $request->validate([
             'location_check_in' => ['required', 'string', 'max:255'],
             'photo_check_in' => ['required', 'image', 'max:2048'],
-            'notes' => ['nullable', 'string', 'max:500'], // Catatan opsional saat check-in
+            'notes' => ['nullable', 'string', 'max:500'],
         ]);
+
+        Log::info('data dari react native ' . $validatedData);
 
         // Tambahkan data otomatis
         $validatedData['user_id'] = $user->id;

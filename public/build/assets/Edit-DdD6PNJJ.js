@@ -1,0 +1,1 @@
+import{j as t}from"./app-0c5FR7Uu.js";function e(){return t.jsx("div",{children:t.jsx("p",{children:"Lorem ipsum dolor sit amet consectetur adipisicing elit. Cumque facere ullam quis perspiciatis inventore sit natus totam voluptate odit officia?"})})}export{e as default};

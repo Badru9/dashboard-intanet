@@ -72,13 +72,16 @@ Route::middleware('guest')->group(function () {
     Route::post('register', [AuthController::class, 'register']);
 });
 
+// Route::middleware('api')->group(function () {
+//     Route::post('/login', [AuthController::class, 'loginApi']);
+//     Route::post('/register', [AuthController::class, 'registerApi']);
+//     Route::get('/api/chart-data', [DataController::class, 'getChartData']);
+// });
+
 Route::middleware('auth')->group(function () {
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 });
 
-Route::get('/api/chart-data', [DataController::class, 'getChartData']);
-Route::get('/api/outcome-chart-data', [DataController::class, 'getOutcomeChartData']);
-Route::get('/api/customers-distribution-data', [DataController::class, 'getCustomerPercentageData']);
 
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';
