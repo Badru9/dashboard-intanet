@@ -7,17 +7,19 @@ use App\Http\Controllers\DataController;
 use App\Http\Controllers\AttendanceController;
 
 // Handle preflight OPTIONS requests untuk semua route API
-Route::options('/{any}', function (Request $request) {
-    return response('', 200)
-        ->header('Access-Control-Allow-Origin', '*')
-        ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS')
-        ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
-})->where('any', '.*');
+// Route::options('/{any}', function (Request $request) {
+//     return response('', 200)
+//         ->header('Access-Control-Allow-Origin', '*')
+//         ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS')
+//         ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
+// })->where('any', '.*');
 
 // --- Public API Routes (Tidak Membutuhkan Autentikasi) ---
 Route::post('/login', [AuthController::class, 'loginApi']);
 Route::post('/register', [AuthController::class, 'registerApi']);
 // Route::post('/logout', [AuthController::class, 'logoutApi']);
+Route::post('/attendances/check-in', [AttendanceController::class, 'checkIn']);
+Route::patch('/attendances/check-out', [AttendanceController::class, 'checkOut']);
 
 
 // Test endpoint untuk memastikan API berfungsi
@@ -45,6 +47,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/customers-distribution-data', [DataController::class, 'getCustomerPercentageData']);
 
     // Absensi / Kehadiran
-    Route::post('/attendances/check-in', [AttendanceController::class, 'checkIn']);
-    Route::patch('/attendances/check-out', [AttendanceController::class, 'checkOut']);
+    // Route::post('/attendances/check-in', [AttendanceController::class, 'checkIn']);
+    // Route::patch('/attendances/check-out', [AttendanceController::class, 'checkOut']);
 });

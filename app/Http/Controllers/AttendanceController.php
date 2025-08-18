@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Carbon\Carbon; // <--- Import Carbon untuk penanganan tanggal/waktu
+use Illuminate\Validation\ValidationException;
 
 class AttendanceController extends Controller
 {
@@ -151,43 +152,66 @@ class AttendanceController extends Controller
      * Handle user check-in.
      * Creates a new attendance record for the current day.
      */
+
     public function checkIn(Request $request)
     {
-        $user = Auth::user();
-        $today = Carbon::today();
+        try {
+            // Get the authenticated user
+            $user = Auth::user();
+            if (!$user) {
+                return response()->json(['success' => false, 'message' => 'Unauthenticated.'], 401);
+            }
 
-        // Cek apakah user sudah check-in hari ini
-        $existingAttendance = Attendance::where('user_id', $user->id)
-            ->whereDate('date', $today)
-            ->first();
+            $today = Carbon::today();
 
-        if ($existingAttendance) {
-            return redirect()->back()->with('error', 'Anda sudah melakukan check-in hari ini.');
+            // Check if the user has already checked in today
+            $existingAttendance = Attendance::where('user_id', $user->id)
+                ->whereDate('date', $today)
+                ->first();
+
+            if ($existingAttendance) {
+                return response()->json(['success' => false, 'message' => 'Anda sudah melakukan check-in hari ini.'], 409);
+            }
+
+            // Validate the request data
+            $validatedData = $request->validate([
+                'location_check_in' => ['required', 'string', 'max:255'],
+                'photo_check_in' => ['required', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:5120'], // Max 5MB
+                'notes' => ['nullable', 'string', 'max:500'],
+            ]);
+
+            Log::info('Check-in Request Data:', [
+                'user_id' => $user->id,
+                'date' => $today->toDateString(),
+                'location_check_in' => $validatedData['location_check_in'],
+                'notes' => $validatedData['notes'] ?? null,
+            ]);
+
+            // Handle the photo upload
+            $path = $request->file('photo_check_in')->store('photos/check_in', 'public');
+
+            // Add additional data to the validated data array
+            $validatedData['user_id'] = $user->id;
+            $validatedData['date'] = $today->toDateString();
+            $validatedData['check_in_time'] = now();
+            $validatedData['status'] = 'PRESENT';
+            $validatedData['photo_check_in'] = $path;
+
+            // Create the attendance record
+            Attendance::create($validatedData);
+
+            return response()->json(['success' => true, 'message' => 'Check-in berhasil!'], 201);
+        } catch (ValidationException $e) {
+            Log::error('Validation failed for check-in:', ['errors' => $e->errors()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Data yang diberikan tidak valid.',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            Log::error('An unexpected error occurred during check-in:', ['error' => $e->getMessage()]);
+            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan server. Silakan coba lagi.'], 500);
         }
-
-        // Validasi khusus untuk check-in
-        $validatedData = $request->validate([
-            'location_check_in' => ['required', 'string', 'max:255'],
-            'photo_check_in' => ['required', 'image', 'max:2048'],
-            'notes' => ['nullable', 'string', 'max:500'],
-        ]);
-
-        Log::info('data dari react native ' . $validatedData);
-
-        // Tambahkan data otomatis
-        $validatedData['user_id'] = $user->id;
-        $validatedData['date'] = $today->toDateString(); // Hanya tanggal YYYY-MM-DD
-        $validatedData['check_in_time'] = Carbon::now()->toDateTimeString(); // Waktu saat ini
-        $validatedData['status'] = 'PRESENT'; // Default status saat check-in
-
-        // Handle upload foto check_in
-        if ($request->hasFile('photo_check_in')) {
-            $validatedData['photo_check_in'] = $request->file('photo_check_in')->store('photos/check_in', 'public');
-        }
-
-        Attendance::create($validatedData);
-
-        return redirect()->back()->with('success', 'Check-in berhasil!');
     }
 
     /**
