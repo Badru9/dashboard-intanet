@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Carbon\Carbon; // <--- Import Carbon untuk penanganan tanggal/waktu
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
 class AttendanceController extends Controller
@@ -214,55 +215,59 @@ class AttendanceController extends Controller
         }
     }
 
-    /**
-     * Handle user check-out.
-     * Updates the existing attendance record for the current day.
-     */
     public function checkOut(Request $request)
     {
-        $user = Auth::user();
-        $today = Carbon::today();
-
-        // Cari record check-in hari ini
-        $attendance = Attendance::where('user_id', $user->id)
-            ->whereDate('date', $today)
-            ->first();
-
-        if (!$attendance) {
-            return redirect()->back()->with('error', 'Anda belum melakukan check-in hari ini.');
-        }
-
-        if ($attendance->check_out_time) {
-            return redirect()->back()->with('error', 'Anda sudah melakukan check-out hari ini.');
-        }
-
-        // Validasi khusus untuk check-out
-        $validatedData = $request->validate([
-            'location_check_out' => ['required', 'string', 'max:255'],
-            'photo_check_out' => ['required', 'image', 'max:2048'],
-            // 'notes' => ['nullable', 'string', 'max:500'], // Catatan opsional saat check-out, jika diperlukan
-        ]);
-
-        // Tambahkan data otomatis
-        $validatedData['check_out_time'] = Carbon::now()->toDateTimeString(); // Waktu saat ini
-
-        // Validasi waktu pulang harus setelah waktu masuk
-        if (Carbon::parse($validatedData['check_out_time'])->lessThan(Carbon::parse($attendance->check_in_time))) {
-            return redirect()->back()->with('error', 'Waktu pulang tidak boleh lebih awal dari waktu masuk.');
-        }
-
-        // Handle upload foto check_out
-        if ($request->hasFile('photo_check_out')) {
-            // Hapus foto lama jika ada (jika user pernah upload tapi gagal/diulang)
-            if ($attendance->photo_check_out) {
-                Storage::disk('public')->delete($attendance->photo_check_out);
+        try {
+            $user = Auth::user();
+            if (!$user) {
+                return response()->json(['success' => false, 'message' => 'Unauthenticated.'], 401);
             }
-            $validatedData['photo_check_out'] = $request->file('photo_check_out')->store('photos/check_out', 'public');
+
+            $today = Carbon::today();
+
+            // Cari record check-in hari ini
+            $attendance = Attendance::where('user_id', $user->id)
+                ->whereDate('date', $today)
+                ->first();
+
+            if (!$attendance) {
+                return response()->json(['success' => false, 'message' => 'Anda belum melakukan check-in hari ini.'], 400);
+            }
+
+            if ($attendance->check_out_time) {
+                return response()->json(['success' => false, 'message' => 'Anda sudah melakukan check-out hari ini.'], 409);
+            }
+
+            // --- Tidak ada perubahan di sini, validasi tetap sama
+            $validatedData = $request->validate([
+                'location_check_out' => ['required', 'string', 'max:255'],
+                'photo_check_out' => ['required', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:5120'],
+                'notes' => ['nullable', 'string', 'max:500'],
+            ]);
+
+            $validatedData['check_out_time'] = now();
+
+            if (Carbon::parse($validatedData['check_out_time'])->lessThan(Carbon::parse($attendance->check_in_time))) {
+                return response()->json(['success' => false, 'message' => 'Waktu pulang tidak boleh lebih awal dari waktu masuk.'], 400);
+            }
+
+            // Sesuai permintaan Anda, tidak menghapus foto lama.
+            $path = $request->file('photo_check_out')->store('photos/check_out', 'public');
+            $validatedData['photo_check_out'] = $path;
+
+            $attendance->update($validatedData);
+
+            return response()->json(['success' => true, 'message' => 'Check-out berhasil!'], 200);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data yang diberikan tidak valid.',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            Log::error('An unexpected error occurred during check-out:', ['error' => $e->getMessage()]);
+            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan server. Silakan coba lagi.'], 500);
         }
-
-        $attendance->update($validatedData);
-
-        return redirect()->back()->with('success', 'Check-out berhasil!');
     }
 
 
@@ -351,6 +356,32 @@ class AttendanceController extends Controller
                 'trace' => $e->getTraceAsString()
             ]);
             return redirect()->back()->with('error', 'Terjadi kesalahan saat menghapus data presensi.');
+        }
+    }
+
+    public function testFormData(Request $request)
+    {
+        try {
+            Log::info('Test FormData Request:', [
+                'all_data' => $request->all(),
+                'files' => $request->allFiles(),
+                'headers' => $request->headers->all(),
+                'content_type' => $request->header('Content-Type'),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'FormData received successfully',
+                'received_data' => $request->all(),
+                'received_files' => array_keys($request->allFiles()),
+                'content_type' => $request->header('Content-Type'),
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Test FormData Error:', ['error' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ], 500);
         }
     }
 }

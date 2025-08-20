@@ -18,8 +18,9 @@ use App\Http\Controllers\AttendanceController;
 Route::post('/login', [AuthController::class, 'loginApi']);
 Route::post('/register', [AuthController::class, 'registerApi']);
 // Route::post('/logout', [AuthController::class, 'logoutApi']);
-Route::post('/attendances/check-in', [AttendanceController::class, 'checkIn']);
-Route::patch('/attendances/check-out', [AttendanceController::class, 'checkOut']);
+
+
+Route::patch('/attendances/test-formdata', [AttendanceController::class, 'testFormData']);
 
 
 // Test endpoint untuk memastikan API berfungsi
@@ -47,6 +48,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/customers-distribution-data', [DataController::class, 'getCustomerPercentageData']);
 
     // Absensi / Kehadiran
-    // Route::post('/attendances/check-in', [AttendanceController::class, 'checkIn']);
-    // Route::patch('/attendances/check-out', [AttendanceController::class, 'checkOut']);
+    Route::post('/attendances/check-in', [AttendanceController::class, 'checkIn']);
+    Route::post('/attendances/check-out', [AttendanceController::class, 'checkOut']);
 });
