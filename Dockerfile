@@ -35,11 +35,13 @@ RUN composer install --optimize-autoloader --no-dev
 RUN npm install && npm run build
 
 # Change ownership and permissions
-RUN chown -R www-data:www-data /var/www/html \
-    && a2enmod rewrite
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
+    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Set Apache DocumentRoot to Laravel public folder
-RUN sed -i 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/000-default.conf
+# Set Apache DocumentRoot to Laravel public folder and enable .htaccess
+RUN a2enmod rewrite \
+    && sed -i 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/000-default.conf \
+    && sed -i 's/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
 
 EXPOSE 80
 
