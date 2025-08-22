@@ -175,23 +175,21 @@ class AuthController extends Controller
             ]);
 
             // Validasi input dari API request
-            $request->validate([
+            $validated = $request->validate([
                 'name' => ['required', 'string', 'max:255'],
                 'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-                'username' => ['required', 'string', 'max:255', 'unique:users'],
                 'password' => ['required', 'string', 'min:8', 'confirmed'],
-                'phone' => ['nullable', 'string', 'max:20'],
-                'address' => ['nullable', 'string', 'max:255'],
+                'phone' => ['required', 'string', 'max:20'],
+                'address' => ['required', 'string', 'max:255'],
             ]);
 
             // Buat user baru
             $user = User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'username' => $request->username,
-                'password' => Hash::make($request->password),
-                'phone' => $request->phone,
-                'address' => $request->address,
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => Hash::make($validated['password']),
+                'phone' => $validated['phone'],
+                'address' => $validated['address'],
                 'is_admin' => '0', // Default non-admin
             ]);
 
