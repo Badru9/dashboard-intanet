@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DataController;
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\LeaveRequestController;
 
 // Handle preflight OPTIONS requests untuk semua route API
 // Route::options('/{any}', function (Request $request) {
@@ -48,6 +49,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/customers-distribution-data', [DataController::class, 'getCustomerPercentageData']);
 
     // Absensi / Kehadiran
+    Route::get('/attendances/status', [AttendanceController::class, 'getAttendanceStatus']);
+    Route::get('/attendances/history', [AttendanceController::class, 'getAttendanceHistory']);
     Route::post('/attendances/check-in', [AttendanceController::class, 'checkIn']);
     Route::post('/attendances/check-out', [AttendanceController::class, 'checkOut']);
+
+    // Leave Requests / Pengajuan Cuti
+    Route::get('/leave-requests', [LeaveRequestController::class, 'getLeaveRequestsApi']);
+    Route::post('/leave-requests', [LeaveRequestController::class, 'storeApi']);
+    Route::post('/leave-requests/{leaveRequest}/approve', [LeaveRequestController::class, 'approve']);
+    Route::post('/leave-requests/{leaveRequest}/reject', [LeaveRequestController::class, 'reject']);
 });

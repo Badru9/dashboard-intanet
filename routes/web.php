@@ -11,6 +11,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DataController;
+use App\Http\Controllers\LeaveRequestController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -61,6 +62,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('admin')->group(function () {
         Route::resource('attendances', AttendanceController::class);
     });
+
+    // Leave Requests / Pengajuan Cuti
+    Route::resource('leave-requests', LeaveRequestController::class);
+    Route::post('leave-requests/{leaveRequest}/approve', [LeaveRequestController::class, 'approve'])->name('leave-requests.approve')->middleware('admin');
+    Route::post('leave-requests/{leaveRequest}/reject', [LeaveRequestController::class, 'reject'])->name('leave-requests.reject')->middleware('admin');
+
     // Route::post('/attendances/check-in', [AttendanceController::class, 'checkIn'])->name('attendances.checkIn');
     // Route::patch('/attendances/check-out', [AttendanceController::class, 'checkOut'])->name('attendances.checkOut');
 });

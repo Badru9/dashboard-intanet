@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -56,5 +57,21 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return (int)$this->is_admin === 1;
+    }
+
+    /**
+     * Get the leave requests for the user.
+     */
+    public function leaveRequests(): HasMany
+    {
+        return $this->hasMany(LeaveRequest::class);
+    }
+
+    /**
+     * Get the leave requests approved by this user.
+     */
+    public function approvedLeaveRequests(): HasMany
+    {
+        return $this->hasMany(LeaveRequest::class, 'approved_by');
     }
 }
