@@ -435,4 +435,38 @@ class LeaveRequestController extends Controller
 
         return $totalDays;
     }
+
+    /**
+     * Delete leave request via API (Mobile App).
+     */
+    public function deleteLeaveRequestApi(Request $request, $id)
+    {
+        try {
+            $user = Auth::user();
+            $leaveRequest = LeaveRequest::find($id);
+            if (!$leaveRequest) {
+                return response()->json(['success' => false, 'message' => 'Pengajuan cuti tidak ditemukan.'], 404);
+            }
+            // Only allow user to delete their own leave request or admin
+            if (!$user->isAdmin() && $leaveRequest->user_id !== $user->id) {
+                return response()->json(['success' => false, 'message' => 'Unauthorized action.'], 403);
+            }
+            // Only allow deletion if status is pending
+            if (!$leaveRequest->canBeModified()) {
+                return response()->json(['success' => false, 'message' => 'Pengajuan cuti yang sudah diproses tidak dapat dihapus.'], 400);
+            }
+            // Delete attachment if exists
+            if ($leaveRequest->attachment) {
+                Storage::disk('public')->delete($leaveRequest->attachment);
+            }
+            $leaveRequest->delete();
+            return response()->json(['success' => true, 'message' => 'Pengajuan cuti berhasil dihapus.'], 200);
+        } catch (\Exception $e) {
+            Log::error('Error deleting leave request API:', [
+                'leave_request_id' => $id,
+                'error' => $e->getMessage()
+            ]);
+            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan server.'], 500);
+        }
+    }
 }

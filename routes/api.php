@@ -59,4 +59,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/leave-requests', [LeaveRequestController::class, 'storeApi']);
     Route::post('/leave-requests/{leaveRequest}/approve', [LeaveRequestController::class, 'approve']);
     Route::post('/leave-requests/{leaveRequest}/reject', [LeaveRequestController::class, 'reject']);
+    Route::delete('/leave-requests/{id}', [LeaveRequestController::class, 'deleteLeaveRequestApi']);
+
+    // Ganti password user (mobile app)
+    Route::post('/user/change-password', [AuthController::class, 'changePassword']);
+    // Admin reset password user
+    Route::post('/admin/users/{id}/reset-password', [AuthController::class, 'adminResetPassword']);
 });

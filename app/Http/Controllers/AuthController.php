@@ -341,4 +341,92 @@ class AuthController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Change password for authenticated user (Mobile App)
+     */
+    public function changePassword(Request $request)
+    {
+        try {
+            $user = $request->user();
+            $request->validate([
+                'old_password' => ['required', 'string'],
+                'new_password' => ['required', 'string', 'min:8'],
+            ]);
+            if (!Hash::check($request->old_password, $user->password)) {
+                return $this->corsResponse([
+                    'success' => false,
+                    'message' => 'Password lama tidak sesuai.'
+                ], 400);
+            }
+            $user->password = Hash::make($request->new_password);
+            $user->save();
+            return $this->corsResponse([
+                'success' => true,
+                'message' => 'Password berhasil diganti.'
+            ], 200);
+        } catch (ValidationException $e) {
+            return $this->corsResponse([
+                'success' => false,
+                'message' => 'Data tidak valid.',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            Log::error('Change password error', [
+                'user_id' => $request->user()->id ?? 'unknown',
+                'error' => $e->getMessage()
+            ]);
+            return $this->corsResponse([
+                'success' => false,
+                'message' => 'Terjadi kesalahan server.'
+            ], 500);
+        }
+    }
+
+    /**
+     * Admin reset password for user
+     */
+    public function adminResetPassword(Request $request, $id)
+    {
+        try {
+            $admin = $request->user();
+            if (!$admin->is_admin) {
+                return $this->corsResponse([
+                    'success' => false,
+                    'message' => 'Unauthorized action.'
+                ], 403);
+            }
+            $request->validate([
+                'new_password' => ['required', 'string', 'min:8'],
+            ]);
+            $user = User::find($id);
+            if (!$user) {
+                return $this->corsResponse([
+                    'success' => false,
+                    'message' => 'User tidak ditemukan.'
+                ], 404);
+            }
+            $user->password = Hash::make($request->new_password);
+            $user->save();
+            return $this->corsResponse([
+                'success' => true,
+                'message' => 'Password user berhasil direset.'
+            ], 200);
+        } catch (ValidationException $e) {
+            return $this->corsResponse([
+                'success' => false,
+                'message' => 'Data tidak valid.',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            Log::error('Admin reset password error', [
+                'user_id' => $id,
+                'error' => $e->getMessage()
+            ]);
+            return $this->corsResponse([
+                'success' => false,
+                'message' => 'Terjadi kesalahan server.'
+            ], 500);
+        }
+    }
 }
