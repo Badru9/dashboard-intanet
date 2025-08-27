@@ -1,7 +1,7 @@
 import { useAppearance } from '@/hooks/use-appearance';
 import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Popover, PopoverContent, PopoverTrigger } from '@heroui/react';
 import { Link, useForm, usePage } from '@inertiajs/react';
-import { CurrencyDollar, FileText, Gear, House, IdentificationBadge, List, Moon, SignOut, Sun, User, Users, WifiHigh } from '@phosphor-icons/react';
+import { CurrencyDollar, FileText, Gear, House, List, Moon, SignOut, Sun, User, Users, WifiHigh } from '@phosphor-icons/react';
 import clsx from 'clsx';
 import { PropsWithChildren, useState } from 'react';
 
@@ -79,7 +79,7 @@ const settingMenu: SidebarItem[] = [
 const adminMenuItems: SidebarItem[] = [
     ...settingMenu,
     { name: 'Pengguna', Icon: Users, href: route('users.index') },
-    { name: 'Presensi', Icon: IdentificationBadge, href: route('attendances.index') },
+    // { name: 'Presensi', Icon: IdentificationBadge, href: route('attendances.index') },
 ];
 
 const MobileMenuItem = ({ item, isActive }: { item: SidebarItem; isActive: boolean }) => {
