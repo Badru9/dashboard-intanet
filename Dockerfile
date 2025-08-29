@@ -43,6 +43,12 @@ RUN a2enmod rewrite \
     && sed -i 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/000-default.conf \
     && sed -i 's/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
 
+# Tambahkan ServerName ke konfigurasi Apache
+RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
+
+# Atau copy konfigurasi custom
+COPY docker/apache/000-default.conf /etc/apache2/sites-available/000-default.conf
+
 EXPOSE 80
 
 CMD ["apache2-foreground"]
