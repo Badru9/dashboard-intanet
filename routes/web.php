@@ -68,8 +68,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('leave-requests/{leaveRequest}/approve', [LeaveRequestController::class, 'approve'])->name('leave-requests.approve')->middleware('admin');
     Route::post('leave-requests/{leaveRequest}/reject', [LeaveRequestController::class, 'reject'])->name('leave-requests.reject')->middleware('admin');
 
-    // Route::post('/attendances/check-in', [AttendanceController::class, 'checkIn'])->name('attendances.checkIn');
-    // Route::patch('/attendances/check-out', [AttendanceController::class, 'checkOut'])->name('attendances.checkOut');
+    Route::get('attendances', [AttendanceController::class, 'index'])->name('attendances.index');
+    Route::patch('attendances', [AttendanceController::class, 'update'])->name('attendances.update');
+    Route::post('attendances', [AttendanceController::class, 'store'])->name('attendances.store');
+    Route::delete('attendances', [AttendanceController::class, 'destroy'])->name('attendances.destroy');
+
+
+    Route::get('leave-requests', [LeaveRequestController::class, 'index'])->name('leave-requests.index');
+    Route::post('leave-requests', [LeaveRequestController::class, 'store'])->name('leave-requests.store');
+    Route::put('leave-requests/{leaveRequest}', [LeaveRequestController::class, 'update'])->name('leave-requests.update');
+    Route::delete('leave-requests/{leaveRequest}', [LeaveRequestController::class, 'destroy'])->name('leave-requests.destroy');
 });
 
 Route::middleware('guest')->group(function () {

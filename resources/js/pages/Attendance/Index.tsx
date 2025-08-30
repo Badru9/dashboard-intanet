@@ -4,9 +4,9 @@ import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
 import { Attendance, PageProps, User } from '@/types';
 import { type TableColumn } from '@/types/table';
 // Impor komponen Select dari @heroui/react
-import { Button, Chip, Input, Modal, ModalContent, ModalHeader, Select, SelectItem, useDisclosure } from '@heroui/react';
+import { Button, Chip, Input, Modal, ModalBody, ModalContent, ModalHeader, Select, SelectItem, useDisclosure } from '@heroui/react';
 import { Head, router, usePage } from '@inertiajs/react';
-import { MagnifyingGlass, PencilSimple, Plus, Trash } from '@phosphor-icons/react';
+import { Camera, MagnifyingGlass, PencilSimple, Plus, Trash } from '@phosphor-icons/react';
 import moment from 'moment';
 import { useState } from 'react';
 import CreateAttendance from './Create';
@@ -51,8 +51,10 @@ export default function AttendancesIndex() {
     const { isOpen: isCreateOpen, onOpen: onCreateOpen, onOpenChange: onCreateOpenChange } = useDisclosure();
     const { isOpen: isEditOpen, onOpen: onEditOpen, onOpenChange: onEditOpenChange } = useDisclosure();
     const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onOpenChange: onDeleteOpenChange } = useDisclosure();
+    const { isOpen: isPhotoOpen, onOpen: onPhotoOpen, onOpenChange: onPhotoOpenChange } = useDisclosure();
 
     const [selectedAttendance, setSelectedAttendance] = useState<Attendance | null>(null);
+    const [selectedPhoto, setSelectedPhoto] = useState<{ url: string; type: 'check_in' | 'check_out'; userName: string } | null>(null);
     const [search, setSearch] = useState(filters?.search || '');
     const [statusFilter, setStatusFilter] = useState(filters?.status || 'all');
 
@@ -85,6 +87,15 @@ export default function AttendancesIndex() {
     const handleDelete = (attendance: Attendance) => {
         setSelectedAttendance(attendance);
         onDeleteOpen();
+    };
+
+    const handleViewPhoto = (photoPath: string, type: 'check_in' | 'check_out', userName: string) => {
+        setSelectedPhoto({
+            url: `/storage/${photoPath}`,
+            type,
+            userName,
+        });
+        onPhotoOpen();
     };
 
     const confirmDelete = () => {
@@ -131,6 +142,56 @@ export default function AttendancesIndex() {
                 <p className="font-medium text-gray-900 dark:text-gray-100">
                     {attendance.check_out_time ? moment.utc(attendance.check_out_time).format('HH:mm') : 'N/A'}
                 </p>
+            ),
+        },
+        {
+            header: 'Foto Masuk',
+            value: (attendance: Attendance) => (
+                <div className="flex flex-col items-start space-y-1">
+                    {attendance.photo_check_in ? (
+                        <>
+                            <Button
+                                size="sm"
+                                color="primary"
+                                variant="flat"
+                                onPress={() => handleViewPhoto(attendance.photo_check_in!, 'check_in', attendance.user?.name || 'Unknown')}
+                                startContent={<Camera className="h-4 w-4" />}
+                            >
+                                Lihat Foto
+                            </Button>
+                            <span className="text-xs text-gray-500">
+                                {attendance.check_in_time ? moment.utc(attendance.check_in_time).format('HH:mm') : ''}
+                            </span>
+                        </>
+                    ) : (
+                        <span className="text-sm text-gray-400">Tidak ada foto</span>
+                    )}
+                </div>
+            ),
+        },
+        {
+            header: 'Foto Pulang',
+            value: (attendance: Attendance) => (
+                <div className="flex flex-col items-start space-y-1">
+                    {attendance.photo_check_out ? (
+                        <>
+                            <Button
+                                size="sm"
+                                color="secondary"
+                                variant="flat"
+                                onPress={() => handleViewPhoto(attendance.photo_check_out!, 'check_out', attendance.user?.name || 'Unknown')}
+                                startContent={<Camera className="h-4 w-4" />}
+                            >
+                                Lihat Foto
+                            </Button>
+                            <span className="text-xs text-gray-500">
+                                {attendance.check_out_time ? moment.utc(attendance.check_out_time).format('HH:mm') : ''}
+                            </span>
+                        </>
+                    ) : (
+                        <span className="text-sm text-gray-400">Tidak ada foto</span>
+                    )}
+                </div>
             ),
         },
         {
@@ -227,7 +288,7 @@ export default function AttendancesIndex() {
                         <Input
                             startContent={<MagnifyingGlass className="h-4 w-4 text-gray-500" />}
                             type="text"
-                            placeholder="Cari presensi..."
+                            placeholder="Cari nama, tanggal, catatan..."
                             value={search}
                             onChange={handleSearch}
                             color="default"
@@ -258,16 +319,18 @@ export default function AttendancesIndex() {
                     )}
                 </div>
 
-                <Table<Attendance>
-                    data={attendances.data}
-                    column={columns}
-                    pagination={{
-                        ...attendances,
-                        last_page: attendances.last_page,
-                        current_page: attendances.current_page,
-                        onChange: handlePageChange,
-                    }}
-                />
+                <div className="overflow-x-auto">
+                    <Table<Attendance>
+                        data={attendances.data}
+                        column={columns}
+                        pagination={{
+                            ...attendances,
+                            last_page: attendances.last_page,
+                            current_page: attendances.current_page,
+                            onChange: handlePageChange,
+                        }}
+                    />
+                </div>
 
                 {auth.user.is_admin === 1 && (
                     <>
@@ -304,6 +367,90 @@ export default function AttendancesIndex() {
                         />
                     </>
                 )}
+
+                {/* Photo Modal */}
+                <Modal isOpen={isPhotoOpen} onOpenChange={onPhotoOpenChange} size="3xl">
+                    <ModalContent>
+                        <ModalHeader>
+                            <div className="flex items-center gap-2">
+                                <Camera className="h-5 w-5 text-gray-600" />
+                                <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
+                                    Foto {selectedPhoto?.type === 'check_in' ? 'Check In' : 'Check Out'} - {selectedPhoto?.userName}
+                                </h2>
+                            </div>
+                        </ModalHeader>
+                        <ModalBody>
+                            {selectedPhoto && (
+                                <div className="flex flex-col items-center p-4">
+                                    <div className="relative w-full max-w-md">
+                                        <img
+                                            src={selectedPhoto.url}
+                                            alt={`Foto ${selectedPhoto.type === 'check_in' ? 'Check In' : 'Check Out'}`}
+                                            className="h-auto w-full rounded-lg border border-gray-200 shadow-lg dark:border-gray-700"
+                                            onError={(e) => {
+                                                const target = e.target as HTMLImageElement;
+                                                target.style.display = 'none';
+                                                const errorDiv = target.nextElementSibling as HTMLElement;
+                                                if (errorDiv) {
+                                                    errorDiv.style.display = 'flex';
+                                                }
+                                            }}
+                                            loading="lazy"
+                                        />
+                                        <div
+                                            className="hidden h-64 w-full flex-col items-center justify-center rounded-lg border border-gray-200 bg-gray-100 dark:border-gray-700 dark:bg-gray-800"
+                                            style={{ display: 'none' }}
+                                        >
+                                            <Camera className="mb-2 h-12 w-12 text-gray-400" />
+                                            <p className="text-center text-sm text-gray-500 dark:text-gray-400">
+                                                Foto tidak dapat dimuat
+                                                <br />
+                                                <span className="text-xs">File mungkin telah dihapus atau rusak</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="mt-4 text-center">
+                                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                                            {selectedPhoto.type === 'check_in' ? 'Foto saat check in' : 'Foto saat check out'}
+                                        </p>
+                                        <p className="mt-1 text-xs text-gray-500 dark:text-gray-500">
+                                            {selectedPhoto.userName} - {moment(selectedAttendance?.date).format('DD MMMM YYYY')}
+                                        </p>
+                                        {selectedAttendance && (
+                                            <div className="mt-2 space-y-1 text-xs text-gray-500 dark:text-gray-500">
+                                                <p>
+                                                    <strong>Waktu:</strong>{' '}
+                                                    {selectedPhoto.type === 'check_in'
+                                                        ? moment.utc(selectedAttendance.check_in_time).format('HH:mm:ss')
+                                                        : selectedAttendance.check_out_time
+                                                          ? moment.utc(selectedAttendance.check_out_time).format('HH:mm:ss')
+                                                          : 'N/A'}
+                                                </p>
+                                                {((selectedPhoto.type === 'check_in' && selectedAttendance.location_check_in) ||
+                                                    (selectedPhoto.type === 'check_out' && selectedAttendance.location_check_out)) && (
+                                                    <p>
+                                                        <strong>Lokasi:</strong>{' '}
+                                                        {selectedPhoto.type === 'check_in'
+                                                            ? selectedAttendance.location_check_in
+                                                            : selectedAttendance.location_check_out}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        )}
+                                        <div className="mt-3 flex justify-center gap-2">
+                                            <Button size="sm" color="primary" variant="flat" onPress={() => window.open(selectedPhoto.url, '_blank')}>
+                                                Buka di Tab Baru
+                                            </Button>
+                                            <Button size="sm" color="secondary" variant="flat" onPress={onPhotoOpenChange}>
+                                                Tutup
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </ModalBody>
+                    </ModalContent>
+                </Modal>
             </div>
         </AuthenticatedLayout>
     );

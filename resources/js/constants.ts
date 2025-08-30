@@ -161,3 +161,56 @@ export enum AttendanceType {
     HALF_DAY = 'Setengah Hari',
     LATE = 'Telat',
 }
+
+// Leave Request Options
+export interface LeaveTypeOption {
+    value: 'annual' | 'sick' | 'maternity' | 'paternity' | 'emergency' | 'unpaid';
+    label: string;
+}
+
+export interface LeaveStatusOption {
+    value: 'pending' | 'approved' | 'rejected';
+    label: string;
+}
+
+export const LEAVE_TYPE_OPTIONS: LeaveTypeOption[] = [
+    {
+        value: 'annual',
+        label: 'Cuti Tahunan',
+    },
+    {
+        value: 'sick',
+        label: 'Cuti Sakit',
+    },
+    {
+        value: 'maternity',
+        label: 'Cuti Melahirkan',
+    },
+    {
+        value: 'paternity',
+        label: 'Cuti Ayah',
+    },
+    {
+        value: 'emergency',
+        label: 'Cuti Darurat',
+    },
+    {
+        value: 'unpaid',
+        label: 'Cuti Tanpa Gaji',
+    },
+];
+
+export const LEAVE_STATUS_OPTIONS: LeaveStatusOption[] = [
+    {
+        value: 'pending',
+        label: 'Menunggu Persetujuan',
+    },
+    {
+        value: 'approved',
+        label: 'Disetujui',
+    },
+    {
+        value: 'rejected',
+        label: 'Ditolak',
+    },
+];

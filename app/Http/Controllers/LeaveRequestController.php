@@ -255,11 +255,12 @@ class LeaveRequestController extends Controller
         try {
             // Only admin can approve
             if (!Auth::user()->isAdmin()) {
-                return response()->json(['success' => false, 'message' => 'Unauthorized action.'], 403);
+                abort(403, 'Unauthorized action.');
             }
 
             if (!$leaveRequest->isPending()) {
-                return response()->json(['success' => false, 'message' => 'Pengajuan cuti sudah diproses sebelumnya.'], 400);
+                return redirect()->route('leave-requests.index')
+                    ->with('error', 'Pengajuan cuti sudah diproses sebelumnya.');
             }
 
             $leaveRequest->update([
@@ -274,13 +275,14 @@ class LeaveRequestController extends Controller
                 'approved_by' => Auth::id(),
             ]);
 
-            return response()->json(['success' => true, 'message' => 'Pengajuan cuti berhasil disetujui.'], 200);
+            return redirect()->route('leave-requests.index')
+                ->with('success', 'Pengajuan cuti berhasil disetujui.');
         } catch (\Exception $e) {
             Log::error('Error approving leave request:', [
                 'leave_request_id' => $leaveRequest->id,
                 'error' => $e->getMessage()
             ]);
-            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan server.'], 500);
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat menyetujui pengajuan cuti.');
         }
     }
 
@@ -292,11 +294,12 @@ class LeaveRequestController extends Controller
         try {
             // Only admin can reject
             if (!Auth::user()->isAdmin()) {
-                return response()->json(['success' => false, 'message' => 'Unauthorized action.'], 403);
+                abort(403, 'Unauthorized action.');
             }
 
             if (!$leaveRequest->isPending()) {
-                return response()->json(['success' => false, 'message' => 'Pengajuan cuti sudah diproses sebelumnya.'], 400);
+                return redirect()->route('leave-requests.index')
+                    ->with('error', 'Pengajuan cuti sudah diproses sebelumnya.');
             }
 
             $validatedData = $request->validate([
@@ -316,19 +319,19 @@ class LeaveRequestController extends Controller
                 'reason' => $validatedData['rejection_reason'],
             ]);
 
-            return response()->json(['success' => true, 'message' => 'Pengajuan cuti berhasil ditolak.'], 200);
+            return redirect()->route('leave-requests.index')
+                ->with('success', 'Pengajuan cuti berhasil ditolak.');
         } catch (ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Data yang diberikan tidak valid.',
-                'errors' => $e->errors()
-            ], 422);
+            Log::error('Leave Request rejection validation failed:', ['errors' => $e->errors()]);
+            return redirect()->back()
+                ->withErrors($e->errors())
+                ->withInput();
         } catch (\Exception $e) {
             Log::error('Error rejecting leave request:', [
                 'leave_request_id' => $leaveRequest->id,
                 'error' => $e->getMessage()
             ]);
-            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan server.'], 500);
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat menolak pengajuan cuti.');
         }
     }
 

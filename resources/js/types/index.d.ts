@@ -239,3 +239,23 @@ type Attendance = {
     updated_at: string;
     deleted_at: string | null;
 };
+
+export type LeaveRequest = {
+    id: number;
+    user_id: number;
+    user: User;
+    leave_type: 'annual' | 'sick' | 'maternity' | 'paternity' | 'emergency' | 'unpaid';
+    start_date: string;
+    end_date: string;
+    total_days: number;
+    reason: string;
+    status: 'pending' | 'approved' | 'rejected';
+    approved_by: number | null;
+    approver?: User;
+    approved_at: string | null;
+    rejection_reason: string | null;
+    attachment: string | null;
+    created_at: string;
+    updated_at: string;
+    deleted_at: string | null;
+};
