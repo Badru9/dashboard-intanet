@@ -61,7 +61,6 @@ class AuthController extends Controller
             'password' => Hash::make($validated['password']),
             'phone' => $validated['phone'],
             'address' => $validated['address'],
-            'is_admin' => '0', // Default non-admin
         ]);
 
         Auth::login($user);
@@ -181,6 +180,7 @@ class AuthController extends Controller
                 'password' => ['required', 'string', 'min:8', 'confirmed'],
                 'phone' => ['required', 'string', 'max:20'],
                 'address' => ['required', 'string', 'max:255'],
+                'is_admin' => ['numeric', 'nullable'],
             ]);
 
             // Buat user baru
@@ -190,7 +190,7 @@ class AuthController extends Controller
                 'password' => Hash::make($validated['password']),
                 'phone' => $validated['phone'],
                 'address' => $validated['address'],
-                'is_admin' => '0', // Default non-admin
+                'is_admin' => $validated['is_admin'] ?? 0, // Default non-admin
             ]);
 
             // Buat token Sanctum setelah registrasi
