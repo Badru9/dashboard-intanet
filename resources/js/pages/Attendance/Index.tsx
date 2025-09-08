@@ -206,21 +206,9 @@ export default function AttendancesIndex() {
                         color = 'warning';
                         statusText = 'Cuti';
                         break;
-                    case 'SICK':
-                        color = 'secondary';
-                        statusText = 'Sakit';
-                        break;
                     case 'ABSENT':
                         color = 'danger';
                         statusText = 'Tidak Hadir';
-                        break;
-                    case 'HALF_DAY':
-                        color = 'primary';
-                        statusText = 'Setengah Hari';
-                        break;
-                    case 'LATE':
-                        color = 'danger';
-                        statusText = 'Terlambat';
                         break;
                     default:
                         color = 'default';
