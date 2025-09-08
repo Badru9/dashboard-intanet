@@ -8,6 +8,7 @@ import { Button, Chip, Input, Modal, ModalBody, ModalContent, ModalHeader, Selec
 import { Head, router, usePage } from '@inertiajs/react';
 import { Camera, MagnifyingGlass, PencilSimple, Plus, Trash } from '@phosphor-icons/react';
 import moment from 'moment';
+import 'moment-timezone'; // Pastikan moment-timezone ter-import
 import { useState } from 'react';
 import CreateAttendance from './Create';
 
@@ -30,11 +31,9 @@ type AttendancePageProps = PageProps &
             }>;
         };
         users: User[];
-        // Perbarui filters untuk menyertakan 'status'
         filters: {
             search?: string;
             status?: string;
-            // tambahkan filter lain jika ada
         };
         auth: {
             user: {
@@ -58,16 +57,26 @@ export default function AttendancesIndex() {
     const [search, setSearch] = useState(filters?.search || '');
     const [statusFilter, setStatusFilter] = useState(filters?.status || 'all');
 
-    // const filteredAttendances = useMemo(() => {
-    //     if (!search) return attendances.data;
-    //     return attendances.data.filter(
-    //         (attendance: Attendance) =>
-    //             attendance.date.toLowerCase().includes(search.toLowerCase()) ||
-    //             attendance.status.toString().toLowerCase().includes(search.toLowerCase()) ||
-    //             (attendance.notes && attendance.notes.toLowerCase().includes(search.toLowerCase())) ||
-    //             (attendance.user?.name && attendance.user.name.toLowerCase().includes(search.toLowerCase())),
-    //     );
-    // }, [attendances.data, search]);
+    // Set default timezone untuk Indonesia
+    const TIMEZONE = 'Asia/Jakarta'; // atau 'Asia/Makassar' untuk WITA
+
+    // Helper function untuk format waktu dengan timezone
+    const formatTime = (timeString: string | null) => {
+        if (!timeString) return 'N/A';
+        return moment.utc(timeString).tz(TIMEZONE).format('HH:mm');
+    };
+
+    // Helper function untuk format waktu detail dengan detik
+    const formatTimeDetail = (timeString: string | null) => {
+        if (!timeString) return 'N/A';
+        return moment.utc(timeString).tz(TIMEZONE).format('HH:mm:ss');
+    };
+
+    // Helper function untuk format tanggal
+    const formatDate = (dateString: string | null) => {
+        if (!dateString) return 'N/A';
+        return moment.utc(dateString).tz(TIMEZONE).format('DD MMMM YYYY');
+    };
 
     const statusOptions = [
         { key: 'all', label: 'Semua Status' },
@@ -124,24 +133,16 @@ export default function AttendancesIndex() {
         },
         {
             header: 'Tanggal',
-            value: (attendance: Attendance) => (
-                <p className="text-gray-600 dark:text-gray-300">{moment(attendance.date).format('DD MMMM YYYY') || 'N/A'}</p>
-            ),
+            value: (attendance: Attendance) => <p className="text-gray-600 dark:text-gray-300">{formatDate(attendance.date)}</p>,
         },
         {
             header: 'Waktu Masuk',
-            value: (attendance: Attendance) => (
-                <p className="font-medium text-gray-900 dark:text-gray-100">
-                    {attendance.check_in_time ? moment.utc(attendance.check_in_time).format('HH:mm') : 'N/A'}
-                </p>
-            ),
+            value: (attendance: Attendance) => <p className="font-medium text-gray-900 dark:text-gray-100">{formatTime(attendance.check_in_time)}</p>,
         },
         {
             header: 'Waktu Pulang',
             value: (attendance: Attendance) => (
-                <p className="font-medium text-gray-900 dark:text-gray-100">
-                    {attendance.check_out_time ? moment.utc(attendance.check_out_time).format('HH:mm') : 'N/A'}
-                </p>
+                <p className="font-medium text-gray-900 dark:text-gray-100">{formatTime(attendance.check_out_time)}</p>
             ),
         },
         {
@@ -159,9 +160,7 @@ export default function AttendancesIndex() {
                             >
                                 Lihat Foto
                             </Button>
-                            <span className="text-xs text-gray-500">
-                                {attendance.check_in_time ? moment.utc(attendance.check_in_time).format('HH:mm') : ''}
-                            </span>
+                            <span className="text-xs text-gray-500">{formatTime(attendance.check_in_time)}</span>
                         </>
                     ) : (
                         <span className="text-sm text-gray-400">Tidak ada foto</span>
@@ -184,9 +183,7 @@ export default function AttendancesIndex() {
                             >
                                 Lihat Foto
                             </Button>
-                            <span className="text-xs text-gray-500">
-                                {attendance.check_out_time ? moment.utc(attendance.check_out_time).format('HH:mm') : ''}
-                            </span>
+                            <span className="text-xs text-gray-500">{formatTime(attendance.check_out_time)}</span>
                         </>
                     ) : (
                         <span className="text-sm text-gray-400">Tidak ada foto</span>
@@ -264,8 +261,7 @@ export default function AttendancesIndex() {
     };
 
     const handleStatusChange = (value: string | number) => {
-        // Menggunakan 'value' sebagai parameter, bukan event
-        const newStatus = String(value); // Pastikan value adalah string
+        const newStatus = String(value);
         setStatusFilter(newStatus);
         router.get(route('attendances.index'), { ...filters, search: search, status: newStatus }, { preserveState: true, replace: true });
     };
@@ -297,8 +293,8 @@ export default function AttendancesIndex() {
                         />
                         <Select
                             placeholder="Pilih Status"
-                            selectedKeys={[statusFilter]} // Mengikat nilai terpilih
-                            onSelectionChange={(keys) => handleStatusChange(Array.from(keys)[0])} // Menangani perubahan selection
+                            selectedKeys={[statusFilter]}
+                            onSelectionChange={(keys) => handleStatusChange(Array.from(keys)[0])}
                             color="default"
                             variant="bordered"
                             radius="md"
@@ -363,7 +359,7 @@ export default function AttendancesIndex() {
                             onClose={onDeleteOpenChange}
                             onConfirm={confirmDelete}
                             title="Hapus Presensi"
-                            description={`Apakah Anda yakin ingin menghapus data presensi tanggal ${selectedAttendance?.date}?`}
+                            description={`Apakah Anda yakin ingin menghapus data presensi tanggal ${selectedAttendance ? formatDate(selectedAttendance.date) : ''}?`}
                         />
                     </>
                 )}
@@ -414,17 +410,15 @@ export default function AttendancesIndex() {
                                             {selectedPhoto.type === 'check_in' ? 'Foto saat check in' : 'Foto saat check out'}
                                         </p>
                                         <p className="mt-1 text-xs text-gray-500 dark:text-gray-500">
-                                            {selectedPhoto.userName} - {moment(selectedAttendance?.date).format('DD MMMM YYYY')}
+                                            {selectedPhoto.userName} - {selectedAttendance ? formatDate(selectedAttendance.date) : ''}
                                         </p>
                                         {selectedAttendance && (
                                             <div className="mt-2 space-y-1 text-xs text-gray-500 dark:text-gray-500">
                                                 <p>
                                                     <strong>Waktu:</strong>{' '}
                                                     {selectedPhoto.type === 'check_in'
-                                                        ? moment.utc(selectedAttendance.check_in_time).format('HH:mm:ss')
-                                                        : selectedAttendance.check_out_time
-                                                          ? moment.utc(selectedAttendance.check_out_time).format('HH:mm:ss')
-                                                          : 'N/A'}
+                                                        ? formatTimeDetail(selectedAttendance.check_in_time)
+                                                        : formatTimeDetail(selectedAttendance.check_out_time)}
                                                 </p>
                                                 {((selectedPhoto.type === 'check_in' && selectedAttendance.location_check_in) ||
                                                     (selectedPhoto.type === 'check_out' && selectedAttendance.location_check_out)) && (
