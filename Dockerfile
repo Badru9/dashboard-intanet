@@ -55,7 +55,7 @@ COPY --from=php-base /var/www/html/vendor/bin ./vendor/bin
 
 # Copy built frontend assets from node stage into the correct public assets location
 # Adjust paths if your build outputs elsewhere (e.g., public/build, public/assets, public/js)
-COPY --from=node-build /app/dist ./public/build
+COPY --from=node-build /app/public/build ./public/build
 
 # Apache: set documentroot to public and enable rewrite
 RUN a2enmod rewrite \
