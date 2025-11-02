@@ -1,54 +1,76 @@
-FROM php:8.2-apache
+# -------- Stage 1: Build frontend (Node) --------
+FROM node:20-alpine AS node-build
+WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev \
-    libzip-dev \
-    zip \
-    unzip \
-    nodejs \
-    npm
+# Copy only package files for caching
+COPY package.json package-lock.json* pnpm-lock.yaml* ./
+# Use npm ci when lockfile present (faster & deterministic)
+RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 
-# Clear cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+# Copy frontend source and build assets (assumes assets are in resources/js or similar)
+COPY resources resources
+COPY vite.config.* ./
+COPY tailwind.config.* ./
+RUN npm run build
 
-# Install PHP extensions
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
+# -------- Stage 2: Install PHP dependencies (Composer) --------
+FROM php:8.2-apache AS php-base
 
-# Get latest Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# System deps for Laravel + ext installs
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git curl ca-certificates zip unzip libpng-dev libonig-dev libxml2-dev libzip-dev \
+  && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip \
+  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Set working directory
+# Copy composer binary from official composer image
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
 WORKDIR /var/www/html
 
-# Copy existing application directory contents
-COPY . /var/www/html
+# Copy composer files first (to leverage Docker cache)
+COPY composer.json composer.lock* ./ 
 
-# Install dependencies
-RUN composer install --optimize-autoloader --no-dev
+# Install composer deps (production)
+RUN composer install --no-dev --optimize-autoloader --prefer-dist --no-interaction --no-progress
 
-# Install Node dependencies and build assets
-RUN npm install && npm run build
+# -------- Stage 3: Final image --------
+FROM php:8.2-apache
 
-# Change ownership and permissions
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
-    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+# Reinstall the same PHP extensions in final image
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpng-dev libonig-dev libxml2-dev libzip-dev zip unzip \
+  && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip \
+  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Set Apache DocumentRoot to Laravel public folder and enable .htaccess
+# Bring composer into final image (optional but handy for runtime artisan tasks)
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+# Set working dir and copy app
+WORKDIR /var/www/html
+COPY . .
+
+# Copy composer vendor from previous composer-install stage to avoid reinstalling
+COPY --from=php-base /var/www/html/vendor ./vendor
+COPY --from=php-base /var/www/html/vendor/bin ./vendor/bin
+
+# Copy built frontend assets from node stage into the correct public assets location
+# Adjust paths if your build outputs elsewhere (e.g., public/build, public/assets, public/js)
+COPY --from=node-build /app/dist ./public/build
+
+# Apache: set documentroot to public and enable rewrite
 RUN a2enmod rewrite \
-    && sed -i 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/000-default.conf \
-    && sed -i 's/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
+  && sed -i 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/000-default.conf \
+  && sed -i 's/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf \
+  && echo "ServerName localhost" >> /etc/apache2/apache2.conf
 
-# Tambahkan ServerName ke konfigurasi Apache
-RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
+# Permissions (adjust user/group if needed)
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
+  && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Atau copy konfigurasi custom
-COPY docker/apache/000-default.conf /etc/apache2/sites-available/000-default.conf
+# Optimize Laravel caches (optional; will run during image build)
+RUN php artisan config:cache || true \
+  && php artisan route:cache || true \
+  && php artisan view:cache || true
 
 EXPOSE 80
-
 CMD ["apache2-foreground"]
