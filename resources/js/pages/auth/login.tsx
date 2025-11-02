@@ -28,7 +28,7 @@ export default function Login() {
                     <div className="mb-8">
                         <h1 className="mb-2 text-4xl font-bold">Hello,</h1>
                         <h2 className="mb-4 text-4xl font-bold">Welcome Back</h2>
-                        <p className="text-gray-600">Hey, welcome back to your special place</p>
+                        {/* <p className="text-gray-600">Hey, welcome back to your special place</p> */}
                     </div>
 
                     <form onSubmit={submit} className="space-y-6">
