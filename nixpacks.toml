@@ -1,0 +1,11 @@
+[phases.setup]
+nixPkgs = [
+  "php",
+  "composer",
+  "nodejs",
+  "npm",
+  "phpExtensions.pdo_mysql",
+  "phpExtensions.mbstring",
+  "phpExtensions.bcmath",
+  "phpExtensions.exif"
+]
