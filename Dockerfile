@@ -67,7 +67,6 @@ RUN a2enmod rewrite \
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
   && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Optimize Laravel caches (optional; will run during image build)
 RUN php artisan config:cache || true \
   && php artisan route:cache || true \
   && php artisan view:cache || true
