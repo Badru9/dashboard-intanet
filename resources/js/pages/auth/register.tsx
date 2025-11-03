@@ -32,7 +32,7 @@ export default function Register() {
 
                     <div className="mb-8">
                         <h1 className="mb-2 text-4xl font-bold">Create Account</h1>
-                        <p className="text-gray-600 dark:text-gray-100">Enter your details below to create your account</p>
+                        {/* <p className="text-gray-600 dark:text-gray-100">Enter your details below to create your account</p> */}
                     </div>
 
                     <form onSubmit={submit} className="space-y-6">
