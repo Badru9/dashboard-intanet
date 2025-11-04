@@ -79,18 +79,22 @@
 # CMD ["apache2-foreground"]
 
 
-# -------- Stage 1: Build frontend (Node) --------
+# ---------------- Stage 1: Build frontend (Node) ----------------
 FROM node:20-alpine AS node-build
 WORKDIR /app
+
+# Install deps (use ci when possible)
 COPY package*.json ./
 RUN npm ci --silent || npm install --silent
-COPY . .
-RUN npm run build || echo "Skipping frontend build"
 
-# -------- Stage 2: Install PHP dependencies (Composer) --------
+# Copy frontend sources & build
+COPY . .
+RUN npm run build || echo "No frontend build script or build failed (continuing)"
+
+# ---------------- Stage 2: Install PHP deps with Composer (build-time) ----------------
 FROM php:8.2-apache AS php-base
 
-# Install system deps & PHP extensions
+# Install system libs + PHP extensions required by many Laravel packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git curl ca-certificates zip unzip libpng-dev libonig-dev libxml2-dev libzip-dev libicu-dev \
   && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip intl xml \
@@ -98,48 +102,62 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /var/www/html
 
-# Install Composer manually (curl installer)
-RUN curl -sS https://getcomposer.org/installer -o /tmp/composer-setup.php \
- && php /tmp/composer-setup.php --install-dir=/usr/local/bin --filename=composer \
- && rm /tmp/composer-setup.php \
- && composer --version
-
-# Copy composer files and install deps
+# COPY composer files first to leverage Docker layer cache
 COPY composer.json composer.lock* ./
+
+# Allow passing COMPOSER_AUTH at build time (for private repos)
+# Example build-arg value: '{"github-oauth": {"github.com": "ghp_..."}}'
+ARG COMPOSER_AUTH
+ENV COMPOSER_AUTH=${COMPOSER_AUTH}
+
+# Composer runtime envs
 ENV COMPOSER_ALLOW_SUPERUSER=1 \
-    COMPOSER_MEMORY_LIMIT=-1
+    COMPOSER_MEMORY_LIMIT=-1 \
+    COMPOSER_HOME=/tmp/composer-cache
+
+# Install composer (installer via curl) so composer exists in build environment
+RUN curl -sS https://getcomposer.org/installer -o /tmp/composer-setup.php \
+  && php /tmp/composer-setup.php --install-dir=/usr/local/bin --filename=composer \
+  && rm /tmp/composer-setup.php \
+  && composer --version
+
+# Run composer install (build-time). Log to file for debugging.
 RUN mkdir -p /tmp/composer-cache && \
     COMPOSER_CACHE_DIR=/tmp/composer-cache composer diagnose || true && \
     COMPOSER_CACHE_DIR=/tmp/composer-cache composer install --no-dev --optimize-autoloader --prefer-dist --no-interaction --no-progress --verbose 2>&1 | tee /tmp/composer-install.log || (cat /tmp/composer-install.log && false)
 
-# -------- Stage 3: Final image --------
+# ---------------- Stage 3: Final runtime image ----------------
 FROM php:8.2-apache
+
+# Install php extensions needed at runtime (same as php-base)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpng-dev libonig-dev libxml2-dev libzip-dev zip unzip libicu-dev \
   && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip intl xml \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install composer in final image too (optional, handy)
-RUN curl -sS https://getcomposer.org/installer -o /tmp/composer-setup.php \
- && php /tmp/composer-setup.php --install-dir=/usr/local/bin --filename=composer \
- && rm /tmp/composer-setup.php \
- && composer --version
-
 WORKDIR /var/www/html
+
+# Copy app source
 COPY . .
+
+# Copy vendor from build stage (so we don't run composer in final image)
 COPY --from=php-base /var/www/html/vendor ./vendor
+
+# Copy built frontend assets from node stage (Laravel + Vite default)
 COPY --from=node-build /app/public/build ./public/build
 
-# Apache config + perms
+# Apache config -> serve from public
 RUN a2enmod rewrite && \
     sed -i 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/000-default.conf && \
     sed -i 's/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf && \
     echo "ServerName localhost" >> /etc/apache2/apache2.conf
 
-RUN mkdir -p /var/www/html/storage /var/www/html/bootstrap/cache && \
+# Fix permissions
+RUN mkdir -p storage bootstrap/cache && \
     chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache && \
     chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
+# Pre-warm caches if .env exists (non-fatal)
 RUN php artisan config:cache || true && php artisan route:cache || true && php artisan view:cache || true
 
 EXPOSE 80
