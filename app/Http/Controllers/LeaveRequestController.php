@@ -363,6 +363,13 @@ class LeaveRequestController extends Controller
             $leaveRequests = $query->orderBy('created_at', 'desc')
                 ->paginate($request->get('per_page', 15));
 
+            Log::info('Leave Requests API fetched:', [
+                'user_id' => $user->id,
+                'total_data' => $leaveRequests->total(),
+                'current_page' => $leaveRequests->currentPage(),
+                'per_page' => $leaveRequests->perPage()
+            ]);
+
             return response()->json([
                 'success' => true,
                 'data' => $leaveRequests,
@@ -380,7 +387,7 @@ class LeaveRequestController extends Controller
     {
         try {
             $validatedData = $request->validate([
-                'leave_type' => ['required', Rule::in(['annual', 'sick', 'maternity', 'paternity', 'emergency', 'unpaid'])],
+                'leave_type' => ['required', Rule::in(['permission', 'sick'])],
                 'start_date' => ['required', 'date', 'after_or_equal:today'],
                 'end_date' => ['required', 'date', 'after_or_equal:start_date'],
                 'reason' => ['required', 'string', 'max:1000'],
@@ -402,6 +409,10 @@ class LeaveRequestController extends Controller
             $validatedData['status'] = 'pending';
 
             $leaveRequest = LeaveRequest::create($validatedData);
+
+            Log::info('Leave Request API created:', [
+                'leave_request' => $leaveRequest,
+            ]);
 
             return response()->json([
                 'success' => true,

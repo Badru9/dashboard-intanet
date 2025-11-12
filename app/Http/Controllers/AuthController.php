@@ -105,10 +105,10 @@ class AuthController extends Controller
                 ]);
 
                 return $this->corsResponse([
-                    'message' => 'Kredensial yang diberikan tidak cocok dengan catatan kami.',
+                    'message' => 'Email atau Password salah.',
                     'success' => false,
                     'errors' => [
-                        'email' => ['Kredensial yang diberikan tidak cocok dengan catatan kami.']
+                        'email' => ['Email atau Password salah.']
                     ]
                 ], 401);
             }

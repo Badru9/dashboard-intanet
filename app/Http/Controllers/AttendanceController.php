@@ -94,7 +94,7 @@ class AttendanceController extends Controller
                     'has_checked_out_today' => (bool)($attendanceToday && $attendanceToday->check_out_time),
                     'attendance_id' => $attendanceToday ? $attendanceToday->id : null,
                 ],
-                // Anda juga mungkin ingin mengirim status check-in/out user yang sedang login
+                // Anda juga mungkin ingin mengirim status presensi/out user yang sedang login
                 // 'current_user_attendance_status' => $this->getCurrentUserAttendanceStatus(),
             ]);
         } catch (\Exception $e) {
@@ -150,7 +150,7 @@ class AttendanceController extends Controller
     }
 
     /**
-     * Handle user check-in.
+     * Handle user presensi.
      * Creates a new attendance record for the current day.
      */
 
@@ -171,7 +171,7 @@ class AttendanceController extends Controller
                 ->first();
 
             if ($existingAttendance) {
-                return response()->json(['success' => false, 'message' => 'Anda sudah melakukan check-in hari ini.'], 409);
+                return response()->json(['success' => false, 'message' => 'Anda sudah melakukan presensi hari ini.'], 409);
             }
 
             // Validate the request data
@@ -181,7 +181,7 @@ class AttendanceController extends Controller
                 'notes' => ['nullable', 'string', 'max:500'],
             ]);
 
-            Log::info('Check-in Request Data:', [
+            Log::info('presensi Request Data:', [
                 'user_id' => $user->id,
                 'date' => $today->toDateString(),
                 'location_check_in' => $validatedData['location_check_in'],
@@ -201,16 +201,16 @@ class AttendanceController extends Controller
             // Create the attendance record
             Attendance::create($validatedData);
 
-            return response()->json(['success' => true, 'message' => 'Check-in berhasil!'], 201);
+            return response()->json(['success' => true, 'message' => 'Presensi berhasil!'], 201);
         } catch (ValidationException $e) {
-            Log::error('Validation failed for check-in:', ['errors' => $e->errors()]);
+            Log::error('Validation failed for presensi:', ['errors' => $e->errors()]);
             return response()->json([
                 'success' => false,
                 'message' => 'Data yang diberikan tidak valid.',
                 'errors' => $e->errors()
             ], 422);
         } catch (\Exception $e) {
-            Log::error('An unexpected error occurred during check-in:', ['error' => $e->getMessage()]);
+            Log::error('An unexpected error occurred during presensi:', ['error' => $e->getMessage()]);
             return response()->json(['success' => false, 'message' => 'Terjadi kesalahan server. Silakan coba lagi.'], 500);
         }
     }
@@ -225,13 +225,13 @@ class AttendanceController extends Controller
 
             $today = Carbon::today();
 
-            // Cari record check-in hari ini
+            // Cari record presensi hari ini
             $attendance = Attendance::where('user_id', $user->id)
                 ->whereDate('date', $today)
                 ->first();
 
             if (!$attendance) {
-                return response()->json(['success' => false, 'message' => 'Anda belum melakukan check-in hari ini.'], 400);
+                return response()->json(['success' => false, 'message' => 'Anda belum melakukan presensi hari ini.'], 400);
             }
 
             if ($attendance->check_out_time) {
@@ -257,7 +257,7 @@ class AttendanceController extends Controller
 
             $attendance->update($validatedData);
 
-            return response()->json(['success' => true, 'message' => 'Check-out berhasil!'], 200);
+            return response()->json(['success' => true, 'message' => 'Presensi pulang berhasil!'], 200);
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,

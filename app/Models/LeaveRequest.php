@@ -78,12 +78,8 @@ class LeaveRequest extends Model
     public function getLeaveTypeLabelAttribute()
     {
         return match ($this->leave_type) {
-            'annual' => 'Cuti Tahunan',
+            'permission' => 'Izin',
             'sick' => 'Cuti Sakit',
-            'maternity' => 'Cuti Melahirkan',
-            'paternity' => 'Cuti Ayah',
-            'emergency' => 'Cuti Darurat',
-            'unpaid' => 'Cuti Tanpa Gaji',
             default => 'Unknown'
         };
     }
