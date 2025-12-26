@@ -1,1 +1,0 @@
-import{r as t}from"./app-DLOrUW3Y.js";import{l as c}from"./chunk-SLABUSGS-S72iW4Ue.js";function f(e,u=[]){const r=t.useRef(e);return c(()=>{r.current=e}),t.useCallback((...o)=>{var a;return(a=r.current)==null?void 0:a.call(r,...o)},u)}export{f as u};
