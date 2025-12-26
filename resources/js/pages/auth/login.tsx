@@ -33,8 +33,8 @@ export default function Login() {
                     </div>
 
                     <div className="mb-8">
-                        <h1 className="mb-2 text-4xl font-bold">Hello,</h1>
-                        <h2 className="mb-4 text-4xl font-bold">Welcome Back</h2>
+                        <h1 className="mb-2 text-4xl font-bold">Halo,</h1>
+                        <h2 className="mb-4 text-4xl font-bold">Selamat Datang Kembali</h2>
                         {/* <p className="text-gray-600">Hey, welcome back to your special place</p> */}
                     </div>
 
@@ -53,7 +53,7 @@ export default function Login() {
                             />
                             <Input
                                 type="password"
-                                label="Password"
+                                label="Kata Sandi"
                                 variant="bordered"
                                 value={data.password}
                                 onChange={(e) => setData('password', e.target.value)}
@@ -71,10 +71,10 @@ export default function Login() {
                                 onChange={(e) => setData('remember', e.target.checked)}
                                 disabled={processing}
                             >
-                                <span className="text-slate-900 dark:text-gray-100">Remember Me</span>
+                                <span className="text-slate-900 dark:text-gray-100">Ingat Saya</span>
                             </Checkbox>
                             <a href={route('password.request')} className="hover:text-primary-dark text-sm text-primary">
-                                Forgot Password?
+                                Lupa Kata Sandi?
                             </a>
                         </div>
 
@@ -83,13 +83,13 @@ export default function Login() {
                             className="focus:ring-tertiary hover:bg-primary-dark w-full cursor-pointer rounded-xl bg-primary py-3.5 text-white transition duration-200 hover:bg-primary/70 focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                             disabled={processing}
                         >
-                            {processing ? 'Signing in...' : 'Sign In'}
+                            {processing ? 'Masuk...' : 'Masuk'}
                         </button>
 
                         <div className="text-center text-sm text-gray-600 dark:text-gray-100">
-                            Don't have an account?{' '}
+                            Belum punya akun?{' '}
                             <a href={route('register')} className="hover:text-primary-dark font-medium text-primary">
-                                Sign Up
+                                Daftar
                             </a>
                         </div>
                     </form>

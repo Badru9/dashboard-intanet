@@ -31,7 +31,7 @@ export default function Register() {
                     </div>
 
                     <div className="mb-8">
-                        <h1 className="mb-2 text-4xl font-bold">Create Account</h1>
+                        <h1 className="mb-2 text-4xl font-bold">Buat Akun</h1>
                         {/* <p className="text-gray-600 dark:text-gray-100">Enter your details below to create your account</p> */}
                     </div>
 
@@ -39,7 +39,7 @@ export default function Register() {
                         <div className="space-y-5">
                             <FormInput
                                 type="text"
-                                label="Full Name"
+                                label="Nama Lengkap"
                                 value={data.name}
                                 onChange={(e) => setData('name', e.target.value)}
                                 placeholder="John Doe"
@@ -66,7 +66,7 @@ export default function Register() {
                             />
                             <FormInput
                                 type="password"
-                                label="Password"
+                                label="Kata Sandi"
                                 value={data.password}
                                 onChange={(e) => setData('password', e.target.value)}
                                 placeholder="••••••••••••"
@@ -75,7 +75,7 @@ export default function Register() {
                             />
                             <FormInput
                                 type="password"
-                                label="Confirm Password"
+                                label="Konfirmasi Kata Sandi"
                                 value={data.password_confirmation}
                                 onChange={(e) => setData('password_confirmation', e.target.value)}
                                 placeholder="••••••••••••"
@@ -84,7 +84,7 @@ export default function Register() {
                             />
                             <FormInput
                                 type="text"
-                                label="Phone Number"
+                                label="Nomor Telepon"
                                 value={data.phone}
                                 onChange={(e) => setData('phone', e.target.value)}
                                 placeholder="081234567890"
@@ -93,7 +93,7 @@ export default function Register() {
                             />
                             <FormInput
                                 type="text"
-                                label="Address"
+                                label="Alamat"
                                 value={data.address}
                                 onChange={(e) => setData('address', e.target.value)}
                                 placeholder="Jl. Example No. 123"
@@ -107,13 +107,13 @@ export default function Register() {
                             className="focus:ring-tertiary hover:bg-primary-dark w-full cursor-pointer rounded-xl bg-primary py-3.5 text-white transition duration-200 hover:bg-primary/70 focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                             disabled={processing}
                         >
-                            {processing ? 'Creating account...' : 'Create account'}
+                            {processing ? 'Membuat akun...' : 'Buat akun'}
                         </button>
 
                         <div className="text-center text-sm text-gray-600 dark:text-gray-100">
-                            Already have an account?{' '}
+                            Sudah punya akun?{' '}
                             <a href={route('login')} className="hover:text-primary-dark font-medium text-primary">
-                                Log in
+                                Masuk
                             </a>
                         </div>
                     </form>
