@@ -164,7 +164,7 @@ export enum AttendanceType {
 
 // Leave Request Options
 export interface LeaveTypeOption {
-    value: 'annual' | 'sick' | 'maternity' | 'paternity' | 'emergency' | 'unpaid';
+    value: 'permission' | 'sick';
     label: string;
 }
 
@@ -175,28 +175,12 @@ export interface LeaveStatusOption {
 
 export const LEAVE_TYPE_OPTIONS: LeaveTypeOption[] = [
     {
-        value: 'annual',
-        label: 'Cuti Tahunan',
+        value: 'permission',
+        label: 'Izin',
     },
     {
         value: 'sick',
         label: 'Cuti Sakit',
-    },
-    {
-        value: 'maternity',
-        label: 'Cuti Melahirkan',
-    },
-    {
-        value: 'paternity',
-        label: 'Cuti Ayah',
-    },
-    {
-        value: 'emergency',
-        label: 'Cuti Darurat',
-    },
-    {
-        value: 'unpaid',
-        label: 'Cuti Tanpa Gaji',
     },
 ];
 

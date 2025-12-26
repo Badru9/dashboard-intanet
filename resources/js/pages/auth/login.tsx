@@ -15,6 +15,13 @@ export default function Login() {
         post(route('login'));
     };
 
+    // if (errors?.email) {
+    //     addToast({
+    //         title: errors.email,
+    //         color: 'danger',
+    //     });
+    // }
+
     return (
         <div className="flex min-h-screen items-center justify-center text-gray-900 dark:bg-gray-900 dark:text-gray-100">
             <div className="container mx-auto flex max-w-6xl items-center justify-between px-6">
@@ -88,7 +95,6 @@ export default function Login() {
                     </form>
                 </div>
 
-                {/* Illustration Section */}
                 <div className="hidden lg:block lg:w-1/2 lg:pl-12">
                     <div className="relative h-[600px] w-[600px] overflow-hidden rounded-3xl">
                         <img src="/images/illustrations/login.png" alt="Login illustration" className="h-full w-full object-cover" />

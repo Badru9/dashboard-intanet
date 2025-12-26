@@ -14,6 +14,7 @@ import {
     Sun,
     User,
     Users,
+    UsersThree,
     WifiHigh,
 } from '@phosphor-icons/react';
 import clsx from 'clsx';
@@ -80,7 +81,7 @@ const MenuItem = ({ item, isOpen, isActive }: { item: SidebarItem; isOpen: boole
 
 const mainMenuItems: SidebarItem[] = [
     { name: 'Dashboard', Icon: House, href: route('dashboard') },
-    { name: 'Pelanggan', Icon: Users, href: route('customers.index') },
+    { name: 'Pelanggan', Icon: UsersThree, href: route('customers.index') },
     { name: 'Tagihan', Icon: FileText, href: route('invoices.index') },
     { name: 'Arus Kas', Icon: CurrencyDollar, href: route('cashflows.index') },
 ];

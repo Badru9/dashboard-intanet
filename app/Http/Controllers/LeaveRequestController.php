@@ -61,15 +61,10 @@ class LeaveRequestController extends Controller
                 $query->where('user_id', Auth::id());
             }
 
-            $leaveRequests = $query->orderBy('created_at', 'desc')
+            $leaveRequests = $query->orderBy('status', 'asc')->orderBy('created_at', 'desc')
                 ->paginate(10)
-                ->withQueryString();
 
-            Log::info('Leave Request Final Result:', [
-                'total_data' => $leaveRequests->total(),
-                'current_page' => $leaveRequests->currentPage(),
-                'per_page' => $leaveRequests->perPage()
-            ]);
+                ->withQueryString();
 
             $users = User::select('id', 'name')->get();
 
@@ -160,22 +155,13 @@ class LeaveRequestController extends Controller
     public function update(Request $request, LeaveRequest $leaveRequest)
     {
         try {
-            // Only allow user to edit their own leave request or admin
-            if (!Auth::user()->isAdmin() && $leaveRequest->user_id !== Auth::id()) {
-                abort(403, 'Unauthorized action.');
-            }
-
-            // Only allow editing if status is pending
-            if (!$leaveRequest->canBeModified()) {
-                return redirect()->route('leave-requests.index')
-                    ->with('error', 'Pengajuan cuti yang sudah diproses tidak dapat diubah.');
-            }
 
             $validatedData = $request->validate([
-                'leave_type' => ['required', Rule::in(['annual', 'sick', 'maternity', 'paternity', 'emergency', 'unpaid'])],
+                'leave_type' => ['required', Rule::in(['sick', 'permission'])],
                 'start_date' => ['required', 'date', 'after_or_equal:today'],
                 'end_date' => ['required', 'date', 'after_or_equal:start_date'],
                 'reason' => ['required', 'string', 'max:1000'],
+                'status' => ['required', Rule::in(['approved', 'rejected'])],
                 'attachment' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
             ]);
 
@@ -192,6 +178,11 @@ class LeaveRequestController extends Controller
                 }
                 $validatedData['attachment'] = $request->file('attachment')->store('leave_attachments', 'public');
             }
+
+            Log::info('Updating Leave Request:', [
+                'leave_request_id' => $leaveRequest->id,
+                'validated_data' => $validatedData,
+            ]);
 
             $leaveRequest->update($validatedData);
 
@@ -233,7 +224,11 @@ class LeaveRequestController extends Controller
                 Storage::disk('public')->delete($leaveRequest->attachment);
             }
 
-            $leaveRequest->delete();
+            Log::info('Deleting Leave Request:', [
+                'leave_request_id' => $leaveRequest->id,
+            ]);
+
+            $leaveRequest->update(['deleted_at' => now()]);
 
             return redirect()->route('leave-requests.index')
                 ->with('success', 'Pengajuan cuti berhasil dihapus.');
@@ -434,6 +429,7 @@ class LeaveRequestController extends Controller
 
     /**
      * Calculate business days between two dates.
+     * Business days are Monday to Saturday (excluding Sunday only).
      */
     private function calculateBusinessDays(Carbon $startDate, Carbon $endDate)
     {
@@ -441,7 +437,7 @@ class LeaveRequestController extends Controller
         $current = $startDate->copy();
 
         while ($current->lte($endDate)) {
-            if ($current->isWeekday()) {
+            if (!$current->isSunday()) {
                 $totalDays++;
             }
             $current->addDay();

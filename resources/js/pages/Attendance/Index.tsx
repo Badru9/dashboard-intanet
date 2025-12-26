@@ -6,7 +6,7 @@ import { type TableColumn } from '@/types/table';
 // Impor komponen Select dari @heroui/react
 import { Button, Chip, Input, Modal, ModalBody, ModalContent, ModalHeader, Select, SelectItem, useDisclosure } from '@heroui/react';
 import { Head, router, usePage } from '@inertiajs/react';
-import { Camera, MagnifyingGlass, PencilSimple, Plus, Trash } from '@phosphor-icons/react';
+import { Camera, MagnifyingGlass } from '@phosphor-icons/react';
 import moment from 'moment';
 import 'moment-timezone'; // Pastikan moment-timezone ter-import
 import { useState } from 'react';
@@ -84,8 +84,8 @@ export default function AttendancesIndex() {
         { key: 'ABSENT', label: 'Tidak Hadir' },
         { key: 'LEAVE', label: 'Cuti' },
         { key: 'SICK', label: 'Sakit' },
-        { key: 'HALF_DAY', label: 'Setengah Hari' },
-        { key: 'LATE', label: 'Terlambat' },
+        // { key: 'HALF_DAY', label: 'Setengah Hari' },
+        // { key: 'LATE', label: 'Terlambat' },
     ];
 
     const handleEdit = (attendance: Attendance) => {
@@ -217,29 +217,29 @@ export default function AttendancesIndex() {
                 return <Chip color={color}>{statusText}</Chip>;
             },
         },
-        {
-            header: 'Catatan',
-            value: (attendance: Attendance) => <p className="text-gray-600 dark:text-gray-300">{attendance.notes || '-'}</p>,
-        },
-        {
-            header: 'Aksi',
-            value: (attendance: Attendance) => (
-                <div className="flex items-center gap-2">
-                    <button
-                        onClick={() => handleEdit(attendance)}
-                        className="cursor-pointer rounded-lg p-2 text-yellow-400 transition-colors hover:bg-yellow-400 hover:text-white"
-                    >
-                        <PencilSimple className="h-4 w-4" />
-                    </button>
-                    <button
-                        onClick={() => handleDelete(attendance)}
-                        className="cursor-pointer rounded-lg p-2 text-red-600 transition-colors hover:bg-red-600 hover:text-white"
-                    >
-                        <Trash className="h-4 w-4" />
-                    </button>
-                </div>
-            ),
-        },
+        // {
+        //     header: 'Catatan',
+        //     value: (attendance: Attendance) => <p className="text-gray-600 dark:text-gray-300">{attendance.notes || '-'}</p>,
+        // },
+        // {
+        //     header: 'Aksi',
+        //     value: (attendance: Attendance) => (
+        //         <div className="flex items-center gap-2">
+        //             <button
+        //                 onClick={() => handleEdit(attendance)}
+        //                 className="cursor-pointer rounded-lg p-2 text-yellow-400 transition-colors hover:bg-yellow-400 hover:text-white"
+        //             >
+        //                 <PencilSimple className="h-4 w-4" />
+        //             </button>
+        //             <button
+        //                 onClick={() => handleDelete(attendance)}
+        //                 className="cursor-pointer rounded-lg p-2 text-red-600 transition-colors hover:bg-red-600 hover:text-white"
+        //             >
+        //                 <Trash className="h-4 w-4" />
+        //             </button>
+        //         </div>
+        //     ),
+        // },
     ];
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -294,13 +294,13 @@ export default function AttendancesIndex() {
                             ))}
                         </Select>
                     </div>
-                    {auth.user.is_admin === 1 && (
+                    {/* {auth.user.is_admin === 1 && (
                         <div className="flex w-full justify-center lg:w-1/2 lg:justify-end">
                             <Button onPress={onCreateOpen} color="primary" className="w-full lg:w-fit" startContent={<Plus className="h-5 w-5" />}>
                                 Presensi
                             </Button>
                         </div>
-                    )}
+                    )} */}
                 </div>
 
                 <div className="overflow-x-auto">

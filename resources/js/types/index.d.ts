@@ -229,7 +229,7 @@ type Attendance = {
     check_out_time: string | null;
     break_start_time: string | null;
     break_end_time: string | null;
-    status: 'PRESENT' | 'ABSENT' | 'LEAVE' | 'SICK' | 'HALF_DAY' | 'LATE';
+    status: 'PRESENT' | 'ABSENT' | 'LEAVE' | 'SICK';
     notes: string | null;
     location_check_in: string | null;
     location_check_out: string | null;
@@ -244,7 +244,7 @@ export type LeaveRequest = {
     id: number;
     user_id: number;
     user: User;
-    leave_type: 'annual' | 'sick' | 'maternity' | 'paternity' | 'emergency' | 'unpaid';
+    leave_type: 'permission' | 'sick';
     start_date: string;
     end_date: string;
     total_days: number;

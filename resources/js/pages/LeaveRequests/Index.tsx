@@ -6,7 +6,7 @@ import { type LeaveRequest, type PageProps } from '@/types';
 import { type TableColumn } from '@/types/table';
 import { Button, Chip, Input, Modal, ModalContent, ModalHeader, Select, SelectItem, Textarea, useDisclosure } from '@heroui/react';
 import { Head, router, usePage } from '@inertiajs/react';
-import { Check, Clock, File, MagnifyingGlass, PencilSimple, Trash, X } from '@phosphor-icons/react';
+import { Check, Clock, MagnifyingGlass, PencilSimple, Trash, X } from '@phosphor-icons/react';
 import moment from 'moment';
 import { useMemo, useState } from 'react';
 import EditLeaveRequest from './Edit';
@@ -18,12 +18,8 @@ const statusColors = {
 };
 
 const leaveTypeColors = {
-    annual: 'bg-blue-100 text-blue-700',
+    permission: 'bg-blue-100 text-blue-700',
     sick: 'bg-orange-100 text-orange-700',
-    maternity: 'bg-pink-100 text-pink-700',
-    paternity: 'bg-purple-100 text-purple-700',
-    emergency: 'bg-red-100 text-red-700',
-    unpaid: 'bg-gray-100 text-gray-700',
 };
 
 type LeaveRequestPageProps = PageProps &
@@ -168,9 +164,15 @@ export default function LeaveRequestsIndex() {
     };
 
     const renderActions = (leaveRequest: LeaveRequest) => {
-        const canEdit = leaveRequest.status === 'pending' && (auth.user.is_admin === 1 || leaveRequest.user_id === auth.user.id);
-        const canDelete = leaveRequest.status === 'pending' && (auth.user.is_admin === 1 || leaveRequest.user_id === auth.user.id);
+        const canEdit =
+            (leaveRequest.status === 'approved' || leaveRequest.status === 'rejected') &&
+            (auth.user.is_admin === 1 || leaveRequest.user_id === auth.user.id);
+        const canDelete =
+            (leaveRequest.status === 'approved' || leaveRequest.status === 'rejected') &&
+            (auth.user.is_admin === 1 || leaveRequest.user_id === auth.user.id);
         const canApproveReject = auth.user.is_admin === 1 && leaveRequest.status === 'pending';
+
+        console.log(leaveRequest);
 
         return (
             <div className="flex items-center justify-end gap-2">
@@ -197,20 +199,14 @@ export default function LeaveRequestsIndex() {
                     </>
                 )}
                 {canEdit && (
-                    <button
-                        onClick={() => handleEdit(leaveRequest)}
-                        className="cursor-pointer rounded-lg p-2 text-yellow-400 transition-colors hover:bg-yellow-400 hover:text-white"
-                    >
+                    <Button isIconOnly variant="light" color="warning" onPress={() => handleEdit(leaveRequest)}>
                         <PencilSimple className="h-4 w-4" />
-                    </button>
+                    </Button>
                 )}
                 {canDelete && (
-                    <button
-                        onClick={() => handleDelete(leaveRequest)}
-                        className="cursor-pointer rounded-lg p-2 text-red-600 transition-colors hover:bg-red-600 hover:text-white"
-                    >
+                    <Button isIconOnly variant="light" color="danger" onPress={() => handleDelete(leaveRequest)}>
                         <Trash className="h-4 w-4" />
-                    </button>
+                    </Button>
                 )}
             </div>
         );
@@ -270,23 +266,23 @@ export default function LeaveRequestsIndex() {
                 </div>
             ),
         },
-        {
-            header: 'Lampiran',
-            value: (leaveRequest: LeaveRequest) =>
-                leaveRequest.attachment ? (
-                    <a
-                        href={`/storage/${leaveRequest.attachment}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800"
-                    >
-                        <File className="h-4 w-4" />
-                        <span className="text-sm">Lihat</span>
-                    </a>
-                ) : (
-                    <span className="text-gray-400">-</span>
-                ),
-        },
+        // {
+        //     header: 'Lampiran',
+        //     value: (leaveRequest: LeaveRequest) =>
+        //         leaveRequest.attachment ? (
+        //             <a
+        //                 href={`/storage/${leaveRequest.attachment}`}
+        //                 target="_blank"
+        //                 rel="noopener noreferrer"
+        //                 className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800"
+        //             >
+        //                 <File className="h-4 w-4" />
+        //                 <span className="text-sm">Lihat</span>
+        //             </a>
+        //         ) : (
+        //             <span className="text-gray-400">-</span>
+        //         ),
+        // },
         {
             header: 'Status',
             value: (leaveRequest: LeaveRequest) => (

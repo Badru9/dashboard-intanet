@@ -19,7 +19,7 @@ createInertiaApp({
 
         root.render(
             <HeroUIProvider>
-                <ToastProvider />
+                <ToastProvider placement="top-right" toastProps={{ timeout: 2000 }} />
                 <App {...props} />
             </HeroUIProvider>,
         );

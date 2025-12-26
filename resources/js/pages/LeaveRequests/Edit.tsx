@@ -1,6 +1,6 @@
 import { LEAVE_TYPE_OPTIONS } from '@/constants';
 import type { LeaveRequest } from '@/types';
-import { Button, Input, ModalBody, ModalFooter, ModalHeader, Select, SelectItem, Textarea } from '@heroui/react';
+import { Button, Input, ModalBody, ModalFooter, ModalHeader, Radio, RadioGroup, Select, SelectItem, Textarea } from '@heroui/react';
 import { useForm } from '@inertiajs/react';
 import { useState } from 'react';
 
@@ -12,14 +12,25 @@ interface EditLeaveRequestProps {
 export default function EditLeaveRequest({ leaveRequest, onClose }: EditLeaveRequestProps) {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
+    // Helper function to convert date to YYYY-MM-DD format
+    const formatDateForInput = (dateString: string) => {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return '';
+        return date.toISOString().split('T')[0];
+    };
+
     const { data, setData, post, processing, errors, reset } = useForm({
         leave_type: leaveRequest.leave_type || 'annual',
-        start_date: leaveRequest.start_date || '',
-        end_date: leaveRequest.end_date || '',
+        start_date: formatDateForInput(leaveRequest.start_date) || '',
+        end_date: formatDateForInput(leaveRequest.end_date) || '',
         reason: leaveRequest.reason || '',
+        status: leaveRequest.status || '',
         attachment: null as File | null,
         _method: 'PUT',
     });
+
+    console.log('data yang akan diedit', data);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -60,7 +71,7 @@ export default function EditLeaveRequest({ leaveRequest, onClose }: EditLeaveReq
         <>
             <ModalHeader>
                 <div>
-                    <h3 className="text-lg font-semibold">Edit Pengajuan Cuti</h3>
+                    {/* <h3 className="text-lg font-semibold">Edit Pengajuan Cuti</h3> */}
                     <p className="text-sm text-gray-500">
                         {leaveRequest.user.name} - {getLeaveTypeLabel(leaveRequest.leave_type)}
                     </p>
@@ -75,7 +86,7 @@ export default function EditLeaveRequest({ leaveRequest, onClose }: EditLeaveReq
                             selectedKeys={[data.leave_type]}
                             onSelectionChange={(keys) => {
                                 const selected = Array.from(keys)[0] as string;
-                                setData('leave_type', selected as 'annual' | 'sick' | 'maternity' | 'paternity' | 'emergency' | 'unpaid');
+                                setData('leave_type', selected as 'sick' | 'permission');
                             }}
                             isInvalid={!!errors.leave_type}
                             errorMessage={errors.leave_type}
@@ -91,7 +102,10 @@ export default function EditLeaveRequest({ leaveRequest, onClose }: EditLeaveReq
                                 type="date"
                                 label="Tanggal Mulai"
                                 value={data.start_date}
-                                onChange={(e) => setData('start_date', e.target.value)}
+                                onChange={(e) => {
+                                    setData('start_date', e.target.value);
+                                    console.log(e.target.value);
+                                }}
                                 isInvalid={!!errors.start_date}
                                 errorMessage={errors.start_date}
                                 isRequired
@@ -117,6 +131,20 @@ export default function EditLeaveRequest({ leaveRequest, onClose }: EditLeaveReq
                             maxLength={1000}
                             isRequired
                         />
+
+                        <RadioGroup
+                            label="Status Persetujuan"
+                            orientation="horizontal"
+                            value={data.status}
+                            onChange={(e) => setData('status', e.target.value as 'approved' | 'rejected')}
+                        >
+                            <Radio value="approved" color="success">
+                                Setujui
+                            </Radio>
+                            <Radio value="rejected" color="danger">
+                                Tolak
+                            </Radio>
+                        </RadioGroup>
 
                         <div>
                             <label className="mb-2 block text-sm font-medium text-gray-700">Lampiran</label>
